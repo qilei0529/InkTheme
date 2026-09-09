@@ -26,6 +26,47 @@ struct InkThemeTests {
         #expect(InkPalette.resolved(appearance: .system, system: .light) == .light)
     }
 
+    @Test func appearanceRevealSkipsWhenPaletteUnchanged() {
+        #expect(InkAppearanceTransition.shouldReveal(from: .light, to: .light, system: .dark) == false)
+        #expect(InkAppearanceTransition.shouldReveal(from: .light, to: .system, system: .light) == false)
+        #expect(InkAppearanceTransition.shouldReveal(from: .dark, to: .system, system: .dark) == false)
+        #expect(InkAppearanceTransition.shouldReveal(from: .light, to: .dark, system: .light) == true)
+        #expect(InkAppearanceTransition.shouldReveal(from: .light, to: .system, system: .dark) == true)
+        #expect(InkAppearanceTransition.shouldReveal(from: .system, to: .light, system: .dark) == true)
+    }
+
+    @Test func appearanceRevealCoversWindowFromOrigin() {
+        let bounds = CGRect(x: 0, y: 0, width: 100, height: 100)
+        #expect(InkThemeReveal.coveringRadius(origin: .zero, bounds: bounds) == hypot(100, 100))
+        #expect(InkThemeReveal.coveringRadius(origin: CGPoint(x: 50, y: 50), bounds: bounds) == hypot(50, 50))
+    }
+
+    @Test func blobMotionExpandsTwelvePointsIndependently() {
+        var first = SeededGenerator(seed: 7)
+        var second = SeededGenerator(seed: 99)
+        let bounds = CGRect(x: 0, y: 0, width: 200, height: 400)
+        let origin = CGPoint(x: 40, y: 80)
+        let a = InkBlobMotion.random(origin: origin, bounds: bounds, using: &first)
+        let b = InkBlobMotion.random(origin: origin, bounds: bounds, using: &second)
+
+        #expect(a.startRadii.count == InkBlobShape.pointCount)
+        #expect(a.endRadii.count == InkBlobShape.pointCount)
+        #expect(a.durations.count == InkBlobShape.pointCount)
+        #expect(a != b)
+        #expect(a.maxDuration >= a.durations.min() ?? 0)
+
+        let atStart = a.radii(at: 0)
+        let atEnd = a.radii(at: a.maxDuration)
+        for index in 0..<InkBlobShape.pointCount {
+            #expect(abs(atStart[index] - a.startRadii[index]) < 0.0001)
+            #expect(abs(atEnd[index] - a.endRadii[index]) < 0.0001)
+            #expect(a.endRadii[index] > a.startRadii[index])
+        }
+
+        let path = InkBlobShape.bezierPath(center: origin, radii: atStart, handleScales: a.handleScales)
+        #expect(path.isEmpty == false)
+    }
+
     @Test func textStylesMatchSpec() {
         #expect(InkTextStyle.display.pointSize == 64)
         #expect(InkTextStyle.display.tracking == 4)
@@ -67,5 +108,14 @@ struct InkThemeTests {
         #expect(InkSheetDetent.large.presentationDetents == [.large])
         #expect(InkSheetDetent.medium.presentationDetents == [.medium])
         #expect(InkSheetDetent.mediumAndLarge.presentationDetents == [.medium, .large])
+    }
+}
+
+private struct SeededGenerator: RandomNumberGenerator {
+    var seed: UInt64
+
+    mutating func next() -> UInt64 {
+        seed = seed &* 6_364_136_223_846_793_005 &+ 1
+        return seed
     }
 }

@@ -30,6 +30,7 @@ From `InkTheme/InkTheme/` into the host app (keep names):
 | --- | --- |
 | `Theme/Ink.swift` | Color/layout tokens, fill/outline + bar buttons, `inkScreen()`, `inkStroke()` |
 | `Theme/InkAppearance.swift` | `InkAppearance` (system / light / dark), `.inkAppearance(_:)` |
+| `Theme/InkAppearanceReveal.swift` | 12-point curved blob; each point expands at its own speed |
 | `Theme/InkText.swift` | `InkTextStyle`, `.inkText(_:)`, `InkSpace` |
 | `Theme/InkNav.swift` | `InkNavBar` — hero title + trailing actions |
 | `Theme/InkList.swift` | `InkListRow`, `InkListCover` — cover + title + caption + bar action |
@@ -92,7 +93,13 @@ struct HostApp: App {
 }
 ```
 
-Call `appearanceStore.select(.dark)` (or `.light` / `.system`) from settings. Read fills from `@Environment(\.inkPalette)`.
+Call `appearanceStore.select(.dark)` (or `.light` / `.system`) from settings. Pass the control’s window-space center as `origin` to expand a 12-point curved blob from that button. Each point has its own end radius and duration so the silhouette changes while it grows. Motion is regenerated on every switch:
+
+```swift
+appearanceStore.select(.dark, origin: buttonCenterInGlobal)
+```
+
+`origin: nil` (the default) switches instantly. Skip the reveal when Reduce Motion is on, or when the resolved ink/paper palette does not change (for example Light while the system is already light). Read fills from `@Environment(\.inkPalette)`.
 
 Do not invent extra dark-mode grays or materials. Dark is a strict ink/paper invert.
 

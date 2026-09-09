@@ -338,12 +338,48 @@ struct DesignSystemPlaygroundView: View {
 
     @ViewBuilder
     private func appearanceButton(_ option: InkAppearance, selected: InkAppearance) -> some View {
-        if selected == option {
-            Button(option.title) { appearanceStore.select(option) }
-                .inkFillButton()
+        AppearanceRevealButton(option: option, isSelected: selected == option) { origin in
+            appearanceStore.select(option, origin: origin)
+        }
+    }
+}
+
+private struct AppearanceRevealButton: View {
+    let option: InkAppearance
+    let isSelected: Bool
+    let onSelect: (CGPoint) -> Void
+    @State private var origin = CGPoint.zero
+
+    var body: some View {
+        Button(option.title) {
+            onSelect(origin)
+        }
+        .modifier(AppearanceOptionStyle(isSelected: isSelected))
+        .background {
+            GeometryReader { proxy in
+                Color.clear
+                    .onAppear { origin = center(in: proxy) }
+                    .onChange(of: proxy.frame(in: .global)) { _, _ in
+                        origin = center(in: proxy)
+                    }
+            }
+        }
+    }
+
+    private func center(in proxy: GeometryProxy) -> CGPoint {
+        let frame = proxy.frame(in: .global)
+        return CGPoint(x: frame.midX, y: frame.midY)
+    }
+}
+
+private struct AppearanceOptionStyle: ViewModifier {
+    var isSelected: Bool
+
+    func body(content: Content) -> some View {
+        if isSelected {
+            content.inkFillButton()
         } else {
-            Button(option.title) { appearanceStore.select(option) }
-                .inkOutlineButton()
+            content.inkOutlineButton()
         }
     }
 }

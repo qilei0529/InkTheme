@@ -11,7 +11,27 @@ final class InkAppearanceStore {
         appearance = InkAppearance(rawValue: raw) ?? .system
     }
 
-    func select(_ appearance: InkAppearance) {
+    func select(_ appearance: InkAppearance, origin: CGPoint? = nil) {
+        guard appearance != self.appearance else { return }
+        guard !InkThemeReveal.inProgress else { return }
+
+        let system = InkAppearanceTransition.currentSystemColorScheme()
+        let shouldReveal = origin != nil
+            && !UIAccessibility.isReduceMotionEnabled
+            && InkAppearanceTransition.shouldReveal(from: self.appearance, to: appearance, system: system)
+
+        let apply = { [self] in
+            commit(appearance)
+        }
+
+        if shouldReveal, let origin {
+            InkThemeReveal.play(from: origin, apply: apply)
+        } else {
+            apply()
+        }
+    }
+
+    private func commit(_ appearance: InkAppearance) {
         self.appearance = appearance
         UserDefaults.standard.set(appearance.rawValue, forKey: InkAppearance.storageKey)
         appearance.applyToOpenWindows()
