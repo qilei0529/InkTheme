@@ -12,6 +12,7 @@ enum Ink {
     static let toggleWidth: CGFloat = 52
     static let toggleHeight: CGFloat = 32
     static let toggleKnobSize: CGFloat = 24
+    static let checkboxSize: CGFloat = 32
 }
 
 struct InkOutlineButtonStyle: ButtonStyle {

@@ -5,6 +5,9 @@ struct DesignSystemPlaygroundView: View {
     @State private var toggleOn = true
     @State private var toggleOff = false
     @State private var toggleDisabled = true
+    @State private var checkboxOn = true
+    @State private var checkboxOff = false
+    @State private var checkboxDisabled = true
     @State private var typewriterKey = 0
     @State private var typedDone = false
     @State private var showListSheet = false
@@ -32,6 +35,7 @@ struct DesignSystemPlaygroundView: View {
                     typingDemo
                     buttons
                     toggles
+                    checkboxes
                     voice
                 }
                 .padding(InkSpace.xl)
@@ -360,6 +364,24 @@ struct DesignSystemPlaygroundView: View {
             Toggle("Disabled", isOn: $toggleDisabled)
                 .inkText(.body)
                 .toggleStyle(.ink)
+                .disabled(true)
+        }
+    }
+
+    private var checkboxes: some View {
+        VStack(alignment: .leading, spacing: InkSpace.md) {
+            sectionTitle("Checkbox")
+            Text("32 square, 12pt wrap. Off is 6% ink with a waiting hook. On fills accent.")
+                .inkText(.body)
+            Toggle("On", isOn: $checkboxOn)
+                .inkText(.body)
+                .toggleStyle(.inkCheckbox)
+            Toggle("Off", isOn: $checkboxOff)
+                .inkText(.body)
+                .toggleStyle(.inkCheckbox)
+            Toggle("Disabled", isOn: $checkboxDisabled)
+                .inkText(.body)
+                .toggleStyle(.inkCheckbox)
                 .disabled(true)
         }
     }
