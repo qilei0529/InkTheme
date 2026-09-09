@@ -1,13 +1,14 @@
 import SwiftUI
 
 struct InkListCover<Content: View>: View {
+    @Environment(\.inkPalette) private var palette
     @ViewBuilder var content: () -> Content
 
     var body: some View {
         ZStack {
-            Ink.paper
             content()
         }
+        .background(palette.paper)
         .frame(width: Ink.listCoverSize, height: Ink.listCoverSize)
         .clipShape(RoundedRectangle(cornerRadius: Ink.cornerRadius, style: .continuous))
         .inkStroke()
@@ -18,6 +19,7 @@ struct InkListRow<Cover: View, Action: View>: View {
     let title: String
     let description: String
     var showsBottomBorder: Bool = true
+    @Environment(\.inkPalette) private var palette
     @ViewBuilder var cover: () -> Cover
     @ViewBuilder var action: () -> Action
 
@@ -42,7 +44,7 @@ struct InkListRow<Cover: View, Action: View>: View {
 
             if showsBottomBorder {
                 Rectangle()
-                    .fill(Ink.ink)
+                    .fill(palette.ink)
                     .frame(height: Ink.borderWidth)
             }
         }

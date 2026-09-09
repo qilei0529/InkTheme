@@ -23,6 +23,7 @@ struct InkSheet<Actions: View, Footer: View, Content: View>: View {
     let title: String
     var detent: InkSheetDetent = .large
     var showsDragIndicator: Bool = true
+    @Environment(\.inkPalette) private var palette
     @ViewBuilder var actions: () -> Actions
     @ViewBuilder var footer: () -> Footer
     @ViewBuilder var content: () -> Content
@@ -34,7 +35,7 @@ struct InkSheet<Actions: View, Footer: View, Content: View>: View {
             .presentationDetents(detent.presentationDetents)
             .presentationDragIndicator(showsDragIndicator ? .visible : .hidden)
             .presentationCornerRadius(Ink.sheetCornerRadius)
-            .presentationBackground(Ink.paper)
+            .presentationBackground(palette.paper)
     }
 
     private var floatsAboveScreenEdge: Bool {
@@ -132,14 +133,24 @@ struct InkSheetList<Content: View>: View {
 
 extension View {
     func inkSheetListRow() -> some View {
-        listRowInsets(EdgeInsets())
+        modifier(InkSheetListRowModifier())
+    }
+}
+
+private struct InkSheetListRowModifier: ViewModifier {
+    @Environment(\.inkPalette) private var palette
+
+    func body(content: Content) -> some View {
+        content
+            .listRowInsets(EdgeInsets())
             .listRowSeparator(.hidden)
-            .listRowBackground(Ink.paper)
+            .listRowBackground(Rectangle().fill(palette.paper))
     }
 }
 
 struct InkSheetFooter<Content: View>: View {
     var showsHairline: Bool = true
+    @Environment(\.inkPalette) private var palette
     @ViewBuilder var content: () -> Content
 
     var body: some View {
@@ -148,11 +159,11 @@ struct InkSheetFooter<Content: View>: View {
         }
         .padding(InkSpace.xl)
         .frame(maxWidth: .infinity)
-        .background(Ink.paper)
+        .background(palette.paper)
         .overlay(alignment: .top) {
             if showsHairline {
                 Rectangle()
-                    .fill(Ink.ink)
+                    .fill(palette.ink)
                     .frame(height: Ink.borderWidth)
             }
         }

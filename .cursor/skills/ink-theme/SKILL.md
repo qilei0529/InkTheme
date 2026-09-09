@@ -29,6 +29,7 @@ From `InkTheme/InkTheme/` into the host app (keep names):
 | File | Role |
 | --- | --- |
 | `Theme/Ink.swift` | Color/layout tokens, fill/outline + bar buttons, `inkScreen()`, `inkStroke()` |
+| `Theme/InkAppearance.swift` | `InkAppearance` (system / light / dark), `.inkAppearance(_:)` |
 | `Theme/InkText.swift` | `InkTextStyle`, `.inkText(_:)`, `InkSpace` |
 | `Theme/InkNav.swift` | `InkNavBar` — hero title + trailing actions |
 | `Theme/InkList.swift` | `InkListRow`, `InkListCover` — cover + title + caption + bar action |
@@ -44,10 +45,15 @@ Xcode with a synchronized root group picks up new files automatically. Older `.p
 
 ## Color and layout
 
+| Token | Light | Dark |
+| --- | --- | --- |
+| `inkPalette.ink` | black | white |
+| `inkPalette.paper` | white | black |
+
+Read colors from `@Environment(\.inkPalette)` after the host root applies `.inkAppearance`. Do not use `Color.black` / `Color.white` for chrome.
+
 | Token | Value |
 | --- | --- |
-| `Ink.ink` | `Color.black` |
-| `Ink.paper` | `Color.white` |
 | `Ink.buttonHeight` | `44` |
 | `Ink.barButtonHeight` | `32` |
 | `Ink.cornerRadius` | `12` |
@@ -57,7 +63,38 @@ Xcode with a synchronized root group picks up new files automatically. Older `.p
 | `Ink.voiceSize` | `72` |
 | `Ink.listCoverSize` | `48` |
 
-Accent color is black. No brand color, no SF Rounded, no extra palette.
+Accent follows the same invert (black in light, white in dark). No brand color, no SF Rounded, no extra palette.
+
+## Appearance
+
+Three modes, persisted on `InkAppearanceStore` under `ink.appearance`. Default is **system**.
+
+| Mode | Effect |
+| --- | --- |
+| `system` | Follow iOS appearance (`preferredColorScheme` is `nil`) |
+| `light` | Lock black ink on white paper |
+| `dark` | Lock white ink on black paper |
+
+Host apps must hold one `InkAppearanceStore`, put it in the environment, and apply `.inkAppearance` at the `WindowGroup` root so colors invert on tap:
+
+```swift
+@main
+struct HostApp: App {
+    @State private var appearanceStore = InkAppearanceStore()
+
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+                .environment(appearanceStore)
+                .inkAppearance(appearanceStore.appearance)
+        }
+    }
+}
+```
+
+Call `appearanceStore.select(.dark)` (or `.light` / `.system`) from settings. Read fills from `@Environment(\.inkPalette)`.
+
+Do not invent extra dark-mode grays or materials. Dark is a strict ink/paper invert.
 
 ## Type — `.inkText(_:)`
 
@@ -125,7 +162,7 @@ InkSheetList {
         InkListCover {
             Image(systemName: "person.fill")
                 .font(.system(size: 20, weight: .semibold))
-                .foregroundStyle(Ink.ink)
+                .foregroundStyle(palette.ink)
         }
     } action: {
         Button("Start") { }.inkBarFillButton()
@@ -233,6 +270,7 @@ Lists: `InkListRow` + `listRowBackground(Ink.paper)`. Hide system separators whe
 
 ## Verify
 
-- Playground Type, Space, Nav, List, and Sheet sections match the tables above
+- Playground Appearance, Type, Space, Nav, List, and Sheet sections match the tables above
+- Host app root applies `.inkAppearance` (or `.preferredColorScheme`) so Light / Dark / System works
 - Host screens use `.inkText`, `InkSpace`, `InkNavBar`, `InkListRow`, and `InkSheet`, not ad-hoc sizes or system inline titles
 - No remaining `AskTheme` / `askFillButton` / `askOutlineButton` after a migration

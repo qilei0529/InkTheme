@@ -8,6 +8,8 @@ struct DesignSystemPlaygroundView: View {
     @State private var showFormSheet = false
     @State private var showConfirmSheet = false
     @State private var formName = "Alex"
+    @Environment(InkAppearanceStore.self) private var appearanceStore
+    @Environment(\.inkPalette) private var palette
 
     private let sampleEnglish = "Could you stay a bit later to finish the report?"
 
@@ -16,6 +18,7 @@ struct DesignSystemPlaygroundView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: InkSpace.section) {
                     intro
+                    appearanceCatalog
                     typeCatalog
                     spaceCatalog
                     navCatalog
@@ -39,7 +42,7 @@ struct DesignSystemPlaygroundView: View {
                 }
                 .overlay(alignment: .bottom) {
                     Rectangle()
-                        .fill(Ink.ink)
+                        .fill(palette.ink)
                         .frame(height: Ink.borderWidth)
                 }
             }
@@ -57,10 +60,23 @@ struct DesignSystemPlaygroundView: View {
 
     private var intro: some View {
         VStack(alignment: .leading, spacing: InkSpace.sm) {
-            Text("Black / white")
+            Text("Ink / paper")
                 .inkText(.caption)
-            Text("Named type styles and spacing. Buttons are 44 tall with a black stroke.")
+            Text("Named type styles and spacing. Light is black ink on white paper; dark inverts. Buttons are 44 tall with an ink stroke.")
                 .inkText(.body)
+        }
+    }
+
+    private var appearanceCatalog: some View {
+        VStack(alignment: .leading, spacing: InkSpace.md) {
+            sectionTitle("Appearance")
+            Text("Lock Light or Dark, or follow the system.")
+                .inkText(.body)
+            HStack(spacing: InkSpace.md) {
+                ForEach(InkAppearance.allCases) { option in
+                    appearanceButton(option, selected: appearanceStore.appearance)
+                }
+            }
         }
     }
 
@@ -88,7 +104,7 @@ struct DesignSystemPlaygroundView: View {
                 VStack(alignment: .leading, spacing: InkSpace.xxs) {
                     HStack(alignment: .center, spacing: InkSpace.sm) {
                         Rectangle()
-                            .fill(Ink.ink)
+                            .fill(palette.ink)
                             .frame(width: token.value, height: InkSpace.md)
                         Text("\(token.rawValue)  \(Int(token.value))")
                             .inkText(.bodyStrong)
@@ -127,7 +143,7 @@ struct DesignSystemPlaygroundView: View {
                     InkListCover {
                         Image(systemName: "person.fill")
                             .font(.system(size: 20, weight: .semibold))
-                            .foregroundStyle(Ink.ink)
+                            .foregroundStyle(palette.ink)
                     }
                 } action: {
                     Button("Start") {}
@@ -138,7 +154,7 @@ struct DesignSystemPlaygroundView: View {
                     InkListCover {
                         Image(systemName: "person.fill")
                             .font(.system(size: 20, weight: .semibold))
-                            .foregroundStyle(Ink.ink)
+                            .foregroundStyle(palette.ink)
                     }
                 } action: {
                     Button("More", systemImage: "ellipsis") {}
@@ -153,7 +169,7 @@ struct DesignSystemPlaygroundView: View {
                     InkListCover {
                         Image(systemName: "person.fill")
                             .font(.system(size: 20, weight: .semibold))
-                            .foregroundStyle(Ink.ink)
+                            .foregroundStyle(palette.ink)
                     }
                 } action: {
                     Button("Start") {}
@@ -193,7 +209,7 @@ struct DesignSystemPlaygroundView: View {
                         InkListCover {
                             Image(systemName: tutor.symbol)
                                 .font(.system(size: 20, weight: .semibold))
-                                .foregroundStyle(Ink.ink)
+                                .foregroundStyle(palette.ink)
                         }
                     } action: {
                         Button("Start") {}
@@ -319,8 +335,21 @@ struct DesignSystemPlaygroundView: View {
         Text(title.uppercased())
             .inkText(.capital)
     }
+
+    @ViewBuilder
+    private func appearanceButton(_ option: InkAppearance, selected: InkAppearance) -> some View {
+        if selected == option {
+            Button(option.title) { appearanceStore.select(option) }
+                .inkFillButton()
+        } else {
+            Button(option.title) { appearanceStore.select(option) }
+                .inkOutlineButton()
+        }
+    }
 }
 
 #Preview {
     DesignSystemPlaygroundView()
+        .environment(InkAppearanceStore())
+        .inkAppearance(.system)
 }

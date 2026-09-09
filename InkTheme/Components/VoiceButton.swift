@@ -2,6 +2,7 @@ import SwiftUI
 
 struct VoiceButton: View {
     @Binding var isListening: Bool
+    @Environment(\.inkPalette) private var palette
 
     var body: some View {
         Button {
@@ -11,17 +12,17 @@ struct VoiceButton: View {
         } label: {
             ZStack {
                 Circle()
-                    .fill(isListening ? Ink.ink : Ink.paper)
+                    .fill(isListening ? palette.ink : palette.paper)
                     .frame(width: Ink.voiceSize, height: Ink.voiceSize)
                     .overlay {
                         Circle()
-                            .stroke(Ink.ink, lineWidth: Ink.borderWidth)
+                            .stroke(palette.ink, lineWidth: Ink.borderWidth)
                     }
                     .scaleEffect(isListening ? 1.06 : 1)
 
                 Image(systemName: isListening ? "waveform" : "mic")
                     .font(.system(size: 26, weight: .semibold))
-                    .foregroundStyle(isListening ? Ink.paper : Ink.ink)
+                    .foregroundStyle(isListening ? palette.paper : palette.ink)
             }
         }
         .buttonStyle(.plain)

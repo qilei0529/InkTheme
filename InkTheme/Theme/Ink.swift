@@ -1,8 +1,6 @@
 import SwiftUI
 
 enum Ink {
-    static let ink = Color.black
-    static let paper = Color.white
     static let buttonHeight: CGFloat = 44
     static let barButtonHeight: CGFloat = 32
     static let cornerRadius: CGFloat = 12
@@ -15,18 +13,19 @@ enum Ink {
 
 struct InkOutlineButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
+    @Environment(\.inkPalette) private var palette
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(InkTextStyle.bodyStrong.font)
-            .foregroundStyle(Ink.ink.opacity(isEnabled ? 1 : 0.35))
+            .foregroundStyle(palette.ink.opacity(isEnabled ? 1 : 0.35))
             .frame(maxWidth: .infinity, minHeight: Ink.buttonHeight)
             .padding(.horizontal, InkSpace.lg)
-            .background(Ink.paper)
+            .background(palette.paper)
             .clipShape(RoundedRectangle(cornerRadius: Ink.cornerRadius, style: .continuous))
             .overlay {
                 RoundedRectangle(cornerRadius: Ink.cornerRadius, style: .continuous)
-                    .stroke(Ink.ink.opacity(isEnabled ? 1 : 0.25), lineWidth: Ink.borderWidth)
+                    .stroke(palette.ink.opacity(isEnabled ? 1 : 0.25), lineWidth: Ink.borderWidth)
             }
             .opacity(configuration.isPressed ? 0.55 : 1)
     }
@@ -34,14 +33,15 @@ struct InkOutlineButtonStyle: ButtonStyle {
 
 struct InkFillButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
+    @Environment(\.inkPalette) private var palette
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(InkTextStyle.bodyStrong.font)
-            .foregroundStyle(Ink.paper.opacity(isEnabled ? 1 : 0.7))
+            .foregroundStyle(palette.paper.opacity(isEnabled ? 1 : 0.7))
             .frame(maxWidth: .infinity, minHeight: Ink.buttonHeight)
             .padding(.horizontal, InkSpace.lg)
-            .background(Ink.ink.opacity(isEnabled ? 1 : 0.25))
+            .background(palette.ink.opacity(isEnabled ? 1 : 0.25))
             .clipShape(RoundedRectangle(cornerRadius: Ink.cornerRadius, style: .continuous))
             .opacity(configuration.isPressed ? 0.7 : 1)
     }
@@ -49,19 +49,20 @@ struct InkFillButtonStyle: ButtonStyle {
 
 struct InkBarOutlineButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
+    @Environment(\.inkPalette) private var palette
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .labelStyle(.titleAndIcon)
             .font(InkTextStyle.bodyStrong.font)
-            .foregroundStyle(Ink.ink.opacity(isEnabled ? 1 : 0.35))
+            .foregroundStyle(palette.ink.opacity(isEnabled ? 1 : 0.35))
             .frame(minHeight: Ink.barButtonHeight)
             .padding(.horizontal, InkSpace.md)
-            .background(Ink.paper)
+            .background(palette.paper)
             .clipShape(RoundedRectangle(cornerRadius: Ink.cornerRadius, style: .continuous))
             .overlay {
                 RoundedRectangle(cornerRadius: Ink.cornerRadius, style: .continuous)
-                    .stroke(Ink.ink.opacity(isEnabled ? 1 : 0.25), lineWidth: Ink.borderWidth)
+                    .stroke(palette.ink.opacity(isEnabled ? 1 : 0.25), lineWidth: Ink.borderWidth)
             }
             .opacity(configuration.isPressed ? 0.55 : 1)
     }
@@ -69,15 +70,16 @@ struct InkBarOutlineButtonStyle: ButtonStyle {
 
 struct InkBarFillButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
+    @Environment(\.inkPalette) private var palette
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .labelStyle(.titleAndIcon)
             .font(InkTextStyle.bodyStrong.font)
-            .foregroundStyle(Ink.paper.opacity(isEnabled ? 1 : 0.7))
+            .foregroundStyle(palette.paper.opacity(isEnabled ? 1 : 0.7))
             .frame(minHeight: Ink.barButtonHeight)
             .padding(.horizontal, InkSpace.md)
-            .background(Ink.ink.opacity(isEnabled ? 1 : 0.25))
+            .background(palette.ink.opacity(isEnabled ? 1 : 0.25))
             .clipShape(RoundedRectangle(cornerRadius: Ink.cornerRadius, style: .continuous))
             .opacity(configuration.isPressed ? 0.7 : 1)
     }
@@ -85,18 +87,19 @@ struct InkBarFillButtonStyle: ButtonStyle {
 
 struct InkBarIconOutlineButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
+    @Environment(\.inkPalette) private var palette
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .labelStyle(.iconOnly)
             .font(.system(size: 15, weight: .semibold))
-            .foregroundStyle(Ink.ink.opacity(isEnabled ? 1 : 0.35))
+            .foregroundStyle(palette.ink.opacity(isEnabled ? 1 : 0.35))
             .frame(width: Ink.barButtonHeight, height: Ink.barButtonHeight)
-            .background(Ink.paper)
+            .background(palette.paper)
             .clipShape(RoundedRectangle(cornerRadius: Ink.cornerRadius, style: .continuous))
             .overlay {
                 RoundedRectangle(cornerRadius: Ink.cornerRadius, style: .continuous)
-                    .stroke(Ink.ink.opacity(isEnabled ? 1 : 0.25), lineWidth: Ink.borderWidth)
+                    .stroke(palette.ink.opacity(isEnabled ? 1 : 0.25), lineWidth: Ink.borderWidth)
             }
             .opacity(configuration.isPressed ? 0.55 : 1)
     }
@@ -104,14 +107,15 @@ struct InkBarIconOutlineButtonStyle: ButtonStyle {
 
 struct InkBarIconFillButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
+    @Environment(\.inkPalette) private var palette
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .labelStyle(.iconOnly)
             .font(.system(size: 15, weight: .semibold))
-            .foregroundStyle(Ink.paper.opacity(isEnabled ? 1 : 0.7))
+            .foregroundStyle(palette.paper.opacity(isEnabled ? 1 : 0.7))
             .frame(width: Ink.barButtonHeight, height: Ink.barButtonHeight)
-            .background(Ink.ink.opacity(isEnabled ? 1 : 0.25))
+            .background(palette.ink.opacity(isEnabled ? 1 : 0.25))
             .clipShape(RoundedRectangle(cornerRadius: Ink.cornerRadius, style: .continuous))
             .opacity(configuration.isPressed ? 0.7 : 1)
     }
@@ -143,13 +147,30 @@ extension View {
     }
 
     func inkScreen() -> some View {
-        background(Ink.paper.ignoresSafeArea())
+        modifier(InkScreenModifier())
     }
 
     func inkStroke(enabled: Bool = true) -> some View {
-        overlay {
+        modifier(InkStrokeModifier(enabled: enabled))
+    }
+}
+
+private struct InkScreenModifier: ViewModifier {
+    @Environment(\.inkPalette) private var palette
+
+    func body(content: Content) -> some View {
+        content.background(palette.paper, ignoresSafeAreaEdges: .all)
+    }
+}
+
+private struct InkStrokeModifier: ViewModifier {
+    var enabled: Bool
+    @Environment(\.inkPalette) private var palette
+
+    func body(content: Content) -> some View {
+        content.overlay {
             RoundedRectangle(cornerRadius: Ink.cornerRadius, style: .continuous)
-                .strokeBorder(Ink.ink.opacity(enabled ? 1 : 0.2), lineWidth: Ink.borderWidth)
+                .strokeBorder(palette.ink.opacity(enabled ? 1 : 0.2), lineWidth: Ink.borderWidth)
         }
     }
 }

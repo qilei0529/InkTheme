@@ -143,8 +143,18 @@ enum InkSpaceToken: String, CaseIterable, Identifiable {
 
 extension View {
     func inkText(_ style: InkTextStyle) -> some View {
-        font(style.font)
+        modifier(InkTextModifier(style: style))
+    }
+}
+
+private struct InkTextModifier: ViewModifier {
+    var style: InkTextStyle
+    @Environment(\.inkPalette) private var palette
+
+    func body(content: Content) -> some View {
+        content
+            .font(style.font)
             .tracking(style.tracking)
-            .foregroundStyle(Ink.ink.opacity(style.inkOpacity))
+            .foregroundStyle(palette.ink.opacity(style.inkOpacity))
     }
 }

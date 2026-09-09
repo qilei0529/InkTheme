@@ -13,8 +13,17 @@ struct InkThemeTests {
         #expect(Ink.borderWidth == 2)
         #expect(Ink.voiceSize == 72)
         #expect(Ink.listCoverSize == 48)
-        #expect(Ink.ink == Color.black)
-        #expect(Ink.paper == Color.white)
+    }
+
+    @Test func appearanceMapsToColorScheme() {
+        #expect(InkAppearance.system.colorScheme == nil)
+        #expect(InkAppearance.light.colorScheme == .light)
+        #expect(InkAppearance.dark.colorScheme == .dark)
+        #expect(InkAppearance.storageKey == "ink.appearance")
+        #expect(InkPalette.resolved(appearance: .light, system: .dark) == .light)
+        #expect(InkPalette.resolved(appearance: .dark, system: .light) == .dark)
+        #expect(InkPalette.resolved(appearance: .system, system: .dark) == .dark)
+        #expect(InkPalette.resolved(appearance: .system, system: .light) == .light)
     }
 
     @Test func textStylesMatchSpec() {

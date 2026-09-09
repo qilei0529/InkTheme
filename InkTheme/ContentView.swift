@@ -8,4 +8,6 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
+        .environment(InkAppearanceStore())
+        .inkAppearance(.system)
 }

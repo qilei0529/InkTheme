@@ -3,6 +3,7 @@ import SwiftUI
 struct SoundWaveView: View {
     var isActive: Bool
     var barCount: Int = 7
+    @Environment(\.inkPalette) private var palette
 
     var body: some View {
         TimelineView(.animation(minimumInterval: isActive ? 1 / 30 : 1, paused: !isActive)) { timeline in
@@ -10,7 +11,7 @@ struct SoundWaveView: View {
             HStack(alignment: .center, spacing: 5) {
                 ForEach(0..<barCount, id: \.self) { index in
                     Capsule()
-                        .fill(Ink.ink)
+                        .fill(palette.ink)
                         .frame(width: 5, height: barHeight(index: index, time: t))
                 }
             }

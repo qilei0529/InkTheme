@@ -6,13 +6,14 @@ struct TypewriterText: View {
     var charactersPerSecond: Double = 22
     var onFinished: (() -> Void)?
 
+    @Environment(\.inkPalette) private var palette
     @State private var visibleCount = 0
     @State private var runID = UUID()
 
     var body: some View {
         Text(String(text.prefix(visibleCount)))
             .font(font)
-            .foregroundStyle(Ink.ink)
+            .foregroundStyle(palette.ink)
             .frame(maxWidth: .infinity, alignment: .leading)
             .contentTransition(.interpolate)
             .task(id: runID) {

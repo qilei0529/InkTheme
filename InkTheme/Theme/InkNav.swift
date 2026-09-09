@@ -3,6 +3,7 @@ import SwiftUI
 struct InkNavBar<Actions: View>: View {
     let title: String
     var topPadding: CGFloat = InkSpace.sm
+    @Environment(\.inkPalette) private var palette
     @ViewBuilder var actions: () -> Actions
 
     var body: some View {
@@ -20,7 +21,7 @@ struct InkNavBar<Actions: View>: View {
         .padding(.top, topPadding)
         .padding(.bottom, InkSpace.sm)
         .padding(.horizontal, InkSpace.xl)
-        .background(Ink.paper)
+        .background(palette.paper)
     }
 }
 
