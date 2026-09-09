@@ -10,14 +10,15 @@ struct DesignSystemPlaygroundView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 28) {
+                VStack(alignment: .leading, spacing: InkSpace.section) {
                     intro
-                    typeScale
+                    typeCatalog
+                    spaceCatalog
                     typingDemo
                     buttons
                     voice
                 }
-                .padding(20)
+                .padding(InkSpace.xl)
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .inkScreen()
@@ -27,39 +28,55 @@ struct DesignSystemPlaygroundView: View {
     }
 
     private var intro: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: InkSpace.sm) {
             Text("Black / white")
-                .font(Ink.captionFont)
-                .foregroundStyle(Ink.ink.opacity(0.55))
-            Text("Apple system font. Buttons are 44 tall with a black stroke and rounded corners.")
-                .font(Ink.bodyFont)
-                .foregroundStyle(Ink.ink)
+                .inkText(.caption)
+            Text("Named type styles and spacing. Buttons are 44 tall with a black stroke.")
+                .inkText(.body)
         }
     }
 
-    private var typeScale: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            sectionTitle("English, large")
-            Text("INK")
-                .font(.system(size: 64, weight: .bold))
-                .foregroundStyle(Ink.ink)
-                .tracking(4)
-            Text("A colleague asks if you can stay late.")
-                .font(.system(size: 28, weight: .semibold))
-                .foregroundStyle(Ink.ink)
-                .fixedSize(horizontal: false, vertical: true)
+    private var typeCatalog: some View {
+        VStack(alignment: .leading, spacing: InkSpace.md) {
+            sectionTitle("Type")
+            ForEach(InkTextStyle.allCases) { style in
+                VStack(alignment: .leading, spacing: InkSpace.xs) {
+                    Text(style.sample)
+                        .inkText(style)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Text(style.spec)
+                        .inkText(.caption)
+                }
+            }
+        }
+    }
+
+    private var spaceCatalog: some View {
+        VStack(alignment: .leading, spacing: InkSpace.md) {
+            sectionTitle("Space")
+            Text("Label to body uses xs or sm. Sections use section. Screen inset is xl.")
+                .inkText(.body)
+            ForEach(InkSpaceToken.allCases) { token in
+                VStack(alignment: .leading, spacing: InkSpace.xxs) {
+                    HStack(alignment: .center, spacing: InkSpace.sm) {
+                        Rectangle()
+                            .fill(Ink.ink)
+                            .frame(width: token.value, height: InkSpace.md)
+                        Text("\(token.rawValue)  \(Int(token.value))")
+                            .inkText(.bodyStrong)
+                    }
+                    Text(token.usage)
+                        .inkText(.caption)
+                }
+            }
         }
     }
 
     private var typingDemo: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: InkSpace.md) {
             sectionTitle("Typing")
-            TypewriterText(
-                text: sampleEnglish,
-                font: .system(size: 28, weight: .bold),
-                onFinished: { typedDone = true }
-            )
-            .id(typewriterKey)
+            TypewriterText(text: sampleEnglish, onFinished: { typedDone = true })
+                .id(typewriterKey)
 
             Button("Replay typing") {
                 typedDone = false
@@ -69,20 +86,19 @@ struct DesignSystemPlaygroundView: View {
 
             if typedDone {
                 Text("Done.")
-                    .font(Ink.captionFont)
-                    .foregroundStyle(Ink.ink.opacity(0.55))
+                    .inkText(.caption)
             }
         }
     }
 
     private var buttons: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: InkSpace.md) {
             sectionTitle("Black-border buttons")
             Button("Next item") {}
                 .inkFillButton()
             Button("Show grammar hint") {}
                 .inkOutlineButton()
-            HStack(spacing: 12) {
+            HStack(spacing: InkSpace.md) {
                 Button("Yes") {}
                     .inkFillButton()
                 Button("No") {}
@@ -92,15 +108,14 @@ struct DesignSystemPlaygroundView: View {
     }
 
     private var voice: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: InkSpace.lg) {
             sectionTitle("Voice")
-            HStack(spacing: 20) {
+            HStack(spacing: InkSpace.xl) {
                 VoiceButton(isListening: $isListening)
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: InkSpace.xs) {
                     SoundWaveView(isActive: isListening)
                     Text(isListening ? "Listening…" : "Tap the mic.")
-                        .font(Ink.captionFont)
-                        .foregroundStyle(Ink.ink.opacity(0.55))
+                        .inkText(.caption)
                 }
             }
 
@@ -115,9 +130,7 @@ struct DesignSystemPlaygroundView: View {
 
     private func sectionTitle(_ title: String) -> some View {
         Text(title.uppercased())
-            .font(Ink.captionFont.weight(.semibold))
-            .tracking(1.2)
-            .foregroundStyle(Ink.ink.opacity(0.45))
+            .inkText(.capital)
     }
 }
 

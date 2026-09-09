@@ -12,4 +12,40 @@ struct InkThemeTests {
         #expect(Ink.ink == Color.black)
         #expect(Ink.paper == Color.white)
     }
+
+    @Test func textStylesMatchSpec() {
+        #expect(InkTextStyle.display.pointSize == 64)
+        #expect(InkTextStyle.display.tracking == 4)
+        #expect(InkTextStyle.display.inkOpacity == 1)
+
+        #expect(InkTextStyle.displaySmall.pointSize == 48)
+        #expect(InkTextStyle.displaySmall.tracking == 3)
+
+        #expect(InkTextStyle.numeral.pointSize == 56)
+        #expect(InkTextStyle.numeral.tracking == 0)
+
+        #expect(InkTextStyle.hero.pointSize == 28)
+        #expect(InkTextStyle.hero.tracking == 0)
+
+        #expect(InkTextStyle.title.textStyle == .title2)
+        #expect(InkTextStyle.body.textStyle == .body)
+        #expect(InkTextStyle.bodyStrong.textStyle == .body)
+        #expect(InkTextStyle.caption.textStyle == .footnote)
+        #expect(InkTextStyle.caption.inkOpacity == 0.55)
+        #expect(InkTextStyle.caption.tracking == 0)
+
+        #expect(InkTextStyle.capital.textStyle == .footnote)
+        #expect(InkTextStyle.capital.tracking == 1.2)
+        #expect(InkTextStyle.capital.inkOpacity == 0.45)
+    }
+
+    @Test func spaceTokensMatchSpec() {
+        #expect(InkSpace.xxs == 4)
+        #expect(InkSpace.xs == 6)
+        #expect(InkSpace.sm == 8)
+        #expect(InkSpace.md == 12)
+        #expect(InkSpace.lg == 16)
+        #expect(InkSpace.xl == 20)
+        #expect(InkSpace.section == 28)
+    }
 }

@@ -7,11 +7,6 @@ enum Ink {
     static let cornerRadius: CGFloat = 12
     static let borderWidth: CGFloat = 2
     static let voiceSize: CGFloat = 72
-
-    static let displayFont = Font.system(size: 40, weight: .bold, design: .default)
-    static let titleFont = Font.system(.title2, design: .default).weight(.semibold)
-    static let bodyFont = Font.system(.body, design: .default)
-    static let captionFont = Font.system(.footnote, design: .default)
 }
 
 struct InkOutlineButtonStyle: ButtonStyle {
@@ -19,10 +14,10 @@ struct InkOutlineButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(Ink.bodyFont.weight(.semibold))
+            .font(InkTextStyle.bodyStrong.font)
             .foregroundStyle(Ink.ink.opacity(isEnabled ? 1 : 0.35))
             .frame(maxWidth: .infinity, minHeight: Ink.buttonHeight)
-            .padding(.horizontal, 16)
+            .padding(.horizontal, InkSpace.lg)
             .background(Ink.paper)
             .clipShape(RoundedRectangle(cornerRadius: Ink.cornerRadius, style: .continuous))
             .overlay {
@@ -38,10 +33,10 @@ struct InkFillButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(Ink.bodyFont.weight(.semibold))
+            .font(InkTextStyle.bodyStrong.font)
             .foregroundStyle(Ink.paper.opacity(isEnabled ? 1 : 0.7))
             .frame(maxWidth: .infinity, minHeight: Ink.buttonHeight)
-            .padding(.horizontal, 16)
+            .padding(.horizontal, InkSpace.lg)
             .background(Ink.ink.opacity(isEnabled ? 1 : 0.25))
             .clipShape(RoundedRectangle(cornerRadius: Ink.cornerRadius, style: .continuous))
             .opacity(configuration.isPressed ? 0.7 : 1)

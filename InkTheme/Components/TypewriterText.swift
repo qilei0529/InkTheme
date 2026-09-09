@@ -2,7 +2,7 @@ import SwiftUI
 
 struct TypewriterText: View {
     let text: String
-    var font: Font = Ink.displayFont
+    var font: Font = InkTextStyle.hero.font
     var charactersPerSecond: Double = 22
     var onFinished: (() -> Void)?
 
