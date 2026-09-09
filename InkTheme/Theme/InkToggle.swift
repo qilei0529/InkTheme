@@ -7,12 +7,7 @@ struct InkToggleStyle: ToggleStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         Button {
-            let apply = { configuration.isOn.toggle() }
-            if reduceMotion {
-                apply()
-            } else {
-                withAnimation(.easeInOut(duration: 0.2), apply)
-            }
+            configuration.isOn.toggle()
         } label: {
             HStack(spacing: InkSpace.md) {
                 configuration.label
@@ -26,25 +21,23 @@ struct InkToggleStyle: ToggleStyle {
     }
 
     private func capsule(isOn: Bool) -> some View {
-        HStack {
-            if isOn {
-                Spacer(minLength: 0)
-            }
+        let knob = isOn ? Ink.toggleKnobSize + 2 : Ink.toggleKnobSize
+        let inset = (Ink.toggleHeight - knob) / 2
+        return ZStack(alignment: isOn ? .trailing : .leading) {
+            Capsule(style: .continuous)
+                .fill(isOn ? palette.accent : palette.paper)
             Circle()
                 .fill(isOn ? palette.inverse : palette.ink)
-                .frame(width: Ink.toggleKnobSize, height: Ink.toggleKnobSize)
-            if !isOn {
-                Spacer(minLength: 0)
-            }
+                .frame(width: knob, height: knob)
+                .padding(inset)
         }
-        .padding(4)
         .frame(width: Ink.toggleWidth, height: Ink.toggleHeight)
-        .background(isOn ? palette.accent : palette.paper, in: Capsule(style: .continuous))
         .overlay {
             Capsule(style: .continuous)
                 .strokeBorder(palette.ink, lineWidth: Ink.borderWidth)
                 .opacity(isOn ? 0 : 1)
         }
+        .animation(reduceMotion ? nil : .easeInOut(duration: 0.23), value: isOn)
         .accessibilityHidden(true)
     }
 }

@@ -15,7 +15,7 @@ struct InkThemeTests {
         #expect(Ink.listCoverSize == 48)
         #expect(Ink.toggleWidth == 52)
         #expect(Ink.toggleHeight == 32)
-        #expect(Ink.toggleKnobSize == 24)
+        #expect(Ink.toggleKnobSize == 20)
         #expect(Ink.checkboxSize == 32)
         #expect(InkListCoverSize.small.width == 48)
         #expect(InkListCoverSize.small.height == 48)

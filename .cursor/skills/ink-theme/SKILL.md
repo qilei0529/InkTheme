@@ -69,7 +69,7 @@ Read colors from `@Environment(\.inkPalette)` after the host root applies `.inkA
 | `Ink.listCoverSize` | `48` |
 | `Ink.toggleWidth` | `52` |
 | `Ink.toggleHeight` | `32` |
-| `Ink.toggleKnobSize` | `24` |
+| `Ink.toggleKnobSize` | `20` |
 | `Ink.checkboxSize` | `32` |
 
 `ink` inverts with appearance. Light paper is always white. Dark paper follows `InkGround`: black `#000000`, deep red `#1E080B`, deep blue `#000E1F`, deep green `#04180B`. `inverse` is the untinted partner of ink (white in light, black in dark) for fill labels.
