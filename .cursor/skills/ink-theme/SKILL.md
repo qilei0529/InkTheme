@@ -246,7 +246,7 @@ Present with `.sheet { InkSheet(...) }`. Do not use system `.navigationTitle` in
 
 Chrome: **opaque** `.presentationBackground(Ink.paper)` on every detent. iOS 26/27 half sheets default to Liquid Glass (inset, translucent). Do not use `Color.clear`, `.background`, or a missing presentation background — those re-enable glass. No sheet stroke. `.medium` also lifts by `Ink.sheetScreenInset` (20) from the screen bottom. Large stays edge-attached. Visible drag indicator. Header is `InkNavBar` with `topPadding: InkSpace.xl`. Optional `InkSheetFooter`.
 
-Field strokes use `.inkStroke()` (`strokeBorder` so the 2pt line is not clipped).
+Field strokes use `.inkStroke()` (`strokeBorder` so the 2pt line is not clipped). Outline buttons also use `strokeBorder` so they share the same outer size as fill buttons.
 
 Content:
 

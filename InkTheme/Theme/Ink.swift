@@ -29,7 +29,7 @@ struct InkOutlineButtonStyle: ButtonStyle {
             .clipShape(RoundedRectangle(cornerRadius: Ink.cornerRadius, style: .continuous))
             .overlay {
                 RoundedRectangle(cornerRadius: Ink.cornerRadius, style: .continuous)
-                    .stroke(palette.ink.opacity(isEnabled ? 1 : 0.25), lineWidth: Ink.borderWidth)
+                    .strokeBorder(palette.ink.opacity(isEnabled ? 1 : 0.25), lineWidth: Ink.borderWidth)
             }
             .opacity(configuration.isPressed ? 0.55 : 1)
     }
@@ -66,7 +66,7 @@ struct InkBarOutlineButtonStyle: ButtonStyle {
             .clipShape(RoundedRectangle(cornerRadius: Ink.cornerRadius, style: .continuous))
             .overlay {
                 RoundedRectangle(cornerRadius: Ink.cornerRadius, style: .continuous)
-                    .stroke(palette.ink.opacity(isEnabled ? 1 : 0.25), lineWidth: Ink.borderWidth)
+                    .strokeBorder(palette.ink.opacity(isEnabled ? 1 : 0.25), lineWidth: Ink.borderWidth)
             }
             .opacity(configuration.isPressed ? 0.55 : 1)
     }
@@ -103,7 +103,7 @@ struct InkBarIconOutlineButtonStyle: ButtonStyle {
             .clipShape(RoundedRectangle(cornerRadius: Ink.cornerRadius, style: .continuous))
             .overlay {
                 RoundedRectangle(cornerRadius: Ink.cornerRadius, style: .continuous)
-                    .stroke(palette.ink.opacity(isEnabled ? 1 : 0.25), lineWidth: Ink.borderWidth)
+                    .strokeBorder(palette.ink.opacity(isEnabled ? 1 : 0.25), lineWidth: Ink.borderWidth)
             }
             .opacity(configuration.isPressed ? 0.55 : 1)
     }

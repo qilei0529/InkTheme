@@ -42,7 +42,7 @@ struct InkToggleStyle: ToggleStyle {
         .background(isOn ? palette.accent : palette.paper, in: Capsule(style: .continuous))
         .overlay {
             Capsule(style: .continuous)
-                .stroke(palette.ink, lineWidth: Ink.borderWidth)
+                .strokeBorder(palette.ink, lineWidth: Ink.borderWidth)
                 .opacity(isOn ? 0 : 1)
         }
         .accessibilityHidden(true)

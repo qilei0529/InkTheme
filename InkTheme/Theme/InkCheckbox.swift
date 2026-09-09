@@ -62,7 +62,7 @@ private struct InkCheckboxBody: View {
             }
             .overlay {
                 RoundedRectangle(cornerRadius: Ink.cornerRadius, style: .continuous)
-                    .stroke(palette.ink, lineWidth: Ink.borderWidth)
+                    .strokeBorder(palette.ink, lineWidth: Ink.borderWidth)
                     .opacity(isOn ? 0 : 1)
             }
             .accessibilityHidden(true)

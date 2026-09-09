@@ -16,7 +16,7 @@ struct VoiceButton: View {
                     .frame(width: Ink.voiceSize, height: Ink.voiceSize)
                     .overlay {
                         Circle()
-                            .stroke(palette.ink, lineWidth: Ink.borderWidth)
+                            .strokeBorder(palette.ink, lineWidth: Ink.borderWidth)
                     }
                     .scaleEffect(isListening ? 1.06 : 1)
 
