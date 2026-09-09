@@ -116,6 +116,28 @@ struct InkSheetBody<Content: View>: View {
     }
 }
 
+struct InkSheetList<Content: View>: View {
+    @ViewBuilder var content: () -> Content
+
+    var body: some View {
+        List {
+            content()
+        }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .contentMargins(.horizontal, InkSpace.xl, for: .scrollContent)
+        .contentMargins(.vertical, InkSpace.sm, for: .scrollContent)
+    }
+}
+
+extension View {
+    func inkSheetListRow() -> some View {
+        listRowInsets(EdgeInsets())
+            .listRowSeparator(.hidden)
+            .listRowBackground(Ink.paper)
+    }
+}
+
 struct InkSheetFooter<Content: View>: View {
     var showsHairline: Bool = true
     @ViewBuilder var content: () -> Content

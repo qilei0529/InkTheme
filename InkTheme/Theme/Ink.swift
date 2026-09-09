@@ -10,6 +10,7 @@ enum Ink {
     static let sheetScreenInset: CGFloat = 20
     static let borderWidth: CGFloat = 2
     static let voiceSize: CGFloat = 72
+    static let listCoverSize: CGFloat = 48
 }
 
 struct InkOutlineButtonStyle: ButtonStyle {

@@ -12,6 +12,7 @@ struct InkThemeTests {
         #expect(Ink.sheetScreenInset == 20)
         #expect(Ink.borderWidth == 2)
         #expect(Ink.voiceSize == 72)
+        #expect(Ink.listCoverSize == 48)
         #expect(Ink.ink == Color.black)
         #expect(Ink.paper == Color.white)
     }

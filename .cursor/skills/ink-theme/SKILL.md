@@ -5,7 +5,7 @@ description: >-
   repo. Use when building or restyling iOS/SwiftUI screens, migrating
   AnAskBot AskTheme, adding typewriter text, voice/mic buttons, sound
   waves, outlined 44pt buttons, InkNavBar, InkSheet (list/form/confirm),
-  bar fill/outline actions, named type styles (display, hero, body,
+  bar fill/outline actions, InkListRow, named type styles (display, hero, body,
   capital), InkSpace, or when the user mentions Ink, InkTheme, black/white
   UI, or this skill.
 ---
@@ -31,7 +31,8 @@ From `InkTheme/InkTheme/` into the host app (keep names):
 | `Theme/Ink.swift` | Color/layout tokens, fill/outline + bar buttons, `inkScreen()`, `inkStroke()` |
 | `Theme/InkText.swift` | `InkTextStyle`, `.inkText(_:)`, `InkSpace` |
 | `Theme/InkNav.swift` | `InkNavBar` — hero title + trailing actions |
-| `Theme/InkSheet.swift` | `InkSheet`, detents, `InkSheetBody`, `InkSheetFooter` |
+| `Theme/InkList.swift` | `InkListRow`, `InkListCover` — cover + title + caption + bar action |
+| `Theme/InkSheet.swift` | `InkSheet`, detents, `InkSheetBody`, `InkSheetList`, `InkSheetFooter` |
 | `Components/TypewriterText.swift` | Character-by-character English reveal (default `.hero`) |
 | `Components/VoiceButton.swift` | 72pt circular mic |
 | `Components/SoundWaveView.swift` | Idle/active bars |
@@ -54,6 +55,7 @@ Xcode with a synchronized root group picks up new files automatically. Older `.p
 | `Ink.sheetScreenInset` | `20` |
 | `Ink.borderWidth` | `2` |
 | `Ink.voiceSize` | `72` |
+| `Ink.listCoverSize` | `48` |
 
 Accent color is black. No brand color, no SF Rounded, no extra palette.
 
@@ -111,6 +113,29 @@ Icon actions: `Button("Add", systemImage: "plus")` plus an **icon** style (`.ico
 }
 ```
 
+## List
+
+Use `InkListRow` for cover + title + description + trailing action. Cover is `InkListCover` (48pt square, 12pt continuous radius, paper + `.inkStroke()`). Title `bodyStrong`, description `caption`, spacing `xxs`. Trailing actions are **bar** styles (32pt), never 44pt page buttons. Bottom hairline is 2pt ink. Last row: `showsBottomBorder: false`.
+
+In a sheet, wrap rows in `InkSheetList` so they inset with the nav (`xl` sides, `sm` top and bottom). Hide the system separator so it does not double the hairline:
+
+```swift
+InkSheetList {
+    InkListRow(title: "Pat", description: "English · A1") {
+        InkListCover {
+            Image(systemName: "person.fill")
+                .font(.system(size: 20, weight: .semibold))
+                .foregroundStyle(Ink.ink)
+        }
+    } action: {
+        Button("Start") { }.inkBarFillButton()
+    }
+    .inkSheetListRow()
+}
+```
+
+Photos go in `InkListCover` with `.resizable().scaledToFill()`. Do not mix this hairline with `.listRowSeparatorTint`.
+
 ## Sheet
 
 Present with `.sheet { InkSheet(...) }`. Do not use system `.navigationTitle` inside a sheet. Close is `InkSheetCloseButton` (32 square, `xmark`, outline) — caller still owns dismiss.
@@ -127,7 +152,7 @@ Field strokes use `.inkStroke()` (`strokeBorder` so the 2pt line is not clipped)
 
 Content:
 
-- **List:** `.listStyle(.plain)`, `.scrollContentBackground(.hidden)`, `listRowBackground(Ink.paper)`. Row title `bodyStrong`, subtitle `caption`.
+- **List:** `InkSheetList` (horizontal `xl` + vertical `sm` content margins). Rows: `InkListRow` + `InkListCover` + `.inkSheetListRow()`.
 - **Form:** `InkSheetBody` (scroll, `InkSpace.xl` padding and stack). Fields: `.inkText(.body)` + `padding(InkSpace.md)` + `.inkStroke()`. Section labels `.inkText(.capital)`.
 - **Confirm:** no extra scroll; `capital` + `body` with `InkSpace.sm`. Footer: fill primary, outline secondary, spacing `md`.
 
@@ -159,7 +184,7 @@ Content:
 4. Nav text: `.inkBarFillButton()` / `.inkBarOutlineButton()`. Nav icons: `.inkBarIconFillButton()` / `.inkBarIconOutlineButton()` (32 square).
 5. Fields, cards: paper fill + `.inkStroke()`, padding `InkSpace.md`.
 6. Voice: `VoiceButton` + `SoundWaveView(isActive:)`.
-7. Sheets: `InkSheet` + `InkSheetBody` / `InkSheetFooter`. No gray grouped lists.
+7. Sheets: `InkSheet` + `InkSheetBody` / `InkSheetList` / `InkSheetFooter`. Lists: `InkListRow`. No gray grouped lists.
 8. Reveal copy with `TypewriterText` (default hero, 22 cps). Replay by changing `.id`.
 
 ## Do not
@@ -204,10 +229,10 @@ NavigationStack {
 }
 ```
 
-Lists: `listRowBackground(Ink.paper)`, hide default chrome when it fights the black/white stroke language.
+Lists: `InkListRow` + `listRowBackground(Ink.paper)`. Hide system separators when the row draws its own 2pt hairline.
 
 ## Verify
 
-- Playground Type, Space, Nav, and Sheet sections match the tables above
-- Host screens use `.inkText`, `InkSpace`, `InkNavBar`, and `InkSheet`, not ad-hoc sizes or system inline titles
+- Playground Type, Space, Nav, List, and Sheet sections match the tables above
+- Host screens use `.inkText`, `InkSpace`, `InkNavBar`, `InkListRow`, and `InkSheet`, not ad-hoc sizes or system inline titles
 - No remaining `AskTheme` / `askFillButton` / `askOutlineButton` after a migration

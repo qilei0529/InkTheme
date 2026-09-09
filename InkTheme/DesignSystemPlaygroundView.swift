@@ -19,6 +19,7 @@ struct DesignSystemPlaygroundView: View {
                     typeCatalog
                     spaceCatalog
                     navCatalog
+                    listCatalog
                     sheetCatalog
                     typingDemo
                     buttons
@@ -115,6 +116,53 @@ struct DesignSystemPlaygroundView: View {
         }
     }
 
+    private var listCatalog: some View {
+        VStack(alignment: .leading, spacing: InkSpace.md) {
+            sectionTitle("List")
+            Text("Cover, title, caption, and a 32pt bar action. Rows use a 2pt ink hairline. Last row drops the border.")
+                .inkText(.body)
+
+            VStack(spacing: 0) {
+                InkListRow(title: "Pat", description: "English · A1") {
+                    InkListCover {
+                        Image(systemName: "person.fill")
+                            .font(.system(size: 20, weight: .semibold))
+                            .foregroundStyle(Ink.ink)
+                    }
+                } action: {
+                    Button("Start") {}
+                        .inkBarFillButton()
+                }
+
+                InkListRow(title: "Sam", description: "English · A1") {
+                    InkListCover {
+                        Image(systemName: "person.fill")
+                            .font(.system(size: 20, weight: .semibold))
+                            .foregroundStyle(Ink.ink)
+                    }
+                } action: {
+                    Button("More", systemImage: "ellipsis") {}
+                        .inkBarIconOutlineButton()
+                }
+
+                InkListRow(
+                    title: "Riley",
+                    description: "English · A1",
+                    showsBottomBorder: false
+                ) {
+                    InkListCover {
+                        Image(systemName: "person.fill")
+                            .font(.system(size: 20, weight: .semibold))
+                            .foregroundStyle(Ink.ink)
+                    }
+                } action: {
+                    Button("Start") {}
+                        .inkBarFillButton()
+                }
+            }
+        }
+    }
+
     private var sheetCatalog: some View {
         VStack(alignment: .leading, spacing: InkSpace.md) {
             sectionTitle("Sheet")
@@ -135,27 +183,25 @@ struct DesignSystemPlaygroundView: View {
             Button("Add", systemImage: "plus") {}
                 .inkBarIconFillButton()
         } content: {
-            List {
-                ForEach(
-                    [
-                        ("Pat", "English · A1"),
-                        ("Sam", "English · A1"),
-                        ("Riley", "English · A1"),
-                    ],
-                    id: \.0
-                ) { name, detail in
-                    VStack(alignment: .leading, spacing: InkSpace.xxs) {
-                        Text(name)
-                            .inkText(.bodyStrong)
-                        Text(detail)
-                            .inkText(.caption)
+            InkSheetList {
+                ForEach(Array(tutorRows.enumerated()), id: \.element.name) { index, tutor in
+                    InkListRow(
+                        title: tutor.name,
+                        description: tutor.detail,
+                        showsBottomBorder: index < tutorRows.count - 1
+                    ) {
+                        InkListCover {
+                            Image(systemName: tutor.symbol)
+                                .font(.system(size: 20, weight: .semibold))
+                                .foregroundStyle(Ink.ink)
+                        }
+                    } action: {
+                        Button("Start") {}
+                            .inkBarFillButton()
                     }
-                    .listRowBackground(Ink.paper)
-                    .listRowSeparatorTint(Ink.ink.opacity(0.12))
+                    .inkSheetListRow()
                 }
             }
-            .listStyle(.plain)
-            .scrollContentBackground(.hidden)
         }
     }
 
@@ -259,6 +305,14 @@ struct DesignSystemPlaygroundView: View {
             }
             .inkOutlineButton()
         }
+    }
+
+    private var tutorRows: [(name: String, detail: String, symbol: String)] {
+        [
+            ("Pat", "English · A1", "person.fill"),
+            ("Sam", "English · A1", "person.fill"),
+            ("Riley", "English · A1", "person.fill"),
+        ]
     }
 
     private func sectionTitle(_ title: String) -> some View {
