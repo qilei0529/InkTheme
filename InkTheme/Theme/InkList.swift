@@ -1,6 +1,35 @@
 import SwiftUI
 
+enum InkListCoverSize: CaseIterable, Identifiable {
+    case small
+    case medium
+    case large
+
+    var id: Self { self }
+
+    var width: CGFloat {
+        switch self {
+        case .small:
+            Ink.listCoverSize
+        case .medium:
+            Ink.voiceSize
+        case .large:
+            Ink.listCoverSize * 2
+        }
+    }
+
+    var height: CGFloat {
+        switch self {
+        case .small:
+            Ink.listCoverSize
+        case .medium, .large:
+            Ink.voiceSize
+        }
+    }
+}
+
 struct InkListCover<Content: View>: View {
+    var size: InkListCoverSize = .small
     @Environment(\.inkPalette) private var palette
     @ViewBuilder var content: () -> Content
 
@@ -9,7 +38,7 @@ struct InkListCover<Content: View>: View {
             content()
         }
         .background(palette.paper)
-        .frame(width: Ink.listCoverSize, height: Ink.listCoverSize)
+        .frame(width: size.width, height: size.height)
         .clipShape(RoundedRectangle(cornerRadius: Ink.cornerRadius, style: .continuous))
         .inkStroke()
     }

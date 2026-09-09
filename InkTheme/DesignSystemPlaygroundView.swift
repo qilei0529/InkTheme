@@ -175,11 +175,11 @@ struct DesignSystemPlaygroundView: View {
     private var listCatalog: some View {
         VStack(alignment: .leading, spacing: InkSpace.md) {
             sectionTitle("List")
-            Text("Cover, title, caption, and a 32pt bar action. Rows use a 2pt ink hairline. Last row drops the border.")
+            Text("Cover, title, caption, and a 32pt bar action. Small is 48 square, medium 72 square, large 96×72 (4:3). Rows use a 2pt ink hairline. Last row drops the border.")
                 .inkText(.body)
 
             VStack(spacing: 0) {
-                InkListRow(title: "Pat", description: "English · A1") {
+                InkListRow(title: "Small", description: "48 × 48") {
                     InkListCover {
                         Image(systemName: "person.fill")
                             .font(.system(size: 20, weight: .semibold))
@@ -190,10 +190,10 @@ struct DesignSystemPlaygroundView: View {
                         .inkBarFillButton()
                 }
 
-                InkListRow(title: "Sam", description: "English · A1") {
-                    InkListCover {
+                InkListRow(title: "Medium", description: "72 × 72") {
+                    InkListCover(size: .medium) {
                         Image(systemName: "person.fill")
-                            .font(.system(size: 20, weight: .semibold))
+                            .font(.system(size: 28, weight: .semibold))
                             .foregroundStyle(palette.ink)
                     }
                 } action: {
@@ -202,13 +202,13 @@ struct DesignSystemPlaygroundView: View {
                 }
 
                 InkListRow(
-                    title: "Riley",
-                    description: "English · A1",
+                    title: "Large",
+                    description: "96 × 72 · 4:3",
                     showsBottomBorder: false
                 ) {
-                    InkListCover {
+                    InkListCover(size: .large) {
                         Image(systemName: "person.fill")
-                            .font(.system(size: 20, weight: .semibold))
+                            .font(.system(size: 28, weight: .semibold))
                             .foregroundStyle(palette.ink)
                     }
                 } action: {

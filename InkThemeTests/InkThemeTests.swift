@@ -13,6 +13,13 @@ struct InkThemeTests {
         #expect(Ink.borderWidth == 2)
         #expect(Ink.voiceSize == 72)
         #expect(Ink.listCoverSize == 48)
+        #expect(InkListCoverSize.small.width == 48)
+        #expect(InkListCoverSize.small.height == 48)
+        #expect(InkListCoverSize.medium.width == 72)
+        #expect(InkListCoverSize.medium.height == 72)
+        #expect(InkListCoverSize.large.width == 96)
+        #expect(InkListCoverSize.large.height == 72)
+        #expect(InkListCoverSize.large.width / InkListCoverSize.large.height == CGFloat(4) / 3)
     }
 
     @Test func appearanceMapsToColorScheme() {

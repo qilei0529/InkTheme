@@ -201,14 +201,20 @@ Icon actions: `Button("Add", systemImage: "plus")` plus an **icon** style (`.ico
 
 ## List
 
-Use `InkListRow` for cover + title + description + trailing action. Cover is `InkListCover` (48pt square, 12pt continuous radius, paper + `.inkStroke()`). Title `bodyStrong`, description `caption`, spacing `xxs`. Trailing actions are **bar** styles (32pt), never 44pt page buttons. Bottom hairline is 2pt ink. Last row: `showsBottomBorder: false`.
+Use `InkListRow` for cover + title + description + trailing action. Cover is `InkListCover(size:)` (default **small**), 12pt continuous radius, paper + `.inkStroke()`. Title `bodyStrong`, description `caption`, spacing `xxs`. Trailing actions are **bar** styles (32pt), never 44pt page buttons. Bottom hairline is 2pt ink. Last row: `showsBottomBorder: false`.
+
+| Size | Frame |
+| --- | --- |
+| `small` (default) | 48 × 48 |
+| `medium` | 72 × 72 |
+| `large` | 96 × 72 (landscape 4:3) |
 
 In a sheet, wrap rows in `InkSheetList` so they inset with the nav (`xl` sides, `sm` top and bottom). Hide the system separator so it does not double the hairline:
 
 ```swift
 InkSheetList {
     InkListRow(title: "Pat", description: "English · A1") {
-        InkListCover {
+        InkListCover(size: .medium) {
             Image(systemName: "person.fill")
                 .font(.system(size: 20, weight: .semibold))
                 .foregroundStyle(palette.ink)
