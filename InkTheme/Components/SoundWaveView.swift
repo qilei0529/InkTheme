@@ -11,7 +11,7 @@ struct SoundWaveView: View {
             HStack(alignment: .center, spacing: 5) {
                 ForEach(0..<barCount, id: \.self) { index in
                     Capsule()
-                        .fill(palette.ink)
+                        .fill(palette.accent)
                         .frame(width: 5, height: barHeight(index: index, time: t))
                 }
             }

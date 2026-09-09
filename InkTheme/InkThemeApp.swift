@@ -15,7 +15,7 @@ struct InkThemeApp: App {
         WindowGroup {
             ContentView()
                 .environment(appearanceStore)
-                .inkAppearance(appearanceStore.appearance)
+                .inkAppearance(appearanceStore.appearance, accent: appearanceStore.accent)
         }
     }
 }

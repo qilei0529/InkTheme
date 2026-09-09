@@ -29,7 +29,7 @@ From `InkTheme/InkTheme/` into the host app (keep names):
 | File | Role |
 | --- | --- |
 | `Theme/Ink.swift` | Color/layout tokens, fill/outline + bar buttons, `inkScreen()`, `inkStroke()` |
-| `Theme/InkAppearance.swift` | `InkAppearance` (system / light / dark), `.inkAppearance(_:)` |
+| `Theme/InkAppearance.swift` | `InkAppearance` (system / light / dark), `InkAccent` (ink / red / blue / green), `.inkAppearance(_:accent:)` |
 | `Theme/InkAppearanceReveal.swift` | 12-point curved blob; each point expands at its own speed |
 | `Theme/InkText.swift` | `InkTextStyle`, `.inkText(_:)`, `InkSpace` |
 | `Theme/InkNav.swift` | `InkNavBar` — hero title + trailing actions |
@@ -50,6 +50,7 @@ Xcode with a synchronized root group picks up new files automatically. Older `.p
 | --- | --- | --- |
 | `inkPalette.ink` | black | white |
 | `inkPalette.paper` | white | black |
+| `inkPalette.accent` | follows `InkAccent` | same hue for red / blue / green; ink accent inverts with `ink` |
 
 Read colors from `@Environment(\.inkPalette)` after the host root applies `.inkAppearance`. Do not use `Color.black` / `Color.white` for chrome.
 
@@ -64,7 +65,9 @@ Read colors from `@Environment(\.inkPalette)` after the host root applies `.inkA
 | `Ink.voiceSize` | `72` |
 | `Ink.listCoverSize` | `48` |
 
-Accent follows the same invert (black in light, white in dark). No brand color, no SF Rounded, no extra palette.
+`ink` / `paper` are a strict invert. `accent` is a separate axis: default **ink** matches `ink` (black in light, white in dark). Red `#F6465D`, Blue `#0077FF`, and Green `#22C55E` are fixed in both appearances.
+
+Use `accent` for fill button backgrounds, listening `VoiceButton` fill, and `SoundWaveView` bars. Keep `ink` for type, outlines, hairlines, list covers, and typewriter text. No SF Rounded. No extra grays.
 
 ## Appearance
 
@@ -76,7 +79,7 @@ Three modes, persisted on `InkAppearanceStore` under `ink.appearance`. Default i
 | `light` | Lock black ink on white paper |
 | `dark` | Lock white ink on black paper |
 
-Host apps must hold one `InkAppearanceStore`, put it in the environment, and apply `.inkAppearance` at the `WindowGroup` root so colors invert on tap:
+Host apps must hold one `InkAppearanceStore`, put it in the environment, and apply `.inkAppearance` at the `WindowGroup` root so colors invert on tap. Pass `accent` from the same store:
 
 ```swift
 @main
@@ -87,7 +90,7 @@ struct HostApp: App {
         WindowGroup {
             ContentView()
                 .environment(appearanceStore)
-                .inkAppearance(appearanceStore.appearance)
+                .inkAppearance(appearanceStore.appearance, accent: appearanceStore.accent)
         }
     }
 }
@@ -99,7 +102,22 @@ Call `appearanceStore.select(.dark)` (or `.light` / `.system`) from settings. Pa
 appearanceStore.select(.dark, origin: buttonCenterInGlobal)
 ```
 
-`origin: nil` (the default) switches instantly. Skip the reveal when Reduce Motion is on, or when the resolved ink/paper palette does not change (for example Light while the system is already light). Read fills from `@Environment(\.inkPalette)`.
+`origin: nil` (the default) switches instantly. Skip the reveal when Reduce Motion is on, or when the resolved ink/paper palette does not change (for example Light while the system is already light). Accent changes do not play the blob.
+
+## Accent
+
+Four values, persisted on the same `InkAppearanceStore` under `ink.accent`. Default is **ink**. Independent of Light / Dark / System.
+
+| Accent | Effect |
+| --- | --- |
+| `ink` | `palette.accent` equals `palette.ink` |
+| `red` / `blue` / `green` | Fixed hue in both appearances |
+
+```swift
+appearanceStore.selectAccent(.red)
+```
+
+Switch is instant. Read fill from `@Environment(\.inkPalette).accent`.
 
 Do not invent extra dark-mode grays or materials. Dark is a strict ink/paper invert.
 
@@ -277,7 +295,7 @@ Lists: `InkListRow` + `listRowBackground(Ink.paper)`. Hide system separators whe
 
 ## Verify
 
-- Playground Appearance, Type, Space, Nav, List, and Sheet sections match the tables above
-- Host app root applies `.inkAppearance` (or `.preferredColorScheme`) so Light / Dark / System works
+- Playground Appearance, Accent, Type, Space, Nav, List, and Sheet sections match the tables above
+- Host app root applies `.inkAppearance(store.appearance, accent: store.accent)` so Light / Dark / System and accent work
 - Host screens use `.inkText`, `InkSpace`, `InkNavBar`, `InkListRow`, and `InkSheet`, not ad-hoc sizes or system inline titles
 - No remaining `AskTheme` / `askFillButton` / `askOutlineButton` after a migration

@@ -41,7 +41,7 @@ struct InkFillButtonStyle: ButtonStyle {
             .foregroundStyle(palette.paper.opacity(isEnabled ? 1 : 0.7))
             .frame(maxWidth: .infinity, minHeight: Ink.buttonHeight)
             .padding(.horizontal, InkSpace.lg)
-            .background(palette.ink.opacity(isEnabled ? 1 : 0.25))
+            .background(palette.accent.opacity(isEnabled ? 1 : 0.25))
             .clipShape(RoundedRectangle(cornerRadius: Ink.cornerRadius, style: .continuous))
             .opacity(configuration.isPressed ? 0.7 : 1)
     }
@@ -79,7 +79,7 @@ struct InkBarFillButtonStyle: ButtonStyle {
             .foregroundStyle(palette.paper.opacity(isEnabled ? 1 : 0.7))
             .frame(minHeight: Ink.barButtonHeight)
             .padding(.horizontal, InkSpace.md)
-            .background(palette.ink.opacity(isEnabled ? 1 : 0.25))
+            .background(palette.accent.opacity(isEnabled ? 1 : 0.25))
             .clipShape(RoundedRectangle(cornerRadius: Ink.cornerRadius, style: .continuous))
             .opacity(configuration.isPressed ? 0.7 : 1)
     }
@@ -115,7 +115,7 @@ struct InkBarIconFillButtonStyle: ButtonStyle {
             .font(.system(size: 15, weight: .semibold))
             .foregroundStyle(palette.paper.opacity(isEnabled ? 1 : 0.7))
             .frame(width: Ink.barButtonHeight, height: Ink.barButtonHeight)
-            .background(palette.ink.opacity(isEnabled ? 1 : 0.25))
+            .background(palette.accent.opacity(isEnabled ? 1 : 0.25))
             .clipShape(RoundedRectangle(cornerRadius: Ink.cornerRadius, style: .continuous))
             .opacity(configuration.isPressed ? 0.7 : 1)
     }

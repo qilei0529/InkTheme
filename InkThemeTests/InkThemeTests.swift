@@ -24,6 +24,32 @@ struct InkThemeTests {
         #expect(InkPalette.resolved(appearance: .dark, system: .light) == .dark)
         #expect(InkPalette.resolved(appearance: .system, system: .dark) == .dark)
         #expect(InkPalette.resolved(appearance: .system, system: .light) == .light)
+        #expect(InkPalette.resolved(appearance: .light, accent: .ink, system: .dark) == .light)
+    }
+
+    @Test func accentIsIndependentOfAppearance() {
+        #expect(InkAccent.storageKey == "ink.accent")
+        #expect(InkAccent.allCases.map(\.rawValue) == ["ink", "red", "blue", "green"])
+
+        let lightInk = InkPalette.resolved(appearance: .light, accent: .ink, system: .dark)
+        let darkInk = InkPalette.resolved(appearance: .dark, accent: .ink, system: .light)
+        #expect(lightInk.accent == lightInk.ink)
+        #expect(darkInk.accent == darkInk.ink)
+
+        let lightRed = InkPalette.resolved(appearance: .light, accent: .red, system: .light)
+        let darkRed = InkPalette.resolved(appearance: .dark, accent: .red, system: .dark)
+        #expect(lightRed.ink == .black)
+        #expect(lightRed.paper == .white)
+        #expect(darkRed.ink == .white)
+        #expect(darkRed.paper == .black)
+        #expect(lightRed.accent == darkRed.accent)
+        #expect(lightRed.accent != lightRed.ink)
+
+        let lightBlue = InkPalette.resolved(appearance: .light, accent: .blue, system: .dark)
+        let darkBlue = InkPalette.resolved(appearance: .dark, accent: .blue, system: .light)
+        #expect(lightBlue.accent == darkBlue.accent)
+        #expect(lightBlue.paper == .white)
+        #expect(darkBlue.paper == .black)
     }
 
     @Test func appearanceRevealSkipsWhenPaletteUnchanged() {

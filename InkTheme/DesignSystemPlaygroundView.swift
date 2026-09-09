@@ -19,6 +19,7 @@ struct DesignSystemPlaygroundView: View {
                 VStack(alignment: .leading, spacing: InkSpace.section) {
                     intro
                     appearanceCatalog
+                    accentCatalog
                     typeCatalog
                     spaceCatalog
                     navCatalog
@@ -62,7 +63,7 @@ struct DesignSystemPlaygroundView: View {
         VStack(alignment: .leading, spacing: InkSpace.sm) {
             Text("Ink / paper")
                 .inkText(.caption)
-            Text("Named type styles and spacing. Light is black ink on white paper; dark inverts. Buttons are 44 tall with an ink stroke.")
+            Text("Named type styles and spacing. Light is black ink on white paper; dark inverts. Fill buttons, listening mic, and waves use accent — independent of Light / Dark.")
                 .inkText(.body)
         }
     }
@@ -75,6 +76,19 @@ struct DesignSystemPlaygroundView: View {
             HStack(spacing: InkSpace.md) {
                 ForEach(InkAppearance.allCases) { option in
                     appearanceButton(option, selected: appearanceStore.appearance)
+                }
+            }
+        }
+    }
+
+    private var accentCatalog: some View {
+        VStack(alignment: .leading, spacing: InkSpace.md) {
+            sectionTitle("Accent")
+            Text("Ink follows appearance. Red, Blue, and Green stay the same in Light and Dark.")
+                .inkText(.body)
+            HStack(spacing: InkSpace.md) {
+                ForEach(InkAccent.allCases) { option in
+                    accentSwatch(option, selected: appearanceStore.accent)
                 }
             }
         }
@@ -342,6 +356,26 @@ struct DesignSystemPlaygroundView: View {
             appearanceStore.select(option, origin: origin)
         }
     }
+
+    private func accentSwatch(_ option: InkAccent, selected: InkAccent) -> some View {
+        let isSelected = selected == option
+        return Button {
+            appearanceStore.selectAccent(option)
+        } label: {
+            RoundedRectangle(cornerRadius: Ink.cornerRadius, style: .continuous)
+                .fill(option.resolved(against: palette.ink))
+                .frame(width: Ink.barButtonHeight, height: Ink.barButtonHeight)
+                .padding(4)
+                .overlay {
+                    RoundedRectangle(cornerRadius: Ink.cornerRadius + 2, style: .continuous)
+                        .stroke(palette.ink, lineWidth: Ink.borderWidth)
+                        .opacity(isSelected ? 1 : 0)
+                }
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(option.title)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
 }
 
 private struct AppearanceRevealButton: View {
@@ -387,5 +421,5 @@ private struct AppearanceOptionStyle: ViewModifier {
 #Preview {
     DesignSystemPlaygroundView()
         .environment(InkAppearanceStore())
-        .inkAppearance(.system)
+        .inkAppearance(.system, accent: .ink)
 }

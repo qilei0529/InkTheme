@@ -12,7 +12,7 @@ struct VoiceButton: View {
         } label: {
             ZStack {
                 Circle()
-                    .fill(isListening ? palette.ink : palette.paper)
+                    .fill(isListening ? palette.accent : palette.paper)
                     .frame(width: Ink.voiceSize, height: Ink.voiceSize)
                     .overlay {
                         Circle()
