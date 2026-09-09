@@ -4,9 +4,9 @@ description: >-
   Applies the Ink black-and-white SwiftUI design system from the InkTheme
   repo. Use when building or restyling iOS/SwiftUI screens, migrating
   AnAskBot AskTheme, adding typewriter text, voice/mic buttons, sound
-  waves, outlined 44pt buttons, named type styles (display, hero, body,
-  capital), InkSpace, or when the user mentions Ink, InkTheme, black/white
-  UI, or this skill.
+  waves, outlined 44pt buttons, InkNavBar, bar fill/outline actions, named
+  type styles (display, hero, body, capital), InkSpace, or when the user
+  mentions Ink, InkTheme, black/white UI, or this skill.
 ---
 
 # Ink Theme
@@ -27,8 +27,9 @@ From `InkTheme/InkTheme/` into the host app (keep names):
 
 | File | Role |
 | --- | --- |
-| `Theme/Ink.swift` | Color/layout tokens, fill/outline buttons, `inkScreen()`, `inkStroke()` |
+| `Theme/Ink.swift` | Color/layout tokens, fill/outline + bar buttons, `inkScreen()`, `inkStroke()` |
 | `Theme/InkText.swift` | `InkTextStyle`, `.inkText(_:)`, `InkSpace` |
+| `Theme/InkNav.swift` | `InkNavBar` — hero title + trailing actions |
 | `Components/TypewriterText.swift` | Character-by-character English reveal (default `.hero`) |
 | `Components/VoiceButton.swift` | 72pt circular mic |
 | `Components/SoundWaveView.swift` | Idle/active bars |
@@ -45,6 +46,7 @@ Xcode with a synchronized root group picks up new files automatically. Older `.p
 | `Ink.ink` | `Color.black` |
 | `Ink.paper` | `Color.white` |
 | `Ink.buttonHeight` | `44` |
+| `Ink.barButtonHeight` | `32` |
 | `Ink.cornerRadius` | `12` |
 | `Ink.borderWidth` | `2` |
 | `Ink.voiceSize` | `72` |
@@ -60,7 +62,7 @@ Do not use raw `.font(.system(size:))` or leftover `AskTheme.*Font`. Uppercase `
 | `display` | Short brand (INK / ASK) | 64 | bold | 4 | ink |
 | `displaySmall` | Onboarding brand line | 48 | bold | 3 | ink |
 | `numeral` | Score | 56 | bold | 0 | ink |
-| `hero` | English prompt, typewriter | 28 | bold | 0 | ink |
+| `hero` | Nav title, English prompt, typewriter | 28 | bold | 0 | ink |
 | `title` | Empty/page title | title2 (~22) | semibold | 0 | ink |
 | `body` | Paragraph, field, list subtitle | body (~17) | regular | 0 | ink |
 | `bodyStrong` | List title, button label, EN sample | body | semibold | 0 | ink |
@@ -77,26 +79,50 @@ Label to body: `xs` (6) or `sm` (8). Sections: `section` (28). Screen inset: `xl
 | --- | --- | --- |
 | `xxs` | 4 | Title + note in one item |
 | `xs` | 6 | Label to body, wave to caption |
-| `sm` | 8 | Title + subtitle, score + unit |
-| `md` | 12 | Inner stack, field padding, side-by-side buttons |
+| `sm` | 8 | Title + subtitle, score + unit, nav padding |
+| `md` | 12 | Inner stack, field padding, side-by-side buttons, bar button inset |
 | `lg` | 16 | Control rows, loading |
-| `xl` | 20 | Screen inset, main column |
+| `xl` | 20 | Screen inset, main column, nav horizontal inset |
 | `section` | 28 | Playground / major sections |
+
+## Nav
+
+Do not use system `.navigationTitle` + `.inline`. Hide the UIKit bar and pin `InkNavBar` (hero 28, single line, scales down).
+
+| | Page | Bar text | Bar icon |
+| --- | --- | --- | --- |
+| Modifier | `.inkFillButton()` / `.inkOutlineButton()` | `.inkBarFillButton()` / `.inkBarOutlineButton()` | `.inkBarIconFillButton()` / `.inkBarIconOutlineButton()` |
+| Width | Full | Hug | 32 square |
+| Height | 44 | 32 | 32 |
+
+Icon actions: `Button("Add", systemImage: "plus")` plus an **icon** style (`.iconOnly`, 15pt semibold). Do not put a `Label` / `systemImage` title on `.inkBarFillButton()` — that stacks or stretches the 32pt bar. Optional 2pt ink hairline under the bar in playground-style catalogs.
+
+```swift
+.toolbar(.hidden, for: .navigationBar)
+.safeAreaInset(edge: .top) {
+    InkNavBar(title: "Ask") {
+        Button("Close") { }.inkBarOutlineButton()
+        Button("Add", systemImage: "plus") { }.inkBarIconFillButton()
+    }
+}
+```
 
 ## Rules
 
 1. Screen background: `.inkScreen()`.
 2. Text: `.inkText(.body)` (and siblings). Never `.primary` / `.tint` for chrome.
-3. Buttons: `.inkFillButton()` or `.inkOutlineButton()`. Min height 44, continuous corner 12.
-4. Fields, cards: paper fill + `.inkStroke()`, padding `InkSpace.md`.
-5. Voice: `VoiceButton` + `SoundWaveView(isActive:)`.
-6. Reveal copy with `TypewriterText` (default hero, 22 cps). Replay by changing `.id`.
+3. Page buttons: `.inkFillButton()` or `.inkOutlineButton()`. Min height 44.
+4. Nav text: `.inkBarFillButton()` / `.inkBarOutlineButton()`. Nav icons: `.inkBarIconFillButton()` / `.inkBarIconOutlineButton()` (32 square).
+5. Fields, cards: paper fill + `.inkStroke()`, padding `InkSpace.md`.
+6. Voice: `VoiceButton` + `SoundWaveView(isActive:)`.
+7. Reveal copy with `TypewriterText` (default hero, 22 cps). Replay by changing `.id`.
 
 ## Do not
 
 - Add gray fills, shadows, materials, gradients, or colorful SF Symbols tints
 - Use capsule / fully rounded buttons instead of 12pt continuous rects (mic is the only circle)
-- Mix `ButtonStyle` with extra padding that breaks the 44pt height
+- Put full-width 44pt buttons in the nav bar
+- Mix `ButtonStyle` with extra padding that breaks 44 / 32 heights
 - Port AnAskBot product code (`WordHighlighter`, Ask flow, tutors). That is not Ink.
 - Invent extra type sizes (no 40pt display)
 
@@ -122,10 +148,12 @@ NavigationStack {
     }
     .padding(InkSpace.xl)
     .inkScreen()
-}
-.toolbar {
-    ToolbarItem(placement: .principal) {
-        Text("Screen").inkText(.bodyStrong)
+    .toolbar(.hidden, for: .navigationBar)
+    .safeAreaInset(edge: .top) {
+        InkNavBar(title: "Screen") {
+            Button("Skip") { }.inkBarOutlineButton()
+            Button("Save") { }.inkBarFillButton()
+        }
     }
 }
 ```
@@ -134,6 +162,6 @@ Lists: `listRowBackground(Ink.paper)`, hide default chrome when it fights the bl
 
 ## Verify
 
-- Playground Type and Space sections match the tables above
-- Host screens use `.inkText` and `InkSpace`, not ad-hoc sizes
+- Playground Type, Space, and Nav sections match the tables above
+- Host screens use `.inkText`, `InkSpace`, and `InkNavBar`, not ad-hoc sizes or system inline titles
 - No remaining `AskTheme` / `askFillButton` / `askOutlineButton` after a migration

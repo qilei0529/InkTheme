@@ -14,6 +14,7 @@ struct DesignSystemPlaygroundView: View {
                     intro
                     typeCatalog
                     spaceCatalog
+                    navCatalog
                     typingDemo
                     buttons
                     voice
@@ -22,8 +23,20 @@ struct DesignSystemPlaygroundView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .inkScreen()
-            .navigationTitle("Ink")
-            .navigationBarTitleDisplayMode(.inline)
+            .toolbar(.hidden, for: .navigationBar)
+            .safeAreaInset(edge: .top) {
+                InkNavBar(title: "Ink") {
+                    Button("Close") {}
+                        .inkBarOutlineButton()
+                    Button("Add", systemImage: "plus") {}
+                        .inkBarIconFillButton()
+                }
+                .overlay(alignment: .bottom) {
+                    Rectangle()
+                        .fill(Ink.ink)
+                        .frame(height: Ink.borderWidth)
+                }
+            }
         }
     }
 
@@ -68,6 +81,22 @@ struct DesignSystemPlaygroundView: View {
                     Text(token.usage)
                         .inkText(.caption)
                 }
+            }
+        }
+    }
+
+    private var navCatalog: some View {
+        VStack(alignment: .leading, spacing: InkSpace.md) {
+            sectionTitle("Nav")
+            Text("Hero title at 28. Text actions hug at 32; icon actions are a 32 square. Page actions stay 44 and full width.")
+                .inkText(.body)
+            HStack(spacing: InkSpace.sm) {
+                Button("Close") {}
+                    .inkBarOutlineButton()
+                Button("Add", systemImage: "plus") {}
+                    .inkBarIconFillButton()
+                Button("History", systemImage: "list.bullet") {}
+                    .inkBarIconOutlineButton()
             }
         }
     }
