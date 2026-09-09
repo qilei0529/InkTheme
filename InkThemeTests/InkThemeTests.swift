@@ -52,6 +52,46 @@ struct InkThemeTests {
         #expect(darkBlue.paper == .black)
     }
 
+    @Test func groundTintsDarkPaperOnly() {
+        #expect(InkGround.storageKey == "ink.ground")
+        #expect(InkGround.allCases.map(\.rawValue) == ["black", "red", "blue", "green"])
+
+        let lightRedGround = InkPalette.resolved(
+            appearance: .light,
+            ground: .red,
+            system: .dark
+        )
+        #expect(lightRedGround == .light)
+        #expect(lightRedGround.paper == .white)
+        #expect(lightRedGround.inverse == .white)
+
+        let darkBlack = InkPalette.resolved(appearance: .dark, ground: .black, system: .light)
+        #expect(darkBlack == .dark)
+        #expect(darkBlack.inverse == .black)
+
+        let darkRed = InkPalette.resolved(appearance: .dark, ground: .red, system: .light)
+        #expect(darkRed.ink == .white)
+        #expect(darkRed.paper == InkGround.red.color)
+        #expect(darkRed.inverse == .black)
+        #expect(darkRed.paper != darkBlack.paper)
+
+        let systemDarkGreen = InkPalette.resolved(
+            appearance: .system,
+            ground: .green,
+            system: .dark
+        )
+        #expect(systemDarkGreen.paper == InkGround.green.color)
+        #expect(systemDarkGreen.inverse == .black)
+
+        let systemLightGreen = InkPalette.resolved(
+            appearance: .system,
+            ground: .green,
+            system: .light
+        )
+        #expect(systemLightGreen.paper == .white)
+        #expect(systemLightGreen.inverse == .white)
+    }
+
     @Test func appearanceRevealSkipsWhenPaletteUnchanged() {
         #expect(InkAppearanceTransition.shouldReveal(from: .light, to: .light, system: .dark) == false)
         #expect(InkAppearanceTransition.shouldReveal(from: .light, to: .system, system: .light) == false)

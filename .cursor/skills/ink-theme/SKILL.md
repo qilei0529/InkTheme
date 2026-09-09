@@ -29,7 +29,7 @@ From `InkTheme/InkTheme/` into the host app (keep names):
 | File | Role |
 | --- | --- |
 | `Theme/Ink.swift` | Color/layout tokens, fill/outline + bar buttons, `inkScreen()`, `inkStroke()` |
-| `Theme/InkAppearance.swift` | `InkAppearance` (system / light / dark), `InkAccent` (ink / red / blue / green), `.inkAppearance(_:accent:)` |
+| `Theme/InkAppearance.swift` | `InkAppearance` (system / light / dark), `InkAccent`, `InkGround` (dark paper), `.inkAppearance(_:accent:ground:)` |
 | `Theme/InkAppearanceReveal.swift` | 12-point curved blob; each point expands at its own speed |
 | `Theme/InkText.swift` | `InkTextStyle`, `.inkText(_:)`, `InkSpace` |
 | `Theme/InkNav.swift` | `InkNavBar` — hero title + trailing actions |
@@ -49,8 +49,9 @@ Xcode with a synchronized root group picks up new files automatically. Older `.p
 | Token | Light | Dark |
 | --- | --- | --- |
 | `inkPalette.ink` | black | white |
-| `inkPalette.paper` | white | black |
+| `inkPalette.paper` | white | `InkGround` (default black) |
 | `inkPalette.accent` | follows `InkAccent` | same hue for red / blue / green; ink accent inverts with `ink` |
+| `inkPalette.inverse` | white | black |
 
 Read colors from `@Environment(\.inkPalette)` after the host root applies `.inkAppearance`. Do not use `Color.black` / `Color.white` for chrome.
 
@@ -65,9 +66,11 @@ Read colors from `@Environment(\.inkPalette)` after the host root applies `.inkA
 | `Ink.voiceSize` | `72` |
 | `Ink.listCoverSize` | `48` |
 
-`ink` / `paper` are a strict invert. `accent` is a separate axis: default **ink** matches `ink` (black in light, white in dark). Red `#F6465D`, Blue `#0077FF`, and Green `#22C55E` are fixed in both appearances.
+`ink` inverts with appearance. Light paper is always white. Dark paper follows `InkGround`: black `#000000`, deep red `#1E080B`, deep blue `#000E1F`, deep green `#04180B`. `inverse` is the untinted partner of ink (white in light, black in dark) for fill labels.
 
-Use `accent` for fill button backgrounds, listening `VoiceButton` fill, and `SoundWaveView` bars. Keep `ink` for type, outlines, hairlines, list covers, and typewriter text. No SF Rounded. No extra grays.
+`accent` is a separate axis: default **ink** matches `ink`. Red `#F6465D`, Blue `#0077FF`, and Green `#22C55E` are fixed in both appearances.
+
+Use `accent` for fill button backgrounds, listening `VoiceButton` fill, and `SoundWaveView` bars. Use `inverse` for fill button labels and the listening mic icon. Keep `ink` for type, outlines, hairlines, list covers, and typewriter text. Use `paper` for screens, nav, sheets, outline fills. No SF Rounded. No extra grays.
 
 ## Appearance
 
@@ -77,9 +80,9 @@ Three modes, persisted on `InkAppearanceStore` under `ink.appearance`. Default i
 | --- | --- |
 | `system` | Follow iOS appearance (`preferredColorScheme` is `nil`) |
 | `light` | Lock black ink on white paper |
-| `dark` | Lock white ink on black paper |
+| `dark` | Lock white ink; paper follows `InkGround` |
 
-Host apps must hold one `InkAppearanceStore`, put it in the environment, and apply `.inkAppearance` at the `WindowGroup` root so colors invert on tap. Pass `accent` from the same store:
+Host apps must hold one `InkAppearanceStore`, put it in the environment, and apply `.inkAppearance` at the `WindowGroup` root so colors invert on tap. Pass `accent` and `ground` from the same store:
 
 ```swift
 @main
@@ -90,7 +93,11 @@ struct HostApp: App {
         WindowGroup {
             ContentView()
                 .environment(appearanceStore)
-                .inkAppearance(appearanceStore.appearance, accent: appearanceStore.accent)
+                .inkAppearance(
+                    appearanceStore.appearance,
+                    accent: appearanceStore.accent,
+                    ground: appearanceStore.ground
+                )
         }
     }
 }
@@ -102,7 +109,7 @@ Call `appearanceStore.select(.dark)` (or `.light` / `.system`) from settings. Pa
 appearanceStore.select(.dark, origin: buttonCenterInGlobal)
 ```
 
-`origin: nil` (the default) switches instantly. Skip the reveal when Reduce Motion is on, or when the resolved ink/paper palette does not change (for example Light while the system is already light). Accent changes do not play the blob.
+`origin: nil` (the default) switches instantly. Skip the reveal when Reduce Motion is on, or when the resolved ink/paper palette does not change (for example Light while the system is already light). Accent and ground changes do not play the blob.
 
 ## Accent
 
@@ -119,7 +126,24 @@ appearanceStore.selectAccent(.red)
 
 Switch is instant. Read fill from `@Environment(\.inkPalette).accent`.
 
-Do not invent extra dark-mode grays or materials. Dark is a strict ink/paper invert.
+## Ground
+
+Four values, persisted on the same `InkAppearanceStore` under `ink.ground`. Default is **black**. Independent of accent. Light paper stays white.
+
+| Ground | Dark paper |
+| --- | --- |
+| `black` | `#000000` |
+| `red` | `#1E080B` |
+| `blue` | `#000E1F` |
+| `green` | `#04180B` |
+
+```swift
+appearanceStore.selectGround(.red)
+```
+
+Switch is instant. Read screens from `@Environment(\.inkPalette).paper`. Fill labels use `inverse`, not tinted paper.
+
+Do not invent extra dark-mode grays or materials. Dark ink is still white; only paper can be a deep hue.
 
 ## Type — `.inkText(_:)`
 
@@ -295,7 +319,7 @@ Lists: `InkListRow` + `listRowBackground(Ink.paper)`. Hide system separators whe
 
 ## Verify
 
-- Playground Appearance, Accent, Type, Space, Nav, List, and Sheet sections match the tables above
-- Host app root applies `.inkAppearance(store.appearance, accent: store.accent)` so Light / Dark / System and accent work
+- Playground Appearance, Accent, Paper, Type, Space, Nav, List, and Sheet sections match the tables above
+- Host app root applies `.inkAppearance(store.appearance, accent: store.accent, ground: store.ground)` so Light / Dark / System, accent, and dark paper work
 - Host screens use `.inkText`, `InkSpace`, `InkNavBar`, `InkListRow`, and `InkSheet`, not ad-hoc sizes or system inline titles
 - No remaining `AskTheme` / `askFillButton` / `askOutlineButton` after a migration

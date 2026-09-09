@@ -9,5 +9,5 @@ struct ContentView: View {
 #Preview {
     ContentView()
         .environment(InkAppearanceStore())
-        .inkAppearance(.system, accent: .ink)
+        .inkAppearance(.system, accent: .ink, ground: .black)
 }

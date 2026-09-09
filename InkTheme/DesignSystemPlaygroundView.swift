@@ -20,6 +20,7 @@ struct DesignSystemPlaygroundView: View {
                     intro
                     appearanceCatalog
                     accentCatalog
+                    paperCatalog
                     typeCatalog
                     spaceCatalog
                     navCatalog
@@ -63,7 +64,7 @@ struct DesignSystemPlaygroundView: View {
         VStack(alignment: .leading, spacing: InkSpace.sm) {
             Text("Ink / paper")
                 .inkText(.caption)
-            Text("Named type styles and spacing. Light is black ink on white paper; dark inverts. Fill buttons, listening mic, and waves use accent — independent of Light / Dark.")
+            Text("Named type styles and spacing. Light is black ink on white paper; dark inverts. Fill uses accent. Dark paper can be black or a deep hue — Light stays white.")
                 .inkText(.body)
         }
     }
@@ -88,7 +89,32 @@ struct DesignSystemPlaygroundView: View {
                 .inkText(.body)
             HStack(spacing: InkSpace.md) {
                 ForEach(InkAccent.allCases) { option in
-                    accentSwatch(option, selected: appearanceStore.accent)
+                    PaletteSwatchButton(
+                        fill: option.resolved(against: palette.ink),
+                        title: option.title,
+                        isSelected: appearanceStore.accent == option
+                    ) {
+                        appearanceStore.selectAccent(option)
+                    }
+                }
+            }
+        }
+    }
+
+    private var paperCatalog: some View {
+        VStack(alignment: .leading, spacing: InkSpace.md) {
+            sectionTitle("Paper")
+            Text("Dark paper only. Light stays white.")
+                .inkText(.body)
+            HStack(spacing: InkSpace.md) {
+                ForEach(InkGround.allCases) { option in
+                    PaletteSwatchButton(
+                        fill: option.color,
+                        title: option.title,
+                        isSelected: appearanceStore.ground == option
+                    ) {
+                        appearanceStore.selectGround(option)
+                    }
                 }
             }
         }
@@ -356,14 +382,19 @@ struct DesignSystemPlaygroundView: View {
             appearanceStore.select(option, origin: origin)
         }
     }
+}
 
-    private func accentSwatch(_ option: InkAccent, selected: InkAccent) -> some View {
-        let isSelected = selected == option
-        return Button {
-            appearanceStore.selectAccent(option)
-        } label: {
+private struct PaletteSwatchButton: View {
+    var fill: Color
+    var title: String
+    var isSelected: Bool
+    var action: () -> Void
+    @Environment(\.inkPalette) private var palette
+
+    var body: some View {
+        Button(action: action) {
             RoundedRectangle(cornerRadius: Ink.cornerRadius, style: .continuous)
-                .fill(option.resolved(against: palette.ink))
+                .fill(fill)
                 .frame(width: Ink.barButtonHeight, height: Ink.barButtonHeight)
                 .padding(4)
                 .overlay {
@@ -373,7 +404,7 @@ struct DesignSystemPlaygroundView: View {
                 }
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(option.title)
+        .accessibilityLabel(title)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
@@ -421,5 +452,5 @@ private struct AppearanceOptionStyle: ViewModifier {
 #Preview {
     DesignSystemPlaygroundView()
         .environment(InkAppearanceStore())
-        .inkAppearance(.system, accent: .ink)
+        .inkAppearance(.system, accent: .ink, ground: .black)
 }

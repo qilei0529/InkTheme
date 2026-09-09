@@ -6,12 +6,15 @@ import UIKit
 final class InkAppearanceStore {
     var appearance: InkAppearance
     var accent: InkAccent
+    var ground: InkGround
 
     init() {
         let appearanceRaw = UserDefaults.standard.string(forKey: InkAppearance.storageKey) ?? ""
         appearance = InkAppearance(rawValue: appearanceRaw) ?? .system
         let accentRaw = UserDefaults.standard.string(forKey: InkAccent.storageKey) ?? ""
         accent = InkAccent(rawValue: accentRaw) ?? .ink
+        let groundRaw = UserDefaults.standard.string(forKey: InkGround.storageKey) ?? ""
+        ground = InkGround(rawValue: groundRaw) ?? .black
     }
 
     func select(_ appearance: InkAppearance, origin: CGPoint? = nil) {
@@ -38,6 +41,12 @@ final class InkAppearanceStore {
         guard accent != self.accent else { return }
         self.accent = accent
         UserDefaults.standard.set(accent.rawValue, forKey: InkAccent.storageKey)
+    }
+
+    func selectGround(_ ground: InkGround) {
+        guard ground != self.ground else { return }
+        self.ground = ground
+        UserDefaults.standard.set(ground.rawValue, forKey: InkGround.storageKey)
     }
 
     private func commit(_ appearance: InkAppearance) {
@@ -123,28 +132,71 @@ enum InkAccent: String, CaseIterable, Identifiable {
     }
 }
 
+enum InkGround: String, CaseIterable, Identifiable {
+    case black
+    case red
+    case blue
+    case green
+
+    static let storageKey = "ink.ground"
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .black: "Black"
+        case .red: "Red"
+        case .blue: "Blue"
+        case .green: "Green"
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .black:
+            .black
+        case .red:
+            Color(red: 30 / 255, green: 8 / 255, blue: 11 / 255)
+        case .blue:
+            Color(red: 0, green: 14 / 255, blue: 31 / 255)
+        case .green:
+            Color(red: 4 / 255, green: 24 / 255, blue: 11 / 255)
+        }
+    }
+}
+
 struct InkPalette: Equatable {
     var ink: Color
     var paper: Color
     var accent: Color
+    var inverse: Color
 
-    static let light = InkPalette(ink: .black, paper: .white, accent: .black)
-    static let dark = InkPalette(ink: .white, paper: .black, accent: .white)
+    static let light = InkPalette(ink: .black, paper: .white, accent: .black, inverse: .white)
+    static let dark = InkPalette(ink: .white, paper: .black, accent: .white, inverse: .black)
 
     static func resolved(
         appearance: InkAppearance,
         accent: InkAccent = .ink,
+        ground: InkGround = .black,
         system: ColorScheme
     ) -> InkPalette {
-        let base: InkPalette = switch appearance {
+        let isDark: Bool = switch appearance {
         case .light:
-            .light
+            false
         case .dark:
-            .dark
+            true
         case .system:
-            system == .dark ? .dark : .light
+            system == .dark
         }
-        return InkPalette(ink: base.ink, paper: base.paper, accent: accent.resolved(against: base.ink))
+        let ink: Color = isDark ? .white : .black
+        let paper: Color = isDark ? ground.color : .white
+        let inverse: Color = isDark ? .black : .white
+        return InkPalette(
+            ink: ink,
+            paper: paper,
+            accent: accent.resolved(against: ink),
+            inverse: inverse
+        )
     }
 }
 
@@ -160,20 +212,26 @@ extension EnvironmentValues {
 }
 
 extension View {
-    func inkAppearance(_ preference: InkAppearance, accent: InkAccent = .ink) -> some View {
-        modifier(InkAppearanceModifier(preference: preference, accent: accent))
+    func inkAppearance(
+        _ preference: InkAppearance,
+        accent: InkAccent = .ink,
+        ground: InkGround = .black
+    ) -> some View {
+        modifier(InkAppearanceModifier(preference: preference, accent: accent, ground: ground))
     }
 }
 
 private struct InkAppearanceModifier: ViewModifier {
     var preference: InkAppearance
     var accent: InkAccent
+    var ground: InkGround
     @Environment(\.colorScheme) private var systemColorScheme
 
     func body(content: Content) -> some View {
         let palette = InkPalette.resolved(
             appearance: preference,
             accent: accent,
+            ground: ground,
             system: systemColorScheme
         )
         Group {

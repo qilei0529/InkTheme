@@ -22,7 +22,7 @@ struct VoiceButton: View {
 
                 Image(systemName: isListening ? "waveform" : "mic")
                     .font(.system(size: 26, weight: .semibold))
-                    .foregroundStyle(isListening ? palette.paper : palette.ink)
+                    .foregroundStyle(isListening ? palette.inverse : palette.ink)
             }
         }
         .buttonStyle(.plain)

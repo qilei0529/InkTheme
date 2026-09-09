@@ -38,7 +38,7 @@ struct InkFillButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(InkTextStyle.bodyStrong.font)
-            .foregroundStyle(palette.paper.opacity(isEnabled ? 1 : 0.7))
+            .foregroundStyle(palette.inverse.opacity(isEnabled ? 1 : 0.7))
             .frame(maxWidth: .infinity, minHeight: Ink.buttonHeight)
             .padding(.horizontal, InkSpace.lg)
             .background(palette.accent.opacity(isEnabled ? 1 : 0.25))
@@ -76,7 +76,7 @@ struct InkBarFillButtonStyle: ButtonStyle {
         configuration.label
             .labelStyle(.titleAndIcon)
             .font(InkTextStyle.bodyStrong.font)
-            .foregroundStyle(palette.paper.opacity(isEnabled ? 1 : 0.7))
+            .foregroundStyle(palette.inverse.opacity(isEnabled ? 1 : 0.7))
             .frame(minHeight: Ink.barButtonHeight)
             .padding(.horizontal, InkSpace.md)
             .background(palette.accent.opacity(isEnabled ? 1 : 0.25))
@@ -113,7 +113,7 @@ struct InkBarIconFillButtonStyle: ButtonStyle {
         configuration.label
             .labelStyle(.iconOnly)
             .font(.system(size: 15, weight: .semibold))
-            .foregroundStyle(palette.paper.opacity(isEnabled ? 1 : 0.7))
+            .foregroundStyle(palette.inverse.opacity(isEnabled ? 1 : 0.7))
             .frame(width: Ink.barButtonHeight, height: Ink.barButtonHeight)
             .background(palette.accent.opacity(isEnabled ? 1 : 0.25))
             .clipShape(RoundedRectangle(cornerRadius: Ink.cornerRadius, style: .continuous))
