@@ -4,9 +4,10 @@ description: >-
   Applies the Ink black-and-white SwiftUI design system from the InkTheme
   repo. Use when building or restyling iOS/SwiftUI screens, migrating
   AnAskBot AskTheme, adding typewriter text, voice/mic buttons, sound
-  waves, outlined 44pt buttons, InkNavBar, bar fill/outline actions, named
-  type styles (display, hero, body, capital), InkSpace, or when the user
-  mentions Ink, InkTheme, black/white UI, or this skill.
+  waves, outlined 44pt buttons, InkNavBar, InkSheet (list/form/confirm),
+  bar fill/outline actions, named type styles (display, hero, body,
+  capital), InkSpace, or when the user mentions Ink, InkTheme, black/white
+  UI, or this skill.
 ---
 
 # Ink Theme
@@ -30,6 +31,7 @@ From `InkTheme/InkTheme/` into the host app (keep names):
 | `Theme/Ink.swift` | Color/layout tokens, fill/outline + bar buttons, `inkScreen()`, `inkStroke()` |
 | `Theme/InkText.swift` | `InkTextStyle`, `.inkText(_:)`, `InkSpace` |
 | `Theme/InkNav.swift` | `InkNavBar` — hero title + trailing actions |
+| `Theme/InkSheet.swift` | `InkSheet`, detents, `InkSheetBody`, `InkSheetFooter` |
 | `Components/TypewriterText.swift` | Character-by-character English reveal (default `.hero`) |
 | `Components/VoiceButton.swift` | 72pt circular mic |
 | `Components/SoundWaveView.swift` | Idle/active bars |
@@ -48,6 +50,8 @@ Xcode with a synchronized root group picks up new files automatically. Older `.p
 | `Ink.buttonHeight` | `44` |
 | `Ink.barButtonHeight` | `32` |
 | `Ink.cornerRadius` | `12` |
+| `Ink.sheetCornerRadius` | `24` |
+| `Ink.sheetScreenInset` | `20` |
 | `Ink.borderWidth` | `2` |
 | `Ink.voiceSize` | `72` |
 
@@ -107,6 +111,46 @@ Icon actions: `Button("Add", systemImage: "plus")` plus an **icon** style (`.ico
 }
 ```
 
+## Sheet
+
+Present with `.sheet { InkSheet(...) }`. Do not use system `.navigationTitle` inside a sheet. Close is `InkSheetCloseButton` (32 square, `xmark`, outline) — caller still owns dismiss.
+
+| `InkSheetDetent` | Scene |
+| --- | --- |
+| `.large` | List, multi-step form (default) |
+| `.medium` | Short confirm |
+| `.mediumAndLarge` | Starts medium, can expand |
+
+Chrome: **opaque** `.presentationBackground(Ink.paper)` on every detent. iOS 26/27 half sheets default to Liquid Glass (inset, translucent). Do not use `Color.clear`, `.background`, or a missing presentation background — those re-enable glass. No sheet stroke. `.medium` also lifts by `Ink.sheetScreenInset` (20) from the screen bottom. Large stays edge-attached. Visible drag indicator. Header is `InkNavBar` with `topPadding: InkSpace.xl`. Optional `InkSheetFooter`.
+
+Field strokes use `.inkStroke()` (`strokeBorder` so the 2pt line is not clipped).
+
+Content:
+
+- **List:** `.listStyle(.plain)`, `.scrollContentBackground(.hidden)`, `listRowBackground(Ink.paper)`. Row title `bodyStrong`, subtitle `caption`.
+- **Form:** `InkSheetBody` (scroll, `InkSpace.xl` padding and stack). Fields: `.inkText(.body)` + `padding(InkSpace.md)` + `.inkStroke()`. Section labels `.inkText(.capital)`.
+- **Confirm:** no extra scroll; `capital` + `body` with `InkSpace.sm`. Footer: fill primary, outline secondary, spacing `md`.
+
+```swift
+.sheet(isPresented: $showForm) {
+    InkSheet(title: "Edit") {
+        InkSheetCloseButton { showForm = false }
+    } footer: {
+        InkSheetFooter {
+            Button("Save") { showForm = false }.inkFillButton()
+        }
+    } content: {
+        InkSheetBody {
+            Text("NAME").inkText(.capital)
+            TextField("Name", text: $name)
+                .inkText(.body)
+                .padding(InkSpace.md)
+                .inkStroke()
+        }
+    }
+}
+```
+
 ## Rules
 
 1. Screen background: `.inkScreen()`.
@@ -115,7 +159,8 @@ Icon actions: `Button("Add", systemImage: "plus")` plus an **icon** style (`.ico
 4. Nav text: `.inkBarFillButton()` / `.inkBarOutlineButton()`. Nav icons: `.inkBarIconFillButton()` / `.inkBarIconOutlineButton()` (32 square).
 5. Fields, cards: paper fill + `.inkStroke()`, padding `InkSpace.md`.
 6. Voice: `VoiceButton` + `SoundWaveView(isActive:)`.
-7. Reveal copy with `TypewriterText` (default hero, 22 cps). Replay by changing `.id`.
+7. Sheets: `InkSheet` + `InkSheetBody` / `InkSheetFooter`. No gray grouped lists.
+8. Reveal copy with `TypewriterText` (default hero, 22 cps). Replay by changing `.id`.
 
 ## Do not
 
@@ -123,6 +168,7 @@ Icon actions: `Button("Add", systemImage: "plus")` plus an **icon** style (`.ico
 - Use capsule / fully rounded buttons instead of 12pt continuous rects (mic is the only circle)
 - Put full-width 44pt buttons in the nav bar
 - Mix `ButtonStyle` with extra padding that breaks 44 / 32 heights
+- Use inset grouped / gray list chrome in sheets
 - Port AnAskBot product code (`WordHighlighter`, Ask flow, tutors). That is not Ink.
 - Invent extra type sizes (no 40pt display)
 
@@ -162,6 +208,6 @@ Lists: `listRowBackground(Ink.paper)`, hide default chrome when it fights the bl
 
 ## Verify
 
-- Playground Type, Space, and Nav sections match the tables above
-- Host screens use `.inkText`, `InkSpace`, and `InkNavBar`, not ad-hoc sizes or system inline titles
+- Playground Type, Space, Nav, and Sheet sections match the tables above
+- Host screens use `.inkText`, `InkSpace`, `InkNavBar`, and `InkSheet`, not ad-hoc sizes or system inline titles
 - No remaining `AskTheme` / `askFillButton` / `askOutlineButton` after a migration

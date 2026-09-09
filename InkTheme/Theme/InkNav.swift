@@ -2,6 +2,7 @@ import SwiftUI
 
 struct InkNavBar<Actions: View>: View {
     let title: String
+    var topPadding: CGFloat = InkSpace.sm
     @ViewBuilder var actions: () -> Actions
 
     var body: some View {
@@ -16,14 +17,15 @@ struct InkNavBar<Actions: View>: View {
                 actions()
             }
         }
+        .padding(.top, topPadding)
+        .padding(.bottom, InkSpace.sm)
         .padding(.horizontal, InkSpace.xl)
-        .padding(.vertical, InkSpace.sm)
         .background(Ink.paper)
     }
 }
 
 extension InkNavBar where Actions == EmptyView {
-    init(title: String) {
-        self.init(title: title) { EmptyView() }
+    init(title: String, topPadding: CGFloat = InkSpace.sm) {
+        self.init(title: title, topPadding: topPadding) { EmptyView() }
     }
 }

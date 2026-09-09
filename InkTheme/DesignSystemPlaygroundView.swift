@@ -4,6 +4,10 @@ struct DesignSystemPlaygroundView: View {
     @State private var isListening = false
     @State private var typewriterKey = 0
     @State private var typedDone = false
+    @State private var showListSheet = false
+    @State private var showFormSheet = false
+    @State private var showConfirmSheet = false
+    @State private var formName = "Alex"
 
     private let sampleEnglish = "Could you stay a bit later to finish the report?"
 
@@ -15,6 +19,7 @@ struct DesignSystemPlaygroundView: View {
                     typeCatalog
                     spaceCatalog
                     navCatalog
+                    sheetCatalog
                     typingDemo
                     buttons
                     voice
@@ -36,6 +41,15 @@ struct DesignSystemPlaygroundView: View {
                         .fill(Ink.ink)
                         .frame(height: Ink.borderWidth)
                 }
+            }
+            .sheet(isPresented: $showListSheet) {
+                listSheet
+            }
+            .sheet(isPresented: $showFormSheet) {
+                formSheet
+            }
+            .sheet(isPresented: $showConfirmSheet) {
+                confirmSheet
             }
         }
     }
@@ -98,6 +112,96 @@ struct DesignSystemPlaygroundView: View {
                 Button("History", systemImage: "list.bullet") {}
                     .inkBarIconOutlineButton()
             }
+        }
+    }
+
+    private var sheetCatalog: some View {
+        VStack(alignment: .leading, spacing: InkSpace.md) {
+            sectionTitle("Sheet")
+            Text("Opaque paper sheets — no iOS 26 glass. Medium confirm sits 20pt above the screen bottom. Close is a square xmark.")
+                .inkText(.body)
+            Button("List sheet") { showListSheet = true }
+                .inkOutlineButton()
+            Button("Form sheet") { showFormSheet = true }
+                .inkOutlineButton()
+            Button("Confirm sheet") { showConfirmSheet = true }
+                .inkFillButton()
+        }
+    }
+
+    private var listSheet: some View {
+        InkSheet(title: "Tutors") {
+            InkSheetCloseButton { showListSheet = false }
+            Button("Add", systemImage: "plus") {}
+                .inkBarIconFillButton()
+        } content: {
+            List {
+                ForEach(
+                    [
+                        ("Pat", "English · A1"),
+                        ("Sam", "English · A1"),
+                        ("Riley", "English · A1"),
+                    ],
+                    id: \.0
+                ) { name, detail in
+                    VStack(alignment: .leading, spacing: InkSpace.xxs) {
+                        Text(name)
+                            .inkText(.bodyStrong)
+                        Text(detail)
+                            .inkText(.caption)
+                    }
+                    .listRowBackground(Ink.paper)
+                    .listRowSeparatorTint(Ink.ink.opacity(0.12))
+                }
+            }
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
+        }
+    }
+
+    private var formSheet: some View {
+        InkSheet(title: "Edit") {
+            InkSheetCloseButton { showFormSheet = false }
+        } footer: {
+            InkSheetFooter {
+                Button("Save") { showFormSheet = false }
+                    .inkFillButton()
+            }
+        } content: {
+            InkSheetBody {
+                VStack(alignment: .leading, spacing: InkSpace.xs) {
+                    Text("NAME")
+                        .inkText(.capital)
+                    TextField("Name", text: $formName)
+                        .inkText(.body)
+                        .padding(InkSpace.md)
+                        .inkStroke()
+                }
+                Text("Fields sit on paper with a 2pt stroke. Footer holds the full-width 44pt fill action.")
+                    .inkText(.caption)
+            }
+        }
+    }
+
+    private var confirmSheet: some View {
+        InkSheet(title: "Leave", detent: .medium) {
+            InkSheetCloseButton { showConfirmSheet = false }
+        } footer: {
+            InkSheetFooter(showsHairline: false) {
+                Button("Continue") { showConfirmSheet = false }
+                    .inkFillButton()
+                Button("Cancel") { showConfirmSheet = false }
+                    .inkOutlineButton()
+            }
+        } content: {
+            VStack(alignment: .leading, spacing: InkSpace.sm) {
+                Text("DRAFT")
+                    .inkText(.capital)
+                Text("Discard this draft? You can start a new one anytime.")
+                    .inkText(.body)
+            }
+            .padding(InkSpace.xl)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         }
     }
 

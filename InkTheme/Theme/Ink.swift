@@ -6,6 +6,8 @@ enum Ink {
     static let buttonHeight: CGFloat = 44
     static let barButtonHeight: CGFloat = 32
     static let cornerRadius: CGFloat = 12
+    static let sheetCornerRadius: CGFloat = 24
+    static let sheetScreenInset: CGFloat = 20
     static let borderWidth: CGFloat = 2
     static let voiceSize: CGFloat = 72
 }
@@ -146,7 +148,7 @@ extension View {
     func inkStroke(enabled: Bool = true) -> some View {
         overlay {
             RoundedRectangle(cornerRadius: Ink.cornerRadius, style: .continuous)
-                .stroke(Ink.ink.opacity(enabled ? 1 : 0.2), lineWidth: Ink.borderWidth)
+                .strokeBorder(Ink.ink.opacity(enabled ? 1 : 0.2), lineWidth: Ink.borderWidth)
         }
     }
 }

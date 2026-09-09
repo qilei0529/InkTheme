@@ -8,6 +8,8 @@ struct InkThemeTests {
         #expect(Ink.buttonHeight == 44)
         #expect(Ink.barButtonHeight == 32)
         #expect(Ink.cornerRadius == 12)
+        #expect(Ink.sheetCornerRadius == 24)
+        #expect(Ink.sheetScreenInset == 20)
         #expect(Ink.borderWidth == 2)
         #expect(Ink.voiceSize == 72)
         #expect(Ink.ink == Color.black)
@@ -49,5 +51,11 @@ struct InkThemeTests {
         #expect(InkSpace.lg == 16)
         #expect(InkSpace.xl == 20)
         #expect(InkSpace.section == 28)
+    }
+
+    @Test func sheetDetentsMatchSpec() {
+        #expect(InkSheetDetent.large.presentationDetents == [.large])
+        #expect(InkSheetDetent.medium.presentationDetents == [.medium])
+        #expect(InkSheetDetent.mediumAndLarge.presentationDetents == [.medium, .large])
     }
 }
