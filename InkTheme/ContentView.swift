@@ -1,21 +1,8 @@
-//
-//  ContentView.swift
-//  InkTheme
-//
-//  Created by Qilei on 2026/9/9.
-//
-
 import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
-        .padding()
+        DesignSystemPlaygroundView()
     }
 }
 
