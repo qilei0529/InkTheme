@@ -221,6 +221,8 @@ enum InkAppearanceTransition {
     }
 
     static func currentSystemColorScheme() -> ColorScheme {
-        UIScreen.main.traitCollection.userInterfaceStyle == .dark ? .dark : .light
+        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+        let scene = scenes.first { $0.activationState == .foregroundActive } ?? scenes.first
+        return scene?.traitCollection.userInterfaceStyle == .dark ? .dark : .light
     }
 }
