@@ -9,6 +9,9 @@ enum Ink {
     static let borderWidth: CGFloat = 2
     static let voiceSize: CGFloat = 72
     static let listCoverSize: CGFloat = 48
+    static let toggleWidth: CGFloat = 52
+    static let toggleHeight: CGFloat = 32
+    static let toggleKnobSize: CGFloat = 24
 }
 
 struct InkOutlineButtonStyle: ButtonStyle {

@@ -35,6 +35,7 @@ From `InkTheme/InkTheme/` into the host app (keep names):
 | `Theme/InkNav.swift` | `InkNavBar` — hero title + trailing actions |
 | `Theme/InkList.swift` | `InkListRow`, `InkListCover` — cover + title + caption + bar action |
 | `Theme/InkSheet.swift` | `InkSheet`, detents, `InkSheetBody`, `InkSheetList`, `InkSheetFooter` |
+| `Theme/InkToggle.swift` | Capsule `Toggle` style `.ink` |
 | `Components/TypewriterText.swift` | Character-by-character English reveal (default `.hero`) |
 | `Components/VoiceButton.swift` | 72pt circular mic |
 | `Components/SoundWaveView.swift` | Idle/active bars |
@@ -65,12 +66,15 @@ Read colors from `@Environment(\.inkPalette)` after the host root applies `.inkA
 | `Ink.borderWidth` | `2` |
 | `Ink.voiceSize` | `72` |
 | `Ink.listCoverSize` | `48` |
+| `Ink.toggleWidth` | `52` |
+| `Ink.toggleHeight` | `32` |
+| `Ink.toggleKnobSize` | `24` |
 
 `ink` inverts with appearance. Light paper is always white. Dark paper follows `InkGround`: black `#000000`, deep red `#1E080B`, deep blue `#000E1F`, deep green `#04180B`. `inverse` is the untinted partner of ink (white in light, black in dark) for fill labels.
 
 `accent` is a separate axis: default **ink** matches `ink`. Red `#F6465D`, Blue `#0077FF`, and Green `#22C55E` are fixed in both appearances.
 
-Use `accent` for fill button backgrounds, listening `VoiceButton` fill, and `SoundWaveView` bars. Use `inverse` for fill button labels and the listening mic icon. Keep `ink` for type, outlines, hairlines, list covers, and typewriter text. Use `paper` for screens, nav, sheets, outline fills. No SF Rounded. No extra grays.
+Use `accent` for fill button backgrounds, listening `VoiceButton` fill, `SoundWaveView` bars, and **on** Ink toggles. Use `inverse` for fill button labels, the listening mic icon, and the on-toggle knob. Keep `ink` for type, outlines, hairlines, list covers, typewriter text, and the off-toggle knob. Use `paper` for screens, nav, sheets, outline fills, and the off-toggle track. No SF Rounded. No extra grays.
 
 ## Appearance
 
@@ -276,13 +280,14 @@ Content:
 4. Nav text: `.inkBarFillButton()` / `.inkBarOutlineButton()`. Nav icons: `.inkBarIconFillButton()` / `.inkBarIconOutlineButton()` (32 square).
 5. Fields, cards: paper fill + `.inkStroke()`, padding `InkSpace.md`.
 6. Voice: `VoiceButton` + `SoundWaveView(isActive:)`.
-7. Sheets: `InkSheet` + `InkSheetBody` / `InkSheetList` / `InkSheetFooter`. Lists: `InkListRow`. No gray grouped lists.
-8. Reveal copy with `TypewriterText` (default hero, 22 cps). Replay by changing `.id`.
+7. Toggle: `Toggle(...).toggleStyle(.ink)`. Off paper + ink stroke; on accent fill.
+8. Sheets: `InkSheet` + `InkSheetBody` / `InkSheetList` / `InkSheetFooter`. Lists: `InkListRow`. No gray grouped lists.
+9. Reveal copy with `TypewriterText` (default hero, 22 cps). Replay by changing `.id`.
 
 ## Do not
 
 - Add gray fills, shadows, materials, gradients, or colorful SF Symbols tints
-- Use capsule / fully rounded buttons instead of 12pt continuous rects (mic is the only circle)
+- Use capsule / fully rounded buttons instead of 12pt continuous rects (capsule is only for `.ink` toggle; circle is only the mic)
 - Put full-width 44pt buttons in the nav bar
 - Mix `ButtonStyle` with extra padding that breaks 44 / 32 heights
 - Use inset grouped / gray list chrome in sheets

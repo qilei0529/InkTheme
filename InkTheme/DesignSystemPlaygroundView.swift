@@ -2,6 +2,9 @@ import SwiftUI
 
 struct DesignSystemPlaygroundView: View {
     @State private var isListening = false
+    @State private var toggleOn = true
+    @State private var toggleOff = false
+    @State private var toggleDisabled = true
     @State private var typewriterKey = 0
     @State private var typedDone = false
     @State private var showListSheet = false
@@ -28,6 +31,7 @@ struct DesignSystemPlaygroundView: View {
                     sheetCatalog
                     typingDemo
                     buttons
+                    toggles
                     voice
                 }
                 .padding(InkSpace.xl)
@@ -339,6 +343,24 @@ struct DesignSystemPlaygroundView: View {
                 Button("No") {}
                     .inkOutlineButton()
             }
+        }
+    }
+
+    private var toggles: some View {
+        VStack(alignment: .leading, spacing: InkSpace.md) {
+            sectionTitle("Toggle")
+            Text("Capsule switch. Off is paper with an ink stroke. On fills accent. 32 tall, 52 wide.")
+                .inkText(.body)
+            Toggle("On", isOn: $toggleOn)
+                .inkText(.body)
+                .toggleStyle(.ink)
+            Toggle("Off", isOn: $toggleOff)
+                .inkText(.body)
+                .toggleStyle(.ink)
+            Toggle("Disabled", isOn: $toggleDisabled)
+                .inkText(.body)
+                .toggleStyle(.ink)
+                .disabled(true)
         }
     }
 
