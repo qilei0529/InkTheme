@@ -204,6 +204,14 @@ enum InkRadius: String, CaseIterable, Identifiable {
 
     var button: CGFloat { value }
 
+    /// Dialog card. Zero stays square; otherwise 4pt looser than buttons.
+    var dialog: CGFloat {
+        switch self {
+        case .zero: 0
+        case .sm, .md, .lg: value + 4
+        }
+    }
+
     /// Switch track. `md` and `lg` are fully rounded; `sm` and `zero` use `value`.
     var toggle: CGFloat {
         switch self {

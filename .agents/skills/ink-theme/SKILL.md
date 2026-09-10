@@ -5,9 +5,9 @@ description: >-
   repo. Use when building or restyling iOS/SwiftUI screens, migrating
   AnAskBot AskTheme, adding typewriter text, voice/mic buttons, sound
   waves, outlined 44pt buttons, InkNavBar, InkSheet (list/form/confirm),
-  bar fill/outline actions, InkListRow, named type styles (display, hero, body,
-  capital), InkSpace, or when the user mentions Ink, InkTheme, black/white
-  UI, or this skill.
+  InkDialog / InkAlert overlay, bar fill/outline actions, InkListRow, named
+  type styles (display, hero, body, capital), InkSpace, or when the user
+  mentions Ink, InkTheme, black/white UI, or this skill.
 ---
 
 # Ink Theme
@@ -35,6 +35,7 @@ From `InkTheme/InkTheme/` into the host app (keep names):
 | `Theme/InkNav.swift` | `InkNavBar` — hero title + trailing actions |
 | `Theme/InkList.swift` | `InkListRow`, `InkListCover` — cover + title + caption + bar action |
 | `Theme/InkSheet.swift` | `InkSheet`, detents, `InkSheetBody`, `InkSheetList`, `InkSheetFooter` |
+| `Theme/InkDialog.swift` | Overlay `InkDialog`, `InkDialogFooter`, `InkAlert`, `.inkDialog` / `.inkAlert` |
 | `Theme/InkToggle.swift` | Capsule `Toggle` style `.ink` |
 | `Theme/InkCheckbox.swift` | Square `Toggle` style `.inkCheckbox` |
 | `Components/TypewriterText.swift` | Character-by-character English reveal (default `.hero`) |
@@ -64,6 +65,8 @@ Read colors from `@Environment(\.inkPalette)` after the host root applies `.inkA
 | `Ink.cornerRadius` | `12` (md default; fields now follow `inkRadius.button`) |
 | `Ink.sheetCornerRadius` | `24` |
 | `Ink.sheetScreenInset` | `20` |
+| `Ink.dialogMaxWidth` | `320` |
+| `Ink.dialogMoveInOffset` | `40` |
 | `Ink.borderWidth` | `2` |
 | `Ink.voiceSize` | `72` |
 | `Ink.listCoverSize` | `48` |
@@ -154,14 +157,14 @@ Switch is instant. Read screens from `@Environment(\.inkPalette).paper`. Fill la
 
 Four values, persisted on the same `InkAppearanceStore` under `ink.radius`. Default is **md**. Independent of color axes.
 
-| Radius | Button / Checkbox / Cover / Field | Switch track | Switch knob |
-| --- | --- | --- | --- |
-| `zero` | 0 | 0 | 0 |
-| `sm` | 6 | 6 | 4 |
-| `md` | 12 | fully rounded (`height / 2`) | same as track |
-| `lg` | 16 | fully rounded (`height / 2`) | same as track |
+| Radius | Button / Checkbox / Cover / Field | Dialog | Switch track | Switch knob |
+| --- | --- | --- | --- | --- |
+| `zero` | 0 | 0 | 0 | 0 |
+| `sm` | 6 | 10 | 6 | 4 |
+| `md` | 12 | 16 | fully rounded (`height / 2`) | same as track |
+| `lg` | 16 | 20 | fully rounded (`height / 2`) | same as track |
 
-Buttons, checkbox, list covers, and fields (`.inkStroke()` / `.inkField()`) read `@Environment(\.inkRadius).button`. Switch track uses `.toggle`; the knob uses `.toggleKnob` — `md`/`lg` are fully rounded, `sm` knob is 2pt tighter than the track, `zero` is square on both.
+Buttons, checkbox, list covers, and fields (`.inkStroke()` / `.inkField()`) read `@Environment(\.inkRadius).button`. Dialog cards use `.dialog` (button + 4, zero stays 0). Switch track uses `.toggle`; the knob uses `.toggleKnob` — `md`/`lg` are fully rounded, `sm` knob is 2pt tighter than the track, `zero` is square on both.
 
 ```swift
 appearanceStore.selectRadius(.lg)
@@ -306,6 +309,44 @@ Content:
 }
 ```
 
+## Dialog
+
+Present with `.inkDialog` / `.inkAlert` on the host screen (attach high enough to cover nav). Do **not** use system `.alert` or `.confirmationDialog`. Overlay sits centered on an ink scrim — not a bottom sheet.
+
+| | Scene |
+| --- | --- |
+| `InkAlert` via `.inkAlert` | Confirm / delete — title + optional message + 1–2 actions |
+| `InkDialog` via `.inkDialog` | Custom body (field, copy, etc.) + optional close + footer |
+
+Chrome: scrim `palette.ink.opacity(0.45)` (no material / gray). Card is opaque `paper`, corner radius `inkRadius.dialog` (button + 4; zero stays square), 2pt ink `strokeBorder`, max width `Ink.dialogMaxWidth` (320), horizontal inset `Ink.sheetScreenInset` (20). Title uses `.inkText(.title)` (not hero). Close reuses `InkSheetCloseButton`. Footer is `InkDialogFooter` — stacked 44pt fill / outline, spacing `md`, no hairline. Appear with a 40pt Y move-in (`Ink.dialogMoveInOffset`); dismiss is instant; no fade. Skip the move when Reduce Motion is on. Buttons and fields inside still follow `inkRadius.button`.
+
+Backdrop: custom dialog defaults to `dismissOnBackdrop: true`. Alert uses `false` — user must tap an action. Caller still owns dismiss (`isPresented = false`).
+
+```swift
+.inkAlert(
+    isPresented: $showDelete,
+    title: "Delete",
+    message: "This cannot be undone.",
+    primary: "Delete",
+    secondary: "Cancel"
+) {
+    // primary
+}
+
+.inkDialog(isPresented: $showEdit) {
+    InkDialog(title: "Rename") {
+        InkSheetCloseButton { showEdit = false }
+    } footer: {
+        InkDialogFooter {
+            Button("Save") { showEdit = false }.inkFillButton()
+        }
+    } content: {
+        Text("NAME").inkText(.capital)
+        TextField("Name", text: $name).inkField()
+    }
+}
+```
+
 ## Rules
 
 1. Screen background: `.inkScreen()`.
@@ -317,7 +358,8 @@ Content:
 7. Toggle: `Toggle(...).toggleStyle(.ink)`. Off paper + ink stroke; on accent fill.
 8. Checkbox: `Toggle(...).toggleStyle(.inkCheckbox)`. 32 square; off 6% ink + waiting inverse hook; on accent fill. Tap pops the hook bigger then back.
 9. Sheets: `InkSheet` + `InkSheetBody` / `InkSheetList` / `InkSheetFooter`. Lists: `InkListRow`. No gray grouped lists.
-10. Reveal copy with `TypewriterText` (default hero, 22 cps). Replay by changing `.id`.
+10. Dialogs: `InkDialog` / `InkAlert` via `.inkDialog` / `.inkAlert`. No system `.alert`.
+11. Reveal copy with `TypewriterText` (default hero, 22 cps). Replay by changing `.id`.
 
 ## Do not
 
@@ -326,6 +368,7 @@ Content:
 - Put full-width 44pt buttons in the nav bar
 - Mix `ButtonStyle` with extra padding that breaks 44 / 32 heights
 - Use inset grouped / gray list chrome in sheets
+- Use system `.alert` / `.confirmationDialog` instead of `InkAlert` / `InkDialog`
 - Port AnAskBot product code (`WordHighlighter`, Ask flow, tutors). That is not Ink.
 - Invent extra type sizes (no 40pt display)
 
@@ -363,7 +406,7 @@ Lists: `InkListRow` + `listRowBackground(Ink.paper)`. Hide system separators whe
 
 ## Verify
 
-- Playground Appearance, Accent, Paper, Radius, Type, Space, Nav, List, Field, and Sheet sections match the tables above
+- Playground Appearance, Accent, Paper, Radius, Type, Space, Nav, List, Field, Sheet, and Dialog sections match the tables above
 - Host app root applies `.inkAppearance(store.appearance, accent: store.accent, ground: store.ground, radius: store.radius)` so Light / Dark / System, accent, dark paper, and radius work
-- Host screens use `.inkText`, `InkSpace`, `InkNavBar`, `InkListRow`, and `InkSheet`, not ad-hoc sizes or system inline titles
+- Host screens use `.inkText`, `InkSpace`, `InkNavBar`, `InkListRow`, `InkSheet`, and `InkDialog` / `InkAlert`, not ad-hoc sizes or system inline titles / alerts
 - No remaining `AskTheme` / `askFillButton` / `askOutlineButton` after a migration

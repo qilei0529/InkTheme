@@ -13,6 +13,9 @@ struct DesignSystemPlaygroundView: View {
     @State private var showListSheet = false
     @State private var showFormSheet = false
     @State private var showConfirmSheet = false
+    @State private var showAlertDialog = false
+    @State private var showCustomDialog = false
+    @State private var dialogName = "Alex"
     @State private var formName = "Alex"
     @State private var fieldText = "Could you stay a bit later?"
     @State private var fieldSearch = "Search"
@@ -37,6 +40,7 @@ struct DesignSystemPlaygroundView: View {
                     listCatalog
                     fieldCatalog
                     sheetCatalog
+                    dialogCatalog
                     typingDemo
                     buttons
                     toggles
@@ -69,6 +73,17 @@ struct DesignSystemPlaygroundView: View {
             }
             .sheet(isPresented: $showConfirmSheet) {
                 confirmSheet
+            }
+            .inkAlert(
+                isPresented: $showAlertDialog,
+                title: "Delete",
+                message: "This cannot be undone.",
+                primary: "Delete",
+                secondary: "Cancel"
+            ) {
+            }
+            .inkDialog(isPresented: $showCustomDialog) {
+                customDialog
             }
         }
     }
@@ -274,6 +289,36 @@ struct DesignSystemPlaygroundView: View {
                 .inkOutlineButton()
             Button("Confirm sheet") { showConfirmSheet = true }
                 .inkFillButton()
+        }
+    }
+
+    private var dialogCatalog: some View {
+        VStack(alignment: .leading, spacing: InkSpace.md) {
+            sectionTitle("Dialog")
+            Text("Centered overlay on an ink scrim — not a sheet. Alert requires a button; custom can dismiss on backdrop or close.")
+                .inkText(.body)
+            Button("Alert dialog") { showAlertDialog = true }
+                .inkFillButton()
+            Button("Custom dialog") { showCustomDialog = true }
+                .inkOutlineButton()
+        }
+    }
+
+    private var customDialog: some View {
+        InkDialog(title: "Rename") {
+            InkSheetCloseButton { showCustomDialog = false }
+        } footer: {
+            InkDialogFooter {
+                Button("Save") { showCustomDialog = false }
+                    .inkFillButton()
+            }
+        } content: {
+            VStack(alignment: .leading, spacing: InkSpace.xs) {
+                Text("NAME")
+                    .inkText(.capital)
+                TextField("Name", text: $dialogName)
+                    .inkField()
+            }
         }
     }
 

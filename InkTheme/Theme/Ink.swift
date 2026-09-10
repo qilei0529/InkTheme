@@ -6,6 +6,8 @@ enum Ink {
     static let cornerRadius: CGFloat = 12
     static let sheetCornerRadius: CGFloat = 24
     static let sheetScreenInset: CGFloat = 20
+    static let dialogMaxWidth: CGFloat = 320
+    static let dialogMoveInOffset: CGFloat = 40
     static let borderWidth: CGFloat = 2
     static let voiceSize: CGFloat = 72
     static let listCoverSize: CGFloat = 48
