@@ -61,7 +61,7 @@ Read colors from `@Environment(\.inkPalette)` after the host root applies `.inkA
 | --- | --- |
 | `Ink.buttonHeight` | `44` |
 | `Ink.barButtonHeight` | `32` |
-| `Ink.cornerRadius` | `12` (list cover, `.inkStroke()` fields — not buttons) |
+| `Ink.cornerRadius` | `12` (`.inkStroke()` fields — not buttons or list covers) |
 | `Ink.sheetCornerRadius` | `24` |
 | `Ink.sheetScreenInset` | `20` |
 | `Ink.borderWidth` | `2` |
@@ -154,14 +154,14 @@ Switch is instant. Read screens from `@Environment(\.inkPalette).paper`. Fill la
 
 Four values, persisted on the same `InkAppearanceStore` under `ink.radius`. Default is **md**. Independent of color axes.
 
-| Radius | Button / Checkbox | Switch track | Switch knob |
+| Radius | Button / Checkbox / Cover | Switch track | Switch knob |
 | --- | --- | --- | --- |
 | `zero` | 0 | 0 | 0 |
 | `sm` | 6 | 6 | 4 |
 | `md` | 12 | fully rounded (`height / 2`) | same as track |
 | `lg` | 16 | fully rounded (`height / 2`) | same as track |
 
-Buttons and checkbox read `@Environment(\.inkRadius).button`. Switch track uses `.toggle`; the knob uses `.toggleKnob` — `md`/`lg` are fully rounded, `sm` knob is 2pt tighter than the track, `zero` is square on both. List covers and `.inkStroke()` stay on `Ink.cornerRadius` (12).
+Buttons, checkbox, and list covers read `@Environment(\.inkRadius).button`. Switch track uses `.toggle`; the knob uses `.toggleKnob` — `md`/`lg` are fully rounded, `sm` knob is 2pt tighter than the track, `zero` is square on both. `.inkStroke()` fields stay on `Ink.cornerRadius` (12).
 
 ```swift
 appearanceStore.selectRadius(.lg)
@@ -227,7 +227,7 @@ Icon actions: `Button("Add", systemImage: "plus")` plus an **icon** style (`.ico
 
 ## List
 
-Use `InkListRow` for cover + title + description + trailing action. Cover is `InkListCover(size:)` (default **small**), 12pt continuous radius, paper + `.inkStroke()`. Title `bodyStrong`, description `caption`, spacing `xxs`. Trailing actions are **bar** styles (32pt), never 44pt page buttons. Bottom hairline is 2pt ink. Last row: `showsBottomBorder: false`.
+Use `InkListRow` for cover + title + description + trailing action. Cover is `InkListCover(size:)` (default **small**), paper + the button radius + an inside ink stroke. Title `bodyStrong`, description `caption`, spacing `xxs`. Trailing actions are **bar** styles (32pt), never 44pt page buttons. Bottom hairline is 2pt ink. Last row: `showsBottomBorder: false`.
 
 | Size | Frame |
 | --- | --- |

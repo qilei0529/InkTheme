@@ -31,16 +31,20 @@ enum InkListCoverSize: CaseIterable, Identifiable {
 struct InkListCover<Content: View>: View {
     var size: InkListCoverSize = .small
     @Environment(\.inkPalette) private var palette
+    @Environment(\.inkRadius) private var inkRadius
     @ViewBuilder var content: () -> Content
 
     var body: some View {
+        let shape = RoundedRectangle(cornerRadius: inkRadius.button, style: .continuous)
         ZStack {
             content()
         }
         .background(palette.paper)
         .frame(width: size.width, height: size.height)
-        .clipShape(RoundedRectangle(cornerRadius: Ink.cornerRadius, style: .continuous))
-        .inkStroke()
+        .clipShape(shape)
+        .overlay {
+            shape.strokeBorder(palette.ink, lineWidth: Ink.borderWidth)
+        }
     }
 }
 

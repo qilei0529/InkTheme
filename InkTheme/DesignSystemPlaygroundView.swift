@@ -46,7 +46,7 @@ struct DesignSystemPlaygroundView: View {
             .toolbar(.hidden, for: .navigationBar)
             .safeAreaInset(edge: .top) {
                 InkNavBar(title: "Ink") {
-                    Button("Close") {}
+                    Button("Settings") {}
                         .inkBarOutlineButton()
                     Button("Add", systemImage: "plus") {}
                         .inkBarIconFillButton()
@@ -200,7 +200,7 @@ struct DesignSystemPlaygroundView: View {
     private var listCatalog: some View {
         VStack(alignment: .leading, spacing: InkSpace.md) {
             sectionTitle("List")
-            Text("Cover, title, caption, and a 32pt bar action. Small is 48 square, medium 72 square, large 96×72 (4:3). Rows use a 2pt ink hairline. Last row drops the border.")
+            Text("Cover, title, caption, and a 32pt bar action. Small is 48 square, medium 72 square, large 96×72 (4:3). Cover corners follow the radius picker. Rows use a 2pt ink hairline. Last row drops the border.")
                 .inkText(.body)
 
             VStack(spacing: 0) {
