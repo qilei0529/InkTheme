@@ -28,7 +28,7 @@ From `InkTheme/InkTheme/` into the host app (keep names):
 
 | File | Role |
 | --- | --- |
-| `Theme/Ink.swift` | Color/layout tokens, fill/outline + bar buttons, `inkScreen()`, `inkStroke()` |
+| `Theme/Ink.swift` | Color/layout tokens, fill/outline + bar buttons, `inkScreen()`, `inkStroke()`, `InkFieldSize`, `inkField()` |
 | `Theme/InkAppearance.swift` | `InkAppearance`, `InkAccent`, `InkGround`, `InkRadius` (zero / sm / md / lg), `.inkAppearance(_:accent:ground:radius:)` |
 | `Theme/InkAppearanceReveal.swift` | 12-point curved blob; each point expands at its own speed |
 | `Theme/InkText.swift` | `InkTextStyle`, `.inkText(_:)`, `InkSpace` |
@@ -61,7 +61,7 @@ Read colors from `@Environment(\.inkPalette)` after the host root applies `.inkA
 | --- | --- |
 | `Ink.buttonHeight` | `44` |
 | `Ink.barButtonHeight` | `32` |
-| `Ink.cornerRadius` | `12` (`.inkStroke()` fields — not buttons or list covers) |
+| `Ink.cornerRadius` | `12` (md default; fields now follow `inkRadius.button`) |
 | `Ink.sheetCornerRadius` | `24` |
 | `Ink.sheetScreenInset` | `20` |
 | `Ink.borderWidth` | `2` |
@@ -154,14 +154,14 @@ Switch is instant. Read screens from `@Environment(\.inkPalette).paper`. Fill la
 
 Four values, persisted on the same `InkAppearanceStore` under `ink.radius`. Default is **md**. Independent of color axes.
 
-| Radius | Button / Checkbox / Cover | Switch track | Switch knob |
+| Radius | Button / Checkbox / Cover / Field | Switch track | Switch knob |
 | --- | --- | --- | --- |
 | `zero` | 0 | 0 | 0 |
 | `sm` | 6 | 6 | 4 |
 | `md` | 12 | fully rounded (`height / 2`) | same as track |
 | `lg` | 16 | fully rounded (`height / 2`) | same as track |
 
-Buttons, checkbox, and list covers read `@Environment(\.inkRadius).button`. Switch track uses `.toggle`; the knob uses `.toggleKnob` — `md`/`lg` are fully rounded, `sm` knob is 2pt tighter than the track, `zero` is square on both. `.inkStroke()` fields stay on `Ink.cornerRadius` (12).
+Buttons, checkbox, list covers, and fields (`.inkStroke()` / `.inkField()`) read `@Environment(\.inkRadius).button`. Switch track uses `.toggle`; the knob uses `.toggleKnob` — `md`/`lg` are fully rounded, `sm` knob is 2pt tighter than the track, `zero` is square on both.
 
 ```swift
 appearanceStore.selectRadius(.lg)
@@ -182,7 +182,7 @@ Do not use raw `.font(.system(size:))` or leftover `AskTheme.*Font`. Uppercase `
 | `numeral` | Score | 56 | bold | 0 | ink |
 | `hero` | Nav title, English prompt, typewriter | 28 | bold | 0 | ink |
 | `title` | Empty/page title | title2 (~22) | semibold | 0 | ink |
-| `body` | Paragraph, field, list subtitle | body (~17) | regular | 0 | ink |
+| `body` | Paragraph, md field, list subtitle | body (~17) | regular | 0 | ink |
 | `bodyStrong` | List title, button label, EN sample | body | semibold | 0 | ink |
 | `caption` | Status, translation, helper | footnote (~13) | regular | 0 | ink 0.55 |
 | `capital` | Section label | footnote | semibold | 1.2 | ink 0.45 |
@@ -254,6 +254,20 @@ InkSheetList {
 
 Photos go in `InkListCover` with `.resizable().scaledToFill()`. Do not mix this hairline with `.listRowSeparatorTint`.
 
+## Field
+
+Use `.inkField()` on `TextField` / `TextEditor`. Paper fill, radius-token clip, 2pt `strokeBorder`. Size is independent of the radius picker. `sm` uses footnote at full ink — not caption opacity.
+
+| Size | Height | Horizontal inset | Type | Scene |
+| --- | --- | --- | --- | --- |
+| `md` (default) | 44 | 12 (`InkSpace.md`) | body | Forms, full-width answers |
+| `sm` | 32 | 12 (`InkSpace.md`) | footnote | Compact rows next to a 32pt bar action |
+
+```swift
+TextField("Name", text: $name).inkField()
+TextField("Search", text: $query).inkField(size: .sm)
+```
+
 ## Sheet
 
 Present with `.sheet { InkSheet(...) }`. Do not use system `.navigationTitle` inside a sheet. Close is `InkSheetCloseButton` (32 square, `xmark`, outline) — caller still owns dismiss.
@@ -266,12 +280,12 @@ Present with `.sheet { InkSheet(...) }`. Do not use system `.navigationTitle` in
 
 Chrome: **opaque** `.presentationBackground(Ink.paper)` on every detent. iOS 26/27 half sheets default to Liquid Glass (inset, translucent). Do not use `Color.clear`, `.background`, or a missing presentation background — those re-enable glass. No sheet stroke. `.medium` also lifts by `Ink.sheetScreenInset` (20) from the screen bottom. Large stays edge-attached. Visible drag indicator. Header is `InkNavBar` with `topPadding: InkSpace.xl`. Optional `InkSheetFooter`.
 
-Field strokes use `.inkStroke()` (`strokeBorder` so the 2pt line is not clipped). Outline buttons also use `strokeBorder` so they share the same outer size as fill buttons.
+Field strokes use `.inkField()` (default **md** 44 / body). Use `size: .sm` for 32 / footnote. Both use a 12pt inset so stacked text lines up. Paper fill, radius-token clip, `strokeBorder` so the 2pt line is not clipped. Outline buttons also use `strokeBorder` so they share the same outer size as fill buttons.
 
 Content:
 
 - **List:** `InkSheetList` (horizontal `xl` + vertical `sm` content margins). Rows: `InkListRow` + `InkListCover` + `.inkSheetListRow()`.
-- **Form:** `InkSheetBody` (scroll, `InkSpace.xl` padding and stack). Fields: `.inkText(.body)` + `padding(InkSpace.md)` + `.inkStroke()`. Section labels `.inkText(.capital)`.
+- **Form:** `InkSheetBody` (scroll, `InkSpace.xl` padding and stack). Fields: `.inkField()`. Section labels `.inkText(.capital)`.
 - **Confirm:** no extra scroll; `capital` + `body` with `InkSpace.sm`. Footer: fill primary, outline secondary, spacing `md`.
 
 ```swift
@@ -286,9 +300,7 @@ Content:
         InkSheetBody {
             Text("NAME").inkText(.capital)
             TextField("Name", text: $name)
-                .inkText(.body)
-                .padding(InkSpace.md)
-                .inkStroke()
+                .inkField()
         }
     }
 }
@@ -300,7 +312,7 @@ Content:
 2. Text: `.inkText(.body)` (and siblings). Never `.primary` / `.tint` for chrome.
 3. Page buttons: `.inkFillButton()` or `.inkOutlineButton()`. Min height 44.
 4. Nav text: `.inkBarFillButton()` / `.inkBarOutlineButton()`. Nav icons: `.inkBarIconFillButton()` / `.inkBarIconOutlineButton()` (32 square).
-5. Fields, cards: paper fill + `.inkStroke()`, padding `InkSpace.md`.
+5. Fields: `.inkField()` (md 44, body) or `.inkField(size: .sm)` (32, footnote, full ink). Cards: paper fill + `.inkStroke()`. Corners follow the radius token.
 6. Voice: `VoiceButton` + `SoundWaveView(isActive:)`.
 7. Toggle: `Toggle(...).toggleStyle(.ink)`. Off paper + ink stroke; on accent fill.
 8. Checkbox: `Toggle(...).toggleStyle(.inkCheckbox)`. 32 square; off 6% ink + waiting inverse hook; on accent fill. Tap pops the hook bigger then back.
@@ -328,9 +340,7 @@ NavigationStack {
         TypewriterText(text: prompt)
 
         TextField("Answer", text: $answer)
-            .inkText(.body)
-            .padding(InkSpace.md)
-            .inkStroke()
+            .inkField()
 
         Button("Continue") { }
             .inkFillButton()
@@ -353,7 +363,7 @@ Lists: `InkListRow` + `listRowBackground(Ink.paper)`. Hide system separators whe
 
 ## Verify
 
-- Playground Appearance, Accent, Paper, Radius, Type, Space, Nav, List, and Sheet sections match the tables above
+- Playground Appearance, Accent, Paper, Radius, Type, Space, Nav, List, Field, and Sheet sections match the tables above
 - Host app root applies `.inkAppearance(store.appearance, accent: store.accent, ground: store.ground, radius: store.radius)` so Light / Dark / System, accent, dark paper, and radius work
 - Host screens use `.inkText`, `InkSpace`, `InkNavBar`, `InkListRow`, and `InkSheet`, not ad-hoc sizes or system inline titles
 - No remaining `AskTheme` / `askFillButton` / `askOutlineButton` after a migration

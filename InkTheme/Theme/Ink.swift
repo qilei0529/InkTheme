@@ -15,6 +15,30 @@ enum Ink {
     static let checkboxSize: CGFloat = 32
 }
 
+enum InkFieldSize: CaseIterable, Identifiable {
+    case sm
+    case md
+
+    var id: Self { self }
+
+    var height: CGFloat {
+        switch self {
+        case .sm: Ink.barButtonHeight
+        case .md: Ink.buttonHeight
+        }
+    }
+
+    var padding: CGFloat { InkSpace.md }
+
+    /// `sm` uses footnote at full ink — not caption’s 0.55 opacity.
+    var font: Font {
+        switch self {
+        case .sm: InkTextStyle.caption.font
+        case .md: InkTextStyle.body.font
+        }
+    }
+}
+
 struct InkOutlineButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
     @Environment(\.inkPalette) private var palette
@@ -163,6 +187,25 @@ extension View {
     func inkStroke(enabled: Bool = true) -> some View {
         modifier(InkStrokeModifier(enabled: enabled))
     }
+
+    func inkField(size: InkFieldSize = .md, enabled: Bool = true) -> some View {
+        modifier(InkFieldModifier(size: size, enabled: enabled))
+    }
+}
+
+private struct InkFieldModifier: ViewModifier {
+    var size: InkFieldSize
+    var enabled: Bool
+    @Environment(\.inkPalette) private var palette
+
+    func body(content: Content) -> some View {
+        content
+            .font(size.font)
+            .foregroundStyle(palette.ink)
+            .padding(.horizontal, size.padding)
+            .frame(minHeight: size.height)
+            .inkStroke(enabled: enabled)
+    }
 }
 
 private struct InkScreenModifier: ViewModifier {
@@ -176,11 +219,15 @@ private struct InkScreenModifier: ViewModifier {
 private struct InkStrokeModifier: ViewModifier {
     var enabled: Bool
     @Environment(\.inkPalette) private var palette
+    @Environment(\.inkRadius) private var inkRadius
 
     func body(content: Content) -> some View {
-        content.overlay {
-            RoundedRectangle(cornerRadius: Ink.cornerRadius, style: .continuous)
-                .strokeBorder(palette.ink.opacity(enabled ? 1 : 0.2), lineWidth: Ink.borderWidth)
-        }
+        let shape = RoundedRectangle(cornerRadius: inkRadius.button, style: .continuous)
+        content
+            .background(palette.paper)
+            .clipShape(shape)
+            .overlay {
+                shape.strokeBorder(palette.ink.opacity(enabled ? 1 : 0.2), lineWidth: Ink.borderWidth)
+            }
     }
 }

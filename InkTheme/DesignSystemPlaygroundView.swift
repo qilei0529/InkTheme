@@ -14,6 +14,9 @@ struct DesignSystemPlaygroundView: View {
     @State private var showFormSheet = false
     @State private var showConfirmSheet = false
     @State private var formName = "Alex"
+    @State private var fieldText = "Could you stay a bit later?"
+    @State private var fieldSearch = "Search"
+    @State private var fieldDisabled = "Disabled field"
     @Environment(InkAppearanceStore.self) private var appearanceStore
     @Environment(\.inkPalette) private var palette
 
@@ -32,6 +35,7 @@ struct DesignSystemPlaygroundView: View {
                     spaceCatalog
                     navCatalog
                     listCatalog
+                    fieldCatalog
                     sheetCatalog
                     typingDemo
                     buttons
@@ -71,7 +75,7 @@ struct DesignSystemPlaygroundView: View {
 
     private var intro: some View {
         VStack(alignment: .leading, spacing: InkSpace.sm) {
-            Text("Ink / paper")
+            Text("INK / PAPER")
                 .inkText(.caption)
             Text("Named type styles and spacing. Light is black ink on white paper; dark inverts. Fill uses accent. Dark paper can be black or a deep hue — Light stays white.")
                 .inkText(.body)
@@ -132,7 +136,7 @@ struct DesignSystemPlaygroundView: View {
     private var radiusCatalog: some View {
         VStack(alignment: .leading, spacing: InkSpace.md) {
             sectionTitle("Radius")
-            Text("Buttons and checkbox use Zero 0 / Sm 6 / Md 12 / Lg 16. Switch is fully rounded from Md.")
+            Text("Buttons, checkbox, list covers, and fields use Zero 0 / Sm 6 / Md 12 / Lg 16. Switch is fully rounded from Md.")
                 .inkText(.body)
             HStack(spacing: InkSpace.md) {
                 ForEach(InkRadius.allCases) { option in
@@ -244,6 +248,21 @@ struct DesignSystemPlaygroundView: View {
         }
     }
 
+    private var fieldCatalog: some View {
+        VStack(alignment: .leading, spacing: InkSpace.md) {
+            sectionTitle("Field")
+            Text("Md is 44 and body. Sm is 32 and footnote. Both use a 12pt inset so text lines up. Corners follow the radius picker.")
+                .inkText(.body)
+            TextField("Prompt", text: $fieldText)
+                .inkField()
+            TextField("Search", text: $fieldSearch)
+                .inkField(size: .sm)
+            TextField("Disabled", text: $fieldDisabled)
+                .inkField(enabled: false)
+                .disabled(true)
+        }
+    }
+
     private var sheetCatalog: some View {
         VStack(alignment: .leading, spacing: InkSpace.md) {
             sectionTitle("Sheet")
@@ -300,9 +319,7 @@ struct DesignSystemPlaygroundView: View {
                     Text("NAME")
                         .inkText(.capital)
                     TextField("Name", text: $formName)
-                        .inkText(.body)
-                        .padding(InkSpace.md)
-                        .inkStroke()
+                        .inkField()
                 }
                 Text("Fields sit on paper with a 2pt stroke. Footer holds the full-width 44pt fill action.")
                     .inkText(.caption)

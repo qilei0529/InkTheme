@@ -24,6 +24,12 @@ struct InkThemeTests {
         #expect(InkListCoverSize.large.width == 96)
         #expect(InkListCoverSize.large.height == 72)
         #expect(InkListCoverSize.large.width / InkListCoverSize.large.height == CGFloat(4) / 3)
+        #expect(InkFieldSize.sm.height == 32)
+        #expect(InkFieldSize.md.height == 44)
+        #expect(InkFieldSize.sm.padding == 12)
+        #expect(InkFieldSize.md.padding == 12)
+        #expect(InkFieldSize.sm.font == InkTextStyle.caption.font)
+        #expect(InkFieldSize.md.font == InkTextStyle.body.font)
     }
 
     @Test func appearanceMapsToColorScheme() {
