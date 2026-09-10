@@ -10,6 +10,13 @@ struct InkThemeTests {
         #expect(Ink.cornerRadius == 12)
         #expect(Ink.sheetCornerRadius == 24)
         #expect(Ink.sheetScreenInset == 20)
+        #expect(Ink.sheetMediumHorizontalInset == 10)
+        #expect(Ink.sheetLargeHorizontalInset == 5)
+        #expect(Ink.sheetLargeVerticalInset == 10)
+        #expect(Ink.sheetFullTopExtra == 36)
+        #expect(Ink.sheetMediumFraction == 0.5)
+        #expect(Ink.sheetLargeFraction == 0.88)
+        #expect(Ink.sheetMoveInOffset == 32)
         #expect(Ink.dialogMaxWidth == 320)
         #expect(Ink.dialogMoveInOffset == 40)
         #expect(Ink.borderWidth == 2)
@@ -214,9 +221,76 @@ struct InkThemeTests {
     }
 
     @Test func sheetDetentsMatchSpec() {
-        #expect(InkSheetDetent.large.presentationDetents == [.large])
-        #expect(InkSheetDetent.medium.presentationDetents == [.medium])
-        #expect(InkSheetDetent.mediumAndLarge.presentationDetents == [.medium, .large])
+        #expect(InkSheetDetent.medium.allowedHeights(available: 400) == [200])
+        #expect(InkSheetDetent.large.allowedHeights(available: 400) == [352])
+        #expect(InkSheetDetent.full.allowedHeights(available: 400) == [400])
+        #expect(InkSheetDetent.mediumAndLarge.allowedHeights(available: 400) == [200, 352])
+        #expect(InkSheetDetent.largeAndFull.allowedHeights(available: 400) == [352, 400])
+        #expect(InkSheetDetent.mediumAndFull.allowedHeights(available: 400) == [200, 352, 400])
+        #expect(InkSheetDetent.medium.initialHeight(available: 400) == 200)
+        #expect(InkSheetDetent.large.initialHeight(available: 400) == 352)
+        #expect(InkSheetDetent.full.initialHeight(available: 400) == 400)
+        #expect(InkSheetDetent.mediumAndFull.initialHeight(available: 400) == 200)
+    }
+
+    @Test func sheetChromeProgressEndpoints() {
+        #expect(InkSheetDetent.medium.chromeProgress(height: 200, available: 400) == 0)
+        #expect(InkSheetDetent.large.chromeProgress(height: 352, available: 400) == 0.5)
+        #expect(InkSheetDetent.full.chromeProgress(height: 400, available: 400) == 1)
+        #expect(InkSheetDetent.mediumAndFull.chromeProgress(height: 200, available: 400) == 0)
+        #expect(InkSheetDetent.mediumAndFull.chromeProgress(height: 352, available: 400) == 0.5)
+        #expect(InkSheetDetent.mediumAndFull.chromeProgress(height: 400, available: 400) == 1)
+        #expect(InkSheetDetent.mediumAndLarge.chromeProgress(height: 352, available: 400) == 0.5)
+        #expect(InkSheetDetent.largeAndFull.chromeProgress(height: 352, available: 400) == 0.5)
+        #expect(InkSheetDetent.largeAndFull.chromeProgress(height: 400, available: 400) == 1)
+    }
+
+    @Test func sheetChromeInsetsAndRadius() {
+        #expect(InkSheetChrome.horizontalInset(progress: 0) == 10)
+        #expect(InkSheetChrome.horizontalInset(progress: 0.5) == 5)
+        #expect(InkSheetChrome.horizontalInset(progress: 1) == 0)
+        #expect(InkSheetChrome.verticalInset(progress: 0) == 20)
+        #expect(InkSheetChrome.verticalInset(progress: 0.5) == 10)
+        #expect(InkSheetChrome.verticalInset(progress: 1) == 0)
+        #expect(InkSheetChrome.cornerRadius(progress: 0, radius: .md) == 24)
+        #expect(InkSheetChrome.cornerRadius(progress: 0.5, radius: .md) == 24)
+        #expect(InkSheetChrome.cornerRadius(progress: 1, radius: .md) == 0)
+        #expect(InkSheetChrome.cornerRadius(progress: 0, radius: .zero) == 0)
+        #expect(InkSheetChrome.cornerRadius(progress: 0.75, radius: .md) == 12)
+    }
+
+    @Test func sheetChromeRespectsSafeArea() {
+        let safe = EdgeInsets(top: 59, leading: 0, bottom: 34, trailing: 0)
+
+        let mediumOuter = InkSheetChrome.outerInsets(progress: 0, safe: safe)
+        #expect(mediumOuter.top == 79)
+        #expect(mediumOuter.bottom == 54)
+        #expect(mediumOuter.leading == 10)
+        #expect(mediumOuter.trailing == 10)
+
+        let largeOuter = InkSheetChrome.outerInsets(progress: 0.5, safe: safe)
+        #expect(largeOuter.top == 69)
+        #expect(largeOuter.bottom == 44)
+        #expect(largeOuter.leading == 5)
+        #expect(largeOuter.trailing == 5)
+
+        let fullOuter = InkSheetChrome.outerInsets(progress: 1, safe: safe)
+        #expect(fullOuter.top == 0)
+        #expect(fullOuter.bottom == 0)
+        #expect(fullOuter.leading == 0)
+        #expect(fullOuter.trailing == 0)
+
+        let mediumContent = InkSheetChrome.contentSafeInsets(progress: 0, safe: safe)
+        #expect(mediumContent.top == 0)
+        #expect(mediumContent.bottom == 0)
+
+        let largeContent = InkSheetChrome.contentSafeInsets(progress: 0.5, safe: safe)
+        #expect(largeContent.top == 0)
+        #expect(largeContent.bottom == 0)
+
+        let fullContent = InkSheetChrome.contentSafeInsets(progress: 1, safe: safe)
+        #expect(fullContent.top == 95)
+        #expect(fullContent.bottom == 34)
     }
 }
 

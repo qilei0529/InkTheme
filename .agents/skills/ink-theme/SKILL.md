@@ -3,7 +3,7 @@ name: ink-theme
 description: >-
   Applies the Ink black-and-white SwiftUI design system from the InkTheme
   repo. Use when building or restyling iOS/SwiftUI screens, migrating
-  AnAskBot AskTheme, adding typewriter text, voice/mic buttons, sound
+  AnAskBot AskTheme, adding voice/mic buttons, sound
   waves, outlined 44pt buttons, InkNavBar, InkSheet (list/form/confirm),
   InkDialog / InkAlert overlay, bar fill/outline actions, InkListRow, named
   type styles (display, hero, body, capital), InkSpace, or when the user
@@ -20,7 +20,7 @@ Copy files from that app. Do not reinvent tokens, type styles, button styles, or
 
 - New SwiftUI screens that should look like AnAskBot / Ink
 - Restyling an existing iOS app to black paper, system type, stroked buttons
-- Adding typing, mic, or sound-wave UI
+- Adding mic or sound-wave UI
 
 ## Copy these files
 
@@ -38,7 +38,6 @@ From `InkTheme/InkTheme/` into the host app (keep names):
 | `Theme/InkDialog.swift` | Overlay `InkDialog`, `InkDialogFooter`, `InkAlert`, `.inkDialog` / `.inkAlert` |
 | `Theme/InkToggle.swift` | Capsule `Toggle` style `.ink` |
 | `Theme/InkCheckbox.swift` | Square `Toggle` style `.inkCheckbox` |
-| `Components/TypewriterText.swift` | Character-by-character English reveal (default `.hero`) |
 | `Components/VoiceButton.swift` | 72pt circular mic |
 | `Components/SoundWaveView.swift` | Idle/active bars |
 | `DesignSystemPlaygroundView.swift` | Optional catalog; host as a debug sheet if useful |
@@ -63,8 +62,15 @@ Read colors from `@Environment(\.inkPalette)` after the host root applies `.inkA
 | `Ink.buttonHeight` | `44` |
 | `Ink.barButtonHeight` | `32` |
 | `Ink.cornerRadius` | `12` (md default; fields now follow `inkRadius.button`) |
-| `Ink.sheetCornerRadius` | `24` |
-| `Ink.sheetScreenInset` | `20` |
+| `Ink.sheetCornerRadius` | `24` (medium and large chrome; full lerps to 0) |
+| `Ink.sheetScreenInset` | `20` (medium vertical inset) |
+| `Ink.sheetMediumHorizontalInset` | `10` (medium side inset) |
+| `Ink.sheetLargeHorizontalInset` | `5` (large side inset; full lerps to 0) |
+| `Ink.sheetLargeVerticalInset` | `10` (large vertical inset; full lerps to 0) |
+| `Ink.sheetFullTopExtra` | `36` (added above safe top inside full-bleed content) |
+| `Ink.sheetMediumFraction` | `0.5` |
+| `Ink.sheetLargeFraction` | `0.88` |
+| `Ink.sheetMoveInOffset` | `32` |
 | `Ink.dialogMaxWidth` | `320` |
 | `Ink.dialogMoveInOffset` | `40` |
 | `Ink.borderWidth` | `2` |
@@ -79,7 +85,7 @@ Read colors from `@Environment(\.inkPalette)` after the host root applies `.inkA
 
 `accent` is a separate axis: default **ink** matches `ink`. Red `#F6465D`, Blue `#0077FF`, and Green `#22C55E` are fixed in both appearances.
 
-Use `accent` for fill button backgrounds, listening `VoiceButton` fill, `SoundWaveView` bars, **on** Ink toggles, and **on** Ink checkboxes. Use `inverse` for fill button labels, the listening mic icon, the on-toggle knob, and the checkbox hook. Keep `ink` for type, outlines, hairlines, list covers, typewriter text, and the off-toggle knob. Use `paper` for screens, nav, sheets, outline fills, and the off-toggle track. No SF Rounded. No extra grays.
+Use `accent` for fill button backgrounds, listening `VoiceButton` fill, `SoundWaveView` bars, **on** Ink toggles, and **on** Ink checkboxes. Use `inverse` for fill button labels, the listening mic icon, the on-toggle knob, and the checkbox hook. Keep `ink` for type, outlines, hairlines, list covers, and the off-toggle knob. Use `paper` for screens, nav, sheets, outline fills, and the off-toggle track. No SF Rounded. No extra grays.
 
 ## Appearance
 
@@ -183,7 +189,7 @@ Do not use raw `.font(.system(size:))` or leftover `AskTheme.*Font`. Uppercase `
 | `display` | Short brand (INK / ASK) | 64 | bold | 4 | ink |
 | `displaySmall` | Onboarding brand line | 48 | bold | 3 | ink |
 | `numeral` | Score | 56 | bold | 0 | ink |
-| `hero` | Nav title, English prompt, typewriter | 28 | bold | 0 | ink |
+| `hero` | Nav title, English prompt | 28 | bold | 0 | ink |
 | `title` | Empty/page title | title2 (~22) | semibold | 0 | ink |
 | `body` | Paragraph, md field, list subtitle | body (~17) | regular | 0 | ink |
 | `bodyStrong` | List title, button label, EN sample | body | semibold | 0 | ink |
@@ -273,17 +279,26 @@ TextField("Search", text: $query).inkField(size: .sm)
 
 ## Sheet
 
-Present with `.sheet { InkSheet(...) }`. Do not use system `.navigationTitle` inside a sheet. Close is `InkSheetCloseButton` (32 square, `xmark`, outline) — caller still owns dismiss.
+Present with `.inkSheet { InkSheet(...) }` on the host screen (attach high enough to cover nav). Do **not** use system `.sheet` — it cannot own radius, inset, or a 2pt stroke, and iOS 26/27 half sheets become glass. Do not use system `.navigationTitle` inside a sheet. Close is `InkSheetCloseButton` (32 square, `xmark`, outline) — caller still owns dismiss.
 
-| `InkSheetDetent` | Scene |
-| --- | --- |
-| `.large` | List, multi-step form (default) |
-| `.medium` | Short confirm |
-| `.mediumAndLarge` | Starts medium, can expand |
+| `InkSheetDetent` | Height (full-screen frame `H`) | Scene |
+| --- | --- | --- |
+| `.medium` | `H * 0.5` | Short confirm |
+| `.large` | `H * 0.88` | List / form with margin (default) |
+| `.full` | `H` | Edge-to-edge |
+| `.mediumAndLarge` | `0.5 H` ↔ `0.88 H` | Confirm that can grow, still floated |
+| `.largeAndFull` | `0.88 H` ↔ `H` | Tall sheet that can go full-bleed |
+| `.mediumAndFull` | `0.5 H` ↔ `0.88 H` ↔ `H` | Confirm that can grow through large into full |
 
-Chrome: **opaque** `.presentationBackground(Ink.paper)` on every detent. iOS 26/27 half sheets default to Liquid Glass (inset, translucent). Do not use `Color.clear`, `.background`, or a missing presentation background — those re-enable glass. No sheet stroke. `.medium` also lifts by `Ink.sheetScreenInset` (20) from the screen bottom. Large stays edge-attached. Visible drag indicator. Header is `InkNavBar` with `topPadding: InkSpace.xl`. Optional `InkSheetFooter`.
+Chrome: overlay card on an ink scrim (`palette.ink.opacity(0.45)`). Three chrome stops (lerp with height when multiple detents):
 
-Field strokes use `.inkField()` (default **md** 44 / body). Use `size: .sm` for 32 / footnote. Both use a 12pt inset so stacked text lines up. Paper fill, radius-token clip, `strokeBorder` so the 2pt line is not clipped. Outline buttons also use `strokeBorder` so they share the same outer size as fill buttons.
+| Stop | Outer gap (screen → card) | Corner radius | Content safe area |
+| --- | --- | --- | --- |
+| Medium | safe area + `10` side / `20` vertical | `24` (`0` when radius token is `zero`) | none |
+| Large | safe area + `5` side / `10` vertical | `24` (same as medium) | none |
+| Full | `0` (full-bleed paper) | `0` | pad content by safe area; top also adds `sheetFullTopExtra` (`36`) |
+
+Card is opaque `paper` with a 2pt ink `strokeBorder`. Bottom-aligned; the overlay geometry ignores safe area so full paper can fill the screen while content keeps safe insets. Appear uses a 32pt Y move-in (`Ink.sheetMoveInOffset`). Dismiss matches system sheets: slide down by the sheet height (`Y + h`), ease-in, no fade. Skip motion when Reduce Motion is on. Visible ink grabber (2pt capsule) + `InkNavBar`. Drag **only** the grabber and nav to move detents or dismiss — do not attach drag to `InkSheetBody` / `InkSheetList`. Optional `InkSheetFooter`.
 
 Content:
 
@@ -292,7 +307,7 @@ Content:
 - **Confirm:** no extra scroll; `capital` + `body` with `InkSpace.sm`. Footer: fill primary, outline secondary, spacing `md`.
 
 ```swift
-.sheet(isPresented: $showForm) {
+.inkSheet(isPresented: $showForm) {
     InkSheet(title: "Edit") {
         InkSheetCloseButton { showForm = false }
     } footer: {
@@ -357,9 +372,8 @@ Backdrop: custom dialog defaults to `dismissOnBackdrop: true`. Alert uses `false
 6. Voice: `VoiceButton` + `SoundWaveView(isActive:)`.
 7. Toggle: `Toggle(...).toggleStyle(.ink)`. Off paper + ink stroke; on accent fill.
 8. Checkbox: `Toggle(...).toggleStyle(.inkCheckbox)`. 32 square; off 6% ink + waiting inverse hook; on accent fill. Tap pops the hook bigger then back.
-9. Sheets: `InkSheet` + `InkSheetBody` / `InkSheetList` / `InkSheetFooter`. Lists: `InkListRow`. No gray grouped lists.
+9. Sheets: `.inkSheet` + `InkSheet` + `InkSheetBody` / `InkSheetList` / `InkSheetFooter`. Lists: `InkListRow`. No system `.sheet`. No gray grouped lists.
 10. Dialogs: `InkDialog` / `InkAlert` via `.inkDialog` / `.inkAlert`. No system `.alert`.
-11. Reveal copy with `TypewriterText` (default hero, 22 cps). Replay by changing `.id`.
 
 ## Do not
 
@@ -368,6 +382,7 @@ Backdrop: custom dialog defaults to `dismissOnBackdrop: true`. Alert uses `false
 - Put full-width 44pt buttons in the nav bar
 - Mix `ButtonStyle` with extra padding that breaks 44 / 32 heights
 - Use inset grouped / gray list chrome in sheets
+- Use system `.sheet` instead of `.inkSheet` / `InkSheet`
 - Use system `.alert` / `.confirmationDialog` instead of `InkAlert` / `InkDialog`
 - Port AnAskBot product code (`WordHighlighter`, Ask flow, tutors). That is not Ink.
 - Invent extra type sizes (no 40pt display)
@@ -380,7 +395,8 @@ NavigationStack {
         Text("TITLE")
             .inkText(.capital)
 
-        TypewriterText(text: prompt)
+        Text(prompt)
+            .inkText(.hero)
 
         TextField("Answer", text: $answer)
             .inkField()
@@ -408,5 +424,5 @@ Lists: `InkListRow` + `listRowBackground(Ink.paper)`. Hide system separators whe
 
 - Playground Appearance, Accent, Paper, Radius, Type, Space, Nav, List, Field, Sheet, and Dialog sections match the tables above
 - Host app root applies `.inkAppearance(store.appearance, accent: store.accent, ground: store.ground, radius: store.radius)` so Light / Dark / System, accent, dark paper, and radius work
-- Host screens use `.inkText`, `InkSpace`, `InkNavBar`, `InkListRow`, `InkSheet`, and `InkDialog` / `InkAlert`, not ad-hoc sizes or system inline titles / alerts
+- Host screens use `.inkText`, `InkSpace`, `InkNavBar`, `InkListRow`, `.inkSheet` / `InkSheet`, and `InkDialog` / `InkAlert`, not ad-hoc sizes or system inline titles / alerts / sheets
 - No remaining `AskTheme` / `askFillButton` / `askOutlineButton` after a migration

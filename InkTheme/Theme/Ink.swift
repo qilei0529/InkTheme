@@ -6,6 +6,18 @@ enum Ink {
     static let cornerRadius: CGFloat = 12
     static let sheetCornerRadius: CGFloat = 24
     static let sheetScreenInset: CGFloat = 20
+    /// Medium detent side inset — half of `sheetScreenInset`.
+    static let sheetMediumHorizontalInset: CGFloat = 10
+    /// Large detent side inset — half of `sheetMediumHorizontalInset`. Full lerps to 0.
+    static let sheetLargeHorizontalInset: CGFloat = 5
+    /// Large detent vertical inset — half of `sheetScreenInset`. Full lerps to 0.
+    static let sheetLargeVerticalInset: CGFloat = 10
+    /// Extra top padding inside full-bleed sheet, on top of the status-bar safe area.
+    static let sheetFullTopExtra: CGFloat = 36
+    static let sheetMediumFraction: CGFloat = 0.5
+    /// Large detent height as a fraction of the full-screen frame (between medium and full).
+    static let sheetLargeFraction: CGFloat = 0.88
+    static let sheetMoveInOffset: CGFloat = 32
     static let dialogMaxWidth: CGFloat = 320
     static let dialogMoveInOffset: CGFloat = 40
     static let borderWidth: CGFloat = 2

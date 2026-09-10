@@ -8,8 +8,6 @@ struct DesignSystemPlaygroundView: View {
     @State private var checkboxOn = true
     @State private var checkboxOff = false
     @State private var checkboxDisabled = true
-    @State private var typewriterKey = 0
-    @State private var typedDone = false
     @State private var showListSheet = false
     @State private var showFormSheet = false
     @State private var showConfirmSheet = false
@@ -22,8 +20,6 @@ struct DesignSystemPlaygroundView: View {
     @State private var fieldDisabled = "Disabled field"
     @Environment(InkAppearanceStore.self) private var appearanceStore
     @Environment(\.inkPalette) private var palette
-
-    private let sampleEnglish = "Could you stay a bit later to finish the report?"
 
     var body: some View {
         NavigationStack {
@@ -41,7 +37,6 @@ struct DesignSystemPlaygroundView: View {
                     fieldCatalog
                     sheetCatalog
                     dialogCatalog
-                    typingDemo
                     buttons
                     toggles
                     checkboxes
@@ -65,13 +60,13 @@ struct DesignSystemPlaygroundView: View {
                         .frame(height: Ink.borderWidth)
                 }
             }
-            .sheet(isPresented: $showListSheet) {
+            .inkSheet(isPresented: $showListSheet) {
                 listSheet
             }
-            .sheet(isPresented: $showFormSheet) {
+            .inkSheet(isPresented: $showFormSheet) {
                 formSheet
             }
-            .sheet(isPresented: $showConfirmSheet) {
+            .inkSheet(isPresented: $showConfirmSheet, detent: .mediumAndFull) {
                 confirmSheet
             }
             .inkAlert(
@@ -281,7 +276,7 @@ struct DesignSystemPlaygroundView: View {
     private var sheetCatalog: some View {
         VStack(alignment: .leading, spacing: InkSpace.md) {
             sectionTitle("Sheet")
-            Text("Opaque paper sheets — no iOS 26 glass. Medium confirm sits 20pt above the screen bottom. Close is a square xmark.")
+            Text("Overlay card — 2pt ink stroke. Medium (10/20 inset) → Large (5/10 inset) → Full (edge-to-edge). Corner radius stays 24 until full. Confirm can drag through all three.")
                 .inkText(.body)
             Button("List sheet") { showListSheet = true }
                 .inkOutlineButton()
@@ -373,7 +368,7 @@ struct DesignSystemPlaygroundView: View {
     }
 
     private var confirmSheet: some View {
-        InkSheet(title: "Leave", detent: .medium) {
+        InkSheet(title: "Leave") {
             InkSheetCloseButton { showConfirmSheet = false }
         } footer: {
             InkSheetFooter(showsHairline: false) {
@@ -391,25 +386,6 @@ struct DesignSystemPlaygroundView: View {
             }
             .padding(InkSpace.xl)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        }
-    }
-
-    private var typingDemo: some View {
-        VStack(alignment: .leading, spacing: InkSpace.md) {
-            sectionTitle("Typing")
-            TypewriterText(text: sampleEnglish, onFinished: { typedDone = true })
-                .id(typewriterKey)
-
-            Button("Replay typing") {
-                typedDone = false
-                typewriterKey += 1
-            }
-            .inkOutlineButton()
-
-            if typedDone {
-                Text("Done.")
-                    .inkText(.caption)
-            }
         }
     }
 
