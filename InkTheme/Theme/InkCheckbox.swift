@@ -50,7 +50,7 @@ private struct InkCheckboxBody: View {
         let radius = inkRadius.button
         let box = RoundedRectangle(cornerRadius: radius, style: .continuous)
         return box
-            .fill(isOn ? palette.accent : palette.ink.opacity(0.06))
+            .fill(isOn ? palette.accent : palette.ink.opacity(0.04))
             .frame(width: Ink.checkboxSize, height: Ink.checkboxSize)
             .overlay {
                 InkCheckmarkShape()
