@@ -103,6 +103,26 @@ struct InkThemeTests {
         #expect(systemLightGreen.inverse == .white)
     }
 
+    @Test func radiusTokensMatchSpec() {
+        #expect(InkRadius.storageKey == "ink.radius")
+        #expect(InkRadius.zero.value == 0)
+        #expect(InkRadius.sm.value == 6)
+        #expect(InkRadius.md.value == 12)
+        #expect(InkRadius.lg.value == 16)
+        #expect(InkRadius.zero.button == 0)
+        #expect(InkRadius.sm.button == 6)
+        #expect(InkRadius.md.button == 12)
+        #expect(InkRadius.lg.button == 16)
+        #expect(InkRadius.zero.toggle == 0)
+        #expect(InkRadius.sm.toggle == 6)
+        #expect(InkRadius.md.toggle == Ink.toggleHeight / 2)
+        #expect(InkRadius.lg.toggle == Ink.toggleHeight / 2)
+        #expect(InkRadius.zero.toggleKnob == 0)
+        #expect(InkRadius.sm.toggleKnob == 4)
+        #expect(InkRadius.md.toggleKnob == InkRadius.md.toggle)
+        #expect(InkRadius.lg.toggleKnob == InkRadius.lg.toggle)
+    }
+
     @Test func appearanceRevealSkipsWhenPaletteUnchanged() {
         #expect(InkAppearanceTransition.shouldReveal(from: .light, to: .light, system: .dark) == false)
         #expect(InkAppearanceTransition.shouldReveal(from: .light, to: .system, system: .light) == false)

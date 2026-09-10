@@ -3,6 +3,7 @@ import SwiftUI
 struct InkToggleStyle: ToggleStyle {
     @Environment(\.isEnabled) private var isEnabled
     @Environment(\.inkPalette) private var palette
+    @Environment(\.inkRadius) private var inkRadius
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     func makeBody(configuration: Configuration) -> some View {
@@ -23,17 +24,19 @@ struct InkToggleStyle: ToggleStyle {
     private func capsule(isOn: Bool) -> some View {
         let knob = isOn ? Ink.toggleKnobSize + 2 : Ink.toggleKnobSize
         let inset = (Ink.toggleHeight - knob) / 2
+        let radius = inkRadius.toggle
+        let track = RoundedRectangle(cornerRadius: radius, style: .continuous)
         return ZStack(alignment: isOn ? .trailing : .leading) {
-            Capsule(style: .continuous)
+            track
                 .fill(isOn ? palette.accent : palette.paper)
-            Circle()
+            RoundedRectangle(cornerRadius: inkRadius.toggleKnob, style: .continuous)
                 .fill(isOn ? palette.inverse : palette.ink)
                 .frame(width: knob, height: knob)
                 .padding(inset)
         }
         .frame(width: Ink.toggleWidth, height: Ink.toggleHeight)
         .overlay {
-            Capsule(style: .continuous)
+            track
                 .strokeBorder(palette.ink, lineWidth: Ink.borderWidth)
                 .opacity(isOn ? 0 : 1)
         }

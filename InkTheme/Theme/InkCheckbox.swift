@@ -20,6 +20,7 @@ private struct InkCheckboxBody: View {
     let configuration: ToggleStyleConfiguration
     @Environment(\.isEnabled) private var isEnabled
     @Environment(\.inkPalette) private var palette
+    @Environment(\.inkRadius) private var inkRadius
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var hookPulse = 0
 
@@ -46,7 +47,9 @@ private struct InkCheckboxBody: View {
 
     private var box: some View {
         let isOn = configuration.isOn
-        return RoundedRectangle(cornerRadius: Ink.cornerRadius, style: .continuous)
+        let radius = inkRadius.button
+        let box = RoundedRectangle(cornerRadius: radius, style: .continuous)
+        return box
             .fill(isOn ? palette.accent : palette.ink.opacity(0.06))
             .frame(width: Ink.checkboxSize, height: Ink.checkboxSize)
             .overlay {
@@ -61,7 +64,7 @@ private struct InkCheckboxBody: View {
                     }
             }
             .overlay {
-                RoundedRectangle(cornerRadius: Ink.cornerRadius, style: .continuous)
+                box
                     .strokeBorder(palette.ink, lineWidth: Ink.borderWidth)
                     .opacity(isOn ? 0 : 1)
             }

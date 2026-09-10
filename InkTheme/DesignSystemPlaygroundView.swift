@@ -27,6 +27,7 @@ struct DesignSystemPlaygroundView: View {
                     appearanceCatalog
                     accentCatalog
                     paperCatalog
+                    radiusCatalog
                     typeCatalog
                     spaceCatalog
                     navCatalog
@@ -123,6 +124,22 @@ struct DesignSystemPlaygroundView: View {
                     ) {
                         appearanceStore.selectGround(option)
                     }
+                }
+            }
+        }
+    }
+
+    private var radiusCatalog: some View {
+        VStack(alignment: .leading, spacing: InkSpace.md) {
+            sectionTitle("Radius")
+            Text("Buttons and checkbox use Zero 0 / Sm 6 / Md 12 / Lg 16. Switch is fully rounded from Md.")
+                .inkText(.body)
+            HStack(spacing: InkSpace.md) {
+                ForEach(InkRadius.allCases) { option in
+                    Button(option.title) {
+                        appearanceStore.selectRadius(option)
+                    }
+                    .modifier(AppearanceOptionStyle(isSelected: appearanceStore.radius == option))
                 }
             }
         }
@@ -353,7 +370,7 @@ struct DesignSystemPlaygroundView: View {
     private var toggles: some View {
         VStack(alignment: .leading, spacing: InkSpace.md) {
             sectionTitle("Toggle")
-            Text("Capsule switch. Off is paper with an ink stroke. On fills accent. 32 tall, 52 wide.")
+            Text("32 tall, 52 wide. Fully rounded from Md; Sm and Zero share the same corner on track and knob.")
                 .inkText(.body)
             Toggle("On", isOn: $toggleOn)
                 .inkText(.body)
@@ -371,7 +388,7 @@ struct DesignSystemPlaygroundView: View {
     private var checkboxes: some View {
         VStack(alignment: .leading, spacing: InkSpace.md) {
             sectionTitle("Checkbox")
-            Text("32 square, 12pt wrap. Off is 6% ink with a waiting hook. On fills accent.")
+            Text("32 square. Corner matches the button radius. Off is 6% ink with a waiting hook. On fills accent.")
                 .inkText(.body)
             Toggle("On", isOn: $checkboxOn)
                 .inkText(.body)
@@ -434,15 +451,20 @@ private struct PaletteSwatchButton: View {
     var isSelected: Bool
     var action: () -> Void
     @Environment(\.inkPalette) private var palette
+    @Environment(\.inkRadius) private var inkRadius
+
+    private let ringInset: CGFloat = 4
 
     var body: some View {
+        let inner = inkRadius.button
+        let ring = inner == 0 ? 0 : inner + ringInset
         Button(action: action) {
-            RoundedRectangle(cornerRadius: Ink.cornerRadius, style: .continuous)
+            RoundedRectangle(cornerRadius: inner, style: .continuous)
                 .fill(fill)
                 .frame(width: Ink.barButtonHeight, height: Ink.barButtonHeight)
-                .padding(4)
+                .padding(ringInset)
                 .overlay {
-                    RoundedRectangle(cornerRadius: Ink.cornerRadius + 2, style: .continuous)
+                    RoundedRectangle(cornerRadius: ring, style: .continuous)
                         .stroke(palette.ink, lineWidth: Ink.borderWidth)
                         .opacity(isSelected ? 1 : 0)
                 }
@@ -496,5 +518,5 @@ private struct AppearanceOptionStyle: ViewModifier {
 #Preview {
     DesignSystemPlaygroundView()
         .environment(InkAppearanceStore())
-        .inkAppearance(.system, accent: .ink, ground: .black)
+        .inkAppearance(.system, accent: .ink, ground: .black, radius: .md)
 }

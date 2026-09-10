@@ -29,7 +29,7 @@ From `InkTheme/InkTheme/` into the host app (keep names):
 | File | Role |
 | --- | --- |
 | `Theme/Ink.swift` | Color/layout tokens, fill/outline + bar buttons, `inkScreen()`, `inkStroke()` |
-| `Theme/InkAppearance.swift` | `InkAppearance` (system / light / dark), `InkAccent`, `InkGround` (dark paper), `.inkAppearance(_:accent:ground:)` |
+| `Theme/InkAppearance.swift` | `InkAppearance`, `InkAccent`, `InkGround`, `InkRadius` (zero / sm / md / lg), `.inkAppearance(_:accent:ground:radius:)` |
 | `Theme/InkAppearanceReveal.swift` | 12-point curved blob; each point expands at its own speed |
 | `Theme/InkText.swift` | `InkTextStyle`, `.inkText(_:)`, `InkSpace` |
 | `Theme/InkNav.swift` | `InkNavBar` — hero title + trailing actions |
@@ -61,7 +61,7 @@ Read colors from `@Environment(\.inkPalette)` after the host root applies `.inkA
 | --- | --- |
 | `Ink.buttonHeight` | `44` |
 | `Ink.barButtonHeight` | `32` |
-| `Ink.cornerRadius` | `12` |
+| `Ink.cornerRadius` | `12` (list cover, `.inkStroke()` fields — not buttons) |
 | `Ink.sheetCornerRadius` | `24` |
 | `Ink.sheetScreenInset` | `20` |
 | `Ink.borderWidth` | `2` |
@@ -88,7 +88,7 @@ Three modes, persisted on `InkAppearanceStore` under `ink.appearance`. Default i
 | `light` | Lock black ink on white paper |
 | `dark` | Lock white ink; paper follows `InkGround` |
 
-Host apps must hold one `InkAppearanceStore`, put it in the environment, and apply `.inkAppearance` at the `WindowGroup` root so colors invert on tap. Pass `accent` and `ground` from the same store:
+Host apps must hold one `InkAppearanceStore`, put it in the environment, and apply `.inkAppearance` at the `WindowGroup` root so colors invert on tap. Pass `accent`, `ground`, and `radius` from the same store:
 
 ```swift
 @main
@@ -102,7 +102,8 @@ struct HostApp: App {
                 .inkAppearance(
                     appearanceStore.appearance,
                     accent: appearanceStore.accent,
-                    ground: appearanceStore.ground
+                    ground: appearanceStore.ground,
+                    radius: appearanceStore.radius
                 )
         }
     }
@@ -115,7 +116,7 @@ Call `appearanceStore.select(.dark)` (or `.light` / `.system`) from settings. Pa
 appearanceStore.select(.dark, origin: buttonCenterInGlobal)
 ```
 
-`origin: nil` (the default) switches instantly. Skip the reveal when Reduce Motion is on, or when the resolved ink/paper palette does not change (for example Light while the system is already light). Accent and ground changes do not play the blob.
+`origin: nil` (the default) switches instantly. Skip the reveal when Reduce Motion is on, or when the resolved ink/paper palette does not change (for example Light while the system is already light). Accent, ground, and radius changes do not play the blob.
 
 ## Accent
 
@@ -148,6 +149,25 @@ appearanceStore.selectGround(.red)
 ```
 
 Switch is instant. Read screens from `@Environment(\.inkPalette).paper`. Fill labels use `inverse`, not tinted paper.
+
+## Radius
+
+Four values, persisted on the same `InkAppearanceStore` under `ink.radius`. Default is **md**. Independent of color axes.
+
+| Radius | Button / Checkbox | Switch track | Switch knob |
+| --- | --- | --- | --- |
+| `zero` | 0 | 0 | 0 |
+| `sm` | 6 | 6 | 4 |
+| `md` | 12 | fully rounded (`height / 2`) | same as track |
+| `lg` | 16 | fully rounded (`height / 2`) | same as track |
+
+Buttons and checkbox read `@Environment(\.inkRadius).button`. Switch track uses `.toggle`; the knob uses `.toggleKnob` — `md`/`lg` are fully rounded, `sm` knob is 2pt tighter than the track, `zero` is square on both. List covers and `.inkStroke()` stay on `Ink.cornerRadius` (12).
+
+```swift
+appearanceStore.selectRadius(.lg)
+```
+
+Switch is instant. At `sm` the knob is 2pt tighter than the track.
 
 Do not invent extra dark-mode grays or materials. Dark ink is still white; only paper can be a deep hue.
 
@@ -290,7 +310,7 @@ Content:
 ## Do not
 
 - Add gray fills, shadows, materials, gradients, or colorful SF Symbols tints
-- Use capsule / fully rounded buttons instead of 12pt continuous rects (capsule is only for `.ink` toggle; circle is only the mic)
+- Use capsule / fully rounded buttons instead of radius-token rects (circle is only the mic)
 - Put full-width 44pt buttons in the nav bar
 - Mix `ButtonStyle` with extra padding that breaks 44 / 32 heights
 - Use inset grouped / gray list chrome in sheets
@@ -333,7 +353,7 @@ Lists: `InkListRow` + `listRowBackground(Ink.paper)`. Hide system separators whe
 
 ## Verify
 
-- Playground Appearance, Accent, Paper, Type, Space, Nav, List, and Sheet sections match the tables above
-- Host app root applies `.inkAppearance(store.appearance, accent: store.accent, ground: store.ground)` so Light / Dark / System, accent, and dark paper work
+- Playground Appearance, Accent, Paper, Radius, Type, Space, Nav, List, and Sheet sections match the tables above
+- Host app root applies `.inkAppearance(store.appearance, accent: store.accent, ground: store.ground, radius: store.radius)` so Light / Dark / System, accent, dark paper, and radius work
 - Host screens use `.inkText`, `InkSpace`, `InkNavBar`, `InkListRow`, and `InkSheet`, not ad-hoc sizes or system inline titles
 - No remaining `AskTheme` / `askFillButton` / `askOutlineButton` after a migration

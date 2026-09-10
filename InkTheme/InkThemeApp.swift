@@ -18,7 +18,8 @@ struct InkThemeApp: App {
                 .inkAppearance(
                     appearanceStore.appearance,
                     accent: appearanceStore.accent,
-                    ground: appearanceStore.ground
+                    ground: appearanceStore.ground,
+                    radius: appearanceStore.radius
                 )
         }
     }
