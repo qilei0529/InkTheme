@@ -370,7 +370,7 @@ Backdrop: custom dialog defaults to `dismissOnBackdrop: true`. Alert uses `false
 4. Nav text: `.inkBarFillButton()` / `.inkBarOutlineButton()`. Nav icons: `.inkBarIconFillButton()` / `.inkBarIconOutlineButton()` (32 square).
 5. Fields: `.inkField()` (md 44, body) or `.inkField(size: .sm)` (32, footnote, full ink). Cards: paper fill + `.inkStroke()`. Corners follow the radius token.
 6. Voice: `VoiceButton` + `SoundWaveView(isActive:)`.
-7. Toggle: `Toggle(...).toggleStyle(.ink)`. Off paper + ink stroke; on accent fill.
+7. Toggle: `Toggle(...).toggleStyle(.ink)`. Off paper + ink stroke; on accent fill + ink stroke.
 8. Checkbox: `Toggle(...).toggleStyle(.inkCheckbox)`. 32 square; off 6% ink + waiting inverse hook; on accent fill. Tap pops the hook bigger then back.
 9. Sheets: `.inkSheet` + `InkSheet` + `InkSheetBody` / `InkSheetList` / `InkSheetFooter`. Lists: `InkListRow`. No system `.sheet`. No gray grouped lists.
 10. Dialogs: `InkDialog` / `InkAlert` via `.inkDialog` / `.inkAlert`. No system `.alert`.

@@ -22,7 +22,7 @@ struct InkToggleStyle: ToggleStyle {
     }
 
     private func capsule(isOn: Bool) -> some View {
-        let knob = isOn ? Ink.toggleKnobSize + 2 : Ink.toggleKnobSize
+        let knob = Ink.toggleKnobSize
         let inset = (Ink.toggleHeight - knob) / 2
         let radius = inkRadius.toggle
         let track = RoundedRectangle(cornerRadius: radius, style: .continuous)
@@ -38,7 +38,6 @@ struct InkToggleStyle: ToggleStyle {
         .overlay {
             track
                 .strokeBorder(palette.ink, lineWidth: Ink.borderWidth)
-                .opacity(isOn ? 0 : 1)
         }
         .animation(reduceMotion ? nil : .easeInOut(duration: 0.23), value: isOn)
         .accessibilityHidden(true)
