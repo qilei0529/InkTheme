@@ -66,7 +66,6 @@ private struct InkCheckboxBody: View {
             .overlay {
                 box
                     .strokeBorder(palette.ink, lineWidth: Ink.borderWidth)
-                    .opacity(isOn ? 0 : 1)
             }
             .accessibilityHidden(true)
     }
