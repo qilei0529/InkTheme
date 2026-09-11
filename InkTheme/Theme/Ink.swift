@@ -53,30 +53,6 @@ enum InkFieldSize: CaseIterable, Identifiable {
     }
 }
 
-struct InkDotFill: View {
-    var color: Color
-
-    var body: some View {
-        Canvas { context, size in
-            let dot = Ink.borderWidth
-            let step = dot * 2
-            var y: CGFloat = 0
-            while y < size.height {
-                var x: CGFloat = 0
-                while x < size.width {
-                    context.fill(
-                        Path(CGRect(x: x, y: y, width: dot, height: dot)),
-                        with: .color(color)
-                    )
-                    x += step
-                }
-                y += step
-            }
-        }
-        .allowsHitTesting(false)
-    }
-}
-
 struct InkOutlineButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
     @Environment(\.inkPalette) private var palette
@@ -106,15 +82,10 @@ struct InkFillButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(InkTextStyle.bodyStrong.font)
-            .foregroundStyle(palette.ink.opacity(isEnabled ? 1 : 0.35))
+            .foregroundStyle(palette.inverse.opacity(isEnabled ? 1 : 0.7))
             .frame(maxWidth: .infinity, minHeight: Ink.buttonHeight)
             .padding(.horizontal, InkSpace.lg)
-            .background {
-                ZStack {
-                    palette.paper
-                    InkDotFill(color: palette.accent.opacity(isEnabled ? 1 : 0.25))
-                }
-            }
+            .background(palette.accent.opacity(isEnabled ? 1 : 0.25))
             .clipShape(RoundedRectangle(cornerRadius: inkRadius.button, style: .continuous))
             .opacity(configuration.isPressed ? 0.7 : 1)
     }
@@ -151,15 +122,10 @@ struct InkBarFillButtonStyle: ButtonStyle {
         configuration.label
             .labelStyle(.titleAndIcon)
             .font(InkTextStyle.bodyStrong.font)
-            .foregroundStyle(palette.ink.opacity(isEnabled ? 1 : 0.35))
+            .foregroundStyle(palette.inverse.opacity(isEnabled ? 1 : 0.7))
             .frame(minHeight: Ink.barButtonHeight)
             .padding(.horizontal, InkSpace.md)
-            .background {
-                ZStack {
-                    palette.paper
-                    InkDotFill(color: palette.accent.opacity(isEnabled ? 1 : 0.25))
-                }
-            }
+            .background(palette.accent.opacity(isEnabled ? 1 : 0.25))
             .clipShape(RoundedRectangle(cornerRadius: inkRadius.button, style: .continuous))
             .opacity(configuration.isPressed ? 0.7 : 1)
     }
@@ -195,14 +161,9 @@ struct InkBarIconFillButtonStyle: ButtonStyle {
         configuration.label
             .labelStyle(.iconOnly)
             .font(.system(size: 15, weight: .semibold))
-            .foregroundStyle(palette.ink.opacity(isEnabled ? 1 : 0.35))
+            .foregroundStyle(palette.inverse.opacity(isEnabled ? 1 : 0.7))
             .frame(width: Ink.barButtonHeight, height: Ink.barButtonHeight)
-            .background {
-                ZStack {
-                    palette.paper
-                    InkDotFill(color: palette.accent.opacity(isEnabled ? 1 : 0.25))
-                }
-            }
+            .background(palette.accent.opacity(isEnabled ? 1 : 0.25))
             .clipShape(RoundedRectangle(cornerRadius: inkRadius.button, style: .continuous))
             .opacity(configuration.isPressed ? 0.7 : 1)
     }
