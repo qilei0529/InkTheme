@@ -17,7 +17,6 @@ enum Ink {
     static let sheetMediumFraction: CGFloat = 0.5
     /// Large detent height as a fraction of the full-screen frame (between medium and full).
     static let sheetLargeFraction: CGFloat = 0.88
-    static let sheetMoveInOffset: CGFloat = 32
     static let dialogMaxWidth: CGFloat = 320
     static let dialogMoveInOffset: CGFloat = 40
     static let borderWidth: CGFloat = 2

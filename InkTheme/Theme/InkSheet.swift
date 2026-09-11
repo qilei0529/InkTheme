@@ -409,7 +409,7 @@ private struct InkSheetOverlayModifier<Sheet: View>: ViewModifier {
     @State private var dragTranslation: CGFloat = 0
     /// Keeps chrome on-screen through the move-out; `isPresented` may already be false.
     @State private var isVisible = false
-    /// Appear starts at `sheetMoveInOffset`; rest is 0; dismiss eases to the sheet height (system-like Y+h).
+    /// Appear starts at the sheet height; rest is 0; dismiss eases to the same `Y + h`.
     @State private var verticalOffset: CGFloat = 0
     @State private var isAtRest = false
     @State private var dismissTask: Task<Void, Never>?
@@ -542,7 +542,7 @@ private struct InkSheetOverlayModifier<Sheet: View>: ViewModifier {
         settledHeight = 0
         availableHeight = 0
         isAtRest = false
-        verticalOffset = reduceMotion ? 0 : Ink.sheetMoveInOffset
+        verticalOffset = reduceMotion ? 0 : 10_000
         isVisible = true
     }
 
@@ -552,6 +552,12 @@ private struct InkSheetOverlayModifier<Sheet: View>: ViewModifier {
             verticalOffset = 0
             isAtRest = true
             return
+        }
+        let distance = max(settledHeight, 0)
+        var transaction = Transaction()
+        transaction.disablesAnimations = true
+        withTransaction(transaction) {
+            verticalOffset = distance
         }
         withAnimation(.easeOut(duration: appearDuration)) {
             verticalOffset = 0
@@ -571,7 +577,7 @@ private struct InkSheetOverlayModifier<Sheet: View>: ViewModifier {
         }
         isAtRest = false
         // System sheet dismiss: slide down by the sheet height (Y + h) until off-screen.
-        let distance = max(settledHeight, Ink.sheetMoveInOffset)
+        let distance = max(settledHeight, 0)
         guard !reduceMotion else {
             isVisible = false
             resetDetentState()

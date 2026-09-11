@@ -70,7 +70,6 @@ Read colors from `@Environment(\.inkPalette)` after the host root applies `.inkA
 | `Ink.sheetFullTopExtra` | `36` (added above safe top inside full-bleed content) |
 | `Ink.sheetMediumFraction` | `0.5` |
 | `Ink.sheetLargeFraction` | `0.88` |
-| `Ink.sheetMoveInOffset` | `32` |
 | `Ink.dialogMaxWidth` | `320` |
 | `Ink.dialogMoveInOffset` | `40` |
 | `Ink.borderWidth` | `2` |
@@ -298,7 +297,7 @@ Chrome: overlay card on an ink scrim (`palette.ink.opacity(0.45)`). Three chrome
 | Large | safe area + `5` side / `10` vertical | `24` (same as medium) | none |
 | Full | `0` (full-bleed paper) | `0` | pad content by safe area; top also adds `sheetFullTopExtra` (`36`) |
 
-Card is opaque `paper` with a 2pt ink `strokeBorder`. Bottom-aligned; the overlay geometry ignores safe area so full paper can fill the screen while content keeps safe insets. Appear uses a 32pt Y move-in (`Ink.sheetMoveInOffset`). Dismiss matches system sheets: slide down by the sheet height (`Y + h`), ease-in, no fade. Skip motion when Reduce Motion is on. Visible ink grabber (2pt capsule) + `InkNavBar`. Drag **only** the grabber and nav to move detents or dismiss — do not attach drag to `InkSheetBody` / `InkSheetList`. Optional `InkSheetFooter`.
+Card is opaque `paper` with a 2pt ink `strokeBorder`. Bottom-aligned; the overlay geometry ignores safe area so full paper can fill the screen while content keeps safe insets. Appear and dismiss both travel the sheet height (`Y + h`); appear ease-out, dismiss ease-in, no fade. Skip motion when Reduce Motion is on. Visible ink grabber (2pt capsule) + `InkNavBar`. Drag **only** the grabber and nav to move detents or dismiss — do not attach drag to `InkSheetBody` / `InkSheetList`. Optional `InkSheetFooter`.
 
 Content:
 

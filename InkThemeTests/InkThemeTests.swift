@@ -16,7 +16,6 @@ struct InkThemeTests {
         #expect(Ink.sheetFullTopExtra == 36)
         #expect(Ink.sheetMediumFraction == 0.5)
         #expect(Ink.sheetLargeFraction == 0.88)
-        #expect(Ink.sheetMoveInOffset == 32)
         #expect(Ink.dialogMaxWidth == 320)
         #expect(Ink.dialogMoveInOffset == 40)
         #expect(Ink.borderWidth == 2)
