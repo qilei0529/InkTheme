@@ -392,6 +392,8 @@ struct DesignSystemPlaygroundView: View {
     private var buttons: some View {
         VStack(alignment: .leading, spacing: InkSpace.md) {
             sectionTitle("Black-border buttons")
+            Text("Fill is paper tiled with 2pt accent squares and a 2pt gap. Labels are ink.")
+                .inkText(.body)
             Button("Next item") {}
                 .inkFillButton()
             Button("Show grammar hint") {}

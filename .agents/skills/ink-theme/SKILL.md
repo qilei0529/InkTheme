@@ -28,7 +28,7 @@ From `InkTheme/InkTheme/` into the host app (keep names):
 
 | File | Role |
 | --- | --- |
-| `Theme/Ink.swift` | Color/layout tokens, fill/outline + bar buttons, `inkScreen()`, `inkStroke()`, `InkFieldSize`, `inkField()` |
+| `Theme/Ink.swift` | Color/layout tokens, `InkDotFill`, fill/outline + bar buttons, `inkScreen()`, `inkStroke()`, `InkFieldSize`, `inkField()` |
 | `Theme/InkAppearance.swift` | `InkAppearance`, `InkAccent`, `InkGround`, `InkRadius` (zero / sm / md / lg), `.inkAppearance(_:accent:ground:radius:)` |
 | `Theme/InkAppearanceReveal.swift` | 12-point curved blob; each point expands at its own speed |
 | `Theme/InkText.swift` | `InkTextStyle`, `.inkText(_:)`, `InkSpace` |
@@ -81,11 +81,11 @@ Read colors from `@Environment(\.inkPalette)` after the host root applies `.inkA
 | `Ink.toggleKnobSize` | `20` |
 | `Ink.checkboxSize` | `32` |
 
-`ink` inverts with appearance. Light paper is always white. Dark paper follows `InkGround`: black `#000000`, deep red `#1E080B`, deep blue `#000E1F`, deep green `#04180B`. `inverse` is the untinted partner of ink (white in light, black in dark) for fill labels.
+`ink` inverts with appearance. Light paper is always white. Dark paper follows `InkGround`: black `#000000`, deep red `#1E080B`, deep blue `#000E1F`, deep green `#04180B`. `inverse` is the untinted partner of ink (white in light, black in dark) for the listening mic, the on-toggle knob, and the checkbox hook.
 
 `accent` is a separate axis: default **ink** matches `ink`. Red `#F6465D`, Blue `#0077FF`, and Green `#22C55E` are fixed in both appearances.
 
-Use `accent` for fill button backgrounds, listening `VoiceButton` fill, `SoundWaveView` bars, **on** Ink toggles, and **on** Ink checkboxes. Use `inverse` for fill button labels, the listening mic icon, the on-toggle knob, and the checkbox hook. Keep `ink` for type, outlines, hairlines, list covers, and the off-toggle knob. Use `paper` for screens, nav, sheets, outline fills, and the off-toggle track. No SF Rounded. No extra grays.
+Use `accent` for fill button **dot tiles** (2pt squares, 2pt gap), listening `VoiceButton` fill, `SoundWaveView` bars, **on** Ink toggles, and **on** Ink checkboxes. Use `inverse` for the listening mic icon, the on-toggle knob, and the checkbox hook. Keep `ink` for type, **fill and outline button labels**, outlines, hairlines, list covers, and the off-toggle knob. Use `paper` for screens, nav, sheets, outline fills, fill-button ground (gaps in the tile), and the off-toggle track. No SF Rounded. No extra grays.
 
 ## Appearance
 
@@ -157,7 +157,7 @@ Four values, persisted on the same `InkAppearanceStore` under `ink.ground`. Defa
 appearanceStore.selectGround(.red)
 ```
 
-Switch is instant. Read screens from `@Environment(\.inkPalette).paper`. Fill labels use `inverse`, not tinted paper.
+Switch is instant. Read screens from `@Environment(\.inkPalette).paper`. Fill button labels use `ink`, not `inverse` or tinted paper.
 
 ## Radius
 
@@ -366,7 +366,7 @@ Backdrop: custom dialog defaults to `dismissOnBackdrop: true`. Alert uses `false
 
 1. Screen background: `.inkScreen()`.
 2. Text: `.inkText(.body)` (and siblings). Never `.primary` / `.tint` for chrome.
-3. Page buttons: `.inkFillButton()` or `.inkOutlineButton()`. Min height 44.
+3. Page buttons: `.inkFillButton()` or `.inkOutlineButton()`. Min height 44. Fill is paper + a 2pt accent dot tile (2pt gap); labels are `ink`.
 4. Nav text: `.inkBarFillButton()` / `.inkBarOutlineButton()`. Nav icons: `.inkBarIconFillButton()` / `.inkBarIconOutlineButton()` (32 square).
 5. Fields: `.inkField()` (md 44, body) or `.inkField(size: .sm)` (32, footnote, full ink). Cards: paper fill + `.inkStroke()`. Corners follow the radius token.
 6. Voice: `VoiceButton` + `SoundWaveView(isActive:)`.
