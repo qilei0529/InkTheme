@@ -21,6 +21,7 @@ struct InkThemeApp: App {
                     ground: appearanceStore.ground,
                     radius: appearanceStore.radius
                 )
+                .inkKeyboardBar()
         }
     }
 }

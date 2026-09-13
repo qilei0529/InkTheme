@@ -10,4 +10,5 @@ struct ContentView: View {
     ContentView()
         .environment(InkAppearanceStore())
         .inkAppearance(.system, accent: .ink, ground: .black, radius: .md)
+        .inkKeyboardBar()
 }
