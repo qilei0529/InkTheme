@@ -149,6 +149,14 @@ enum InkSheetChrome {
         return lerp(Ink.sheetCornerRadius, 0, (progress - 0.5) / 0.5)
     }
 
+    /// Medium and large keep opaque ink; large → full fades the stroke to clear.
+    static func strokeOpacity(progress: CGFloat) -> CGFloat {
+        if progress <= 0.5 {
+            return 1
+        }
+        return lerp(1, 0, (progress - 0.5) / 0.5)
+    }
+
     /// Gap from screen edge to card. Medium/large include safe area + chrome; full is 0.
     static func outerInsets(progress: CGFloat, safe: EdgeInsets) -> EdgeInsets {
         let h = horizontalInset(progress: progress)
@@ -180,6 +188,7 @@ struct InkSheet<Actions: View, Footer: View, Content: View>: View {
     @Environment(\.inkPalette) private var palette
     @Environment(\.inkRadius) private var inkRadius
     @Environment(\.inkSheetChromeRadius) private var chromeRadius
+    @Environment(\.inkSheetStrokeOpacity) private var strokeOpacity
     @Environment(\.inkSheetContentSafeInsets) private var contentSafeInsets
     @Environment(\.inkSheetDrag) private var sheetDrag
     @ViewBuilder var actions: () -> Actions
@@ -199,7 +208,7 @@ struct InkSheet<Actions: View, Footer: View, Content: View>: View {
         .background(palette.paper)
         .clipShape(cardShape)
         .overlay {
-            cardShape.strokeBorder(palette.ink, lineWidth: Ink.borderWidth)
+            cardShape.strokeBorder(palette.ink.opacity(strokeOpacity), lineWidth: Ink.borderWidth)
         }
     }
 
@@ -376,6 +385,10 @@ private struct InkSheetChromeRadiusKey: EnvironmentKey {
     static let defaultValue: CGFloat = Ink.sheetCornerRadius
 }
 
+private struct InkSheetStrokeOpacityKey: EnvironmentKey {
+    static let defaultValue: CGFloat = 1
+}
+
 private struct InkSheetContentSafeInsetsKey: EnvironmentKey {
     static let defaultValue = EdgeInsets()
 }
@@ -389,6 +402,11 @@ extension EnvironmentValues {
     var inkSheetChromeRadius: CGFloat {
         get { self[InkSheetChromeRadiusKey.self] }
         set { self[InkSheetChromeRadiusKey.self] = newValue }
+    }
+
+    var inkSheetStrokeOpacity: CGFloat {
+        get { self[InkSheetStrokeOpacityKey.self] }
+        set { self[InkSheetStrokeOpacityKey.self] = newValue }
     }
 
     var inkSheetContentSafeInsets: EdgeInsets {
@@ -441,6 +459,7 @@ private struct InkSheetOverlayModifier<Sheet: View>: ViewModifier {
                             let outer = InkSheetChrome.outerInsets(progress: progress, safe: safe)
                             let contentSafe = InkSheetChrome.contentSafeInsets(progress: progress, safe: safe)
                             let radius = InkSheetChrome.cornerRadius(progress: progress, radius: inkRadius)
+                            let stroke = InkSheetChrome.strokeOpacity(progress: progress)
                             let cardHeight = min(
                                 height,
                                 max(available - outer.top - outer.bottom, 0)
@@ -449,6 +468,7 @@ private struct InkSheetOverlayModifier<Sheet: View>: ViewModifier {
                             sheet()
                                 .frame(height: cardHeight)
                                 .environment(\.inkSheetChromeRadius, radius)
+                                .environment(\.inkSheetStrokeOpacity, stroke)
                                 .environment(\.inkSheetContentSafeInsets, contentSafe)
                                 .environment(\.inkSheetDrag, InkSheetDragHandlers(
                                     onChanged: { translation in

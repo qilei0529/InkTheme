@@ -258,6 +258,10 @@ struct InkThemeTests {
         #expect(InkSheetChrome.cornerRadius(progress: 1, radius: .md) == 0)
         #expect(InkSheetChrome.cornerRadius(progress: 0, radius: .zero) == 0)
         #expect(InkSheetChrome.cornerRadius(progress: 0.75, radius: .md) == 12)
+        #expect(InkSheetChrome.strokeOpacity(progress: 0) == 1)
+        #expect(InkSheetChrome.strokeOpacity(progress: 0.5) == 1)
+        #expect(InkSheetChrome.strokeOpacity(progress: 0.75) == 0.5)
+        #expect(InkSheetChrome.strokeOpacity(progress: 1) == 0)
     }
 
     @Test func sheetChromeRespectsSafeArea() {
