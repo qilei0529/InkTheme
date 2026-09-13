@@ -1,4 +1,7 @@
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#endif
 
 enum Ink {
     static let buttonHeight: CGFloat = 44
@@ -206,6 +209,34 @@ extension View {
 
     func inkField(size: InkFieldSize = .md, enabled: Bool = true) -> some View {
         modifier(InkFieldModifier(size: size, enabled: enabled))
+    }
+
+    func inkDismissKeyboardOnTap(_ isEnabled: Bool = true) -> some View {
+        modifier(InkDismissKeyboardOnTapModifier(isEnabled: isEnabled))
+    }
+}
+
+enum InkKeyboard {
+    static func dismiss() {
+        #if canImport(UIKit)
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        #endif
+    }
+}
+
+private struct InkDismissKeyboardOnTapModifier: ViewModifier {
+    var isEnabled: Bool
+
+    func body(content: Content) -> some View {
+        if isEnabled {
+            content
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    InkKeyboard.dismiss()
+                }
+        } else {
+            content
+        }
     }
 }
 

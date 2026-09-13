@@ -16,6 +16,7 @@ struct InkDialog<Actions: View, Footer: View, Content: View>: View {
         }
         .padding(InkSpace.xl)
         .frame(maxWidth: Ink.dialogMaxWidth, alignment: .leading)
+        .inkDismissKeyboardOnTap()
         .background(palette.paper)
         .clipShape(RoundedRectangle(cornerRadius: inkRadius.dialog, style: .continuous))
         .overlay {

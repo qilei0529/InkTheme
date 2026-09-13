@@ -44,6 +44,7 @@ struct DesignSystemPlaygroundView: View {
                 }
                 .padding(InkSpace.xl)
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .inkDismissKeyboardOnTap()
             }
             .inkScreen()
             .toolbar(.hidden, for: .navigationBar)

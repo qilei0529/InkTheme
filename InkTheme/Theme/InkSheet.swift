@@ -205,6 +205,7 @@ struct InkSheet<Actions: View, Footer: View, Content: View>: View {
         }
         .padding(contentSafeInsets)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .inkDismissKeyboardOnTap()
         .background(palette.paper)
         .clipShape(cardShape)
         .overlay {
@@ -300,6 +301,7 @@ struct InkSheetBody<Content: View>: View {
             .padding(InkSpace.xl)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .scrollDismissesKeyboard(.immediately)
     }
 }
 
