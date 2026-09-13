@@ -178,6 +178,7 @@ struct InkSheet<Actions: View, Footer: View, Content: View>: View {
     let title: String
     var showsDragIndicator: Bool = true
     @Environment(\.inkPalette) private var palette
+    @Environment(\.inkRadius) private var inkRadius
     @Environment(\.inkSheetChromeRadius) private var chromeRadius
     @Environment(\.inkSheetContentSafeInsets) private var contentSafeInsets
     @Environment(\.inkSheetDrag) private var sheetDrag
@@ -209,9 +210,9 @@ struct InkSheet<Actions: View, Footer: View, Content: View>: View {
     private var handle: some View {
         VStack(spacing: 0) {
             if showsDragIndicator {
-                Capsule()
+                RoundedRectangle(cornerRadius: inkRadius.button, style: .continuous)
                     .fill(palette.ink)
-                    .frame(width: 36, height: Ink.borderWidth)
+                    .frame(width: Ink.sheetHandleWidth, height: Ink.sheetHandleHeight)
                     .padding(.top, InkSpace.sm)
                     .frame(maxWidth: .infinity)
             }

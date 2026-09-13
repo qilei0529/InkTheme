@@ -13,7 +13,10 @@ enum Ink {
     /// Large detent vertical inset — half of `sheetScreenInset`. Full lerps to 0.
     static let sheetLargeVerticalInset: CGFloat = 10
     /// Extra top padding inside full-bleed sheet, on top of the status-bar safe area.
-    static let sheetFullTopExtra: CGFloat = 36
+    static let sheetFullTopExtra: CGFloat = 40
+    /// Sheet grabber capsule.
+    static let sheetHandleWidth: CGFloat = 48
+    static let sheetHandleHeight: CGFloat = 4
     static let sheetMediumFraction: CGFloat = 0.5
     /// Large detent height as a fraction of the full-screen frame (between medium and full).
     static let sheetLargeFraction: CGFloat = 0.88
