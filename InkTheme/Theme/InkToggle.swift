@@ -17,7 +17,7 @@ struct InkToggleStyle: ToggleStyle {
             }
         }
         .buttonStyle(.plain)
-        .opacity(isEnabled ? 1 : 0.35)
+        .opacity(isEnabled ? 1 : 0.65)
         .sensoryFeedback(.selection, trigger: configuration.isOn)
     }
 
@@ -39,7 +39,7 @@ struct InkToggleStyle: ToggleStyle {
             track
                 .strokeBorder(palette.ink, lineWidth: Ink.borderWidth)
         }
-        .animation(reduceMotion ? nil : .easeInOut(duration: 0.23), value: isOn)
+        .animation(reduceMotion ? nil : .easeInOut(duration: 0.2), value: isOn)
         .accessibilityHidden(true)
     }
 }

@@ -4,7 +4,7 @@ struct DesignSystemPlaygroundView: View {
     @State private var isListening = false
     @State private var toggleOn = true
     @State private var toggleOff = false
-    @State private var toggleDisabled = true
+    @State private var toggleDisabled = false
     @State private var checkboxOn = true
     @State private var checkboxOff = false
     @State private var checkboxDisabled = true

@@ -41,7 +41,7 @@ private struct InkCheckboxBody: View {
             }
         }
         .buttonStyle(.plain)
-        .opacity(isEnabled ? 1 : 0.35)
+        .opacity(isEnabled ? 1 : 0.65)
         .sensoryFeedback(.selection, trigger: configuration.isOn)
     }
 
@@ -50,7 +50,7 @@ private struct InkCheckboxBody: View {
         let radius = inkRadius.button
         let box = RoundedRectangle(cornerRadius: radius, style: .continuous)
         return box
-            .fill(isOn ? palette.accent : palette.ink.opacity(0.04))
+            .fill(isOn ? palette.accent : palette.ink.opacity(0.02))
             .frame(width: Ink.checkboxSize, height: Ink.checkboxSize)
             .overlay {
                 InkCheckmarkShape()
