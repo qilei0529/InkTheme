@@ -7,7 +7,7 @@ Black-and-white SwiftUI design system for iOS apps. Minimum deployment target is
 In Xcode: File → Add Package Dependencies → Add Local, or depend on this repository:
 
 ```swift
-.package(url: "https://github.com/your-org/InkTheme", from: "1.0.0")
+.package(url: "https://github.com/your-org/InkTheme", from: "0.1.0")
 ```
 
 Link the `InkTheme` library to the app target, then:
