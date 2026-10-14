@@ -3,13 +3,13 @@ import UIKit
 
 @Observable
 @MainActor
-final class InkAppearanceStore {
-    var appearance: InkAppearance
-    var accent: InkAccent
-    var ground: InkGround
-    var radius: InkRadius
+public final class InkAppearanceStore {
+    public var appearance: InkAppearance
+    public var accent: InkAccent
+    public var ground: InkGround
+    public var radius: InkRadius
 
-    init() {
+    public init() {
         let appearanceRaw = UserDefaults.standard.string(forKey: InkAppearance.storageKey) ?? ""
         appearance = InkAppearance(rawValue: appearanceRaw) ?? .system
         let accentRaw = UserDefaults.standard.string(forKey: InkAccent.storageKey) ?? ""
@@ -20,7 +20,7 @@ final class InkAppearanceStore {
         radius = InkRadius(rawValue: radiusRaw) ?? .md
     }
 
-    func select(_ appearance: InkAppearance, origin: CGPoint? = nil) {
+    public func select(_ appearance: InkAppearance, origin: CGPoint? = nil) {
         guard appearance != self.appearance else { return }
         guard !InkThemeReveal.inProgress else { return }
 
@@ -40,19 +40,19 @@ final class InkAppearanceStore {
         }
     }
 
-    func selectAccent(_ accent: InkAccent) {
+    public func selectAccent(_ accent: InkAccent) {
         guard accent != self.accent else { return }
         self.accent = accent
         UserDefaults.standard.set(accent.rawValue, forKey: InkAccent.storageKey)
     }
 
-    func selectGround(_ ground: InkGround) {
+    public func selectGround(_ ground: InkGround) {
         guard ground != self.ground else { return }
         self.ground = ground
         UserDefaults.standard.set(ground.rawValue, forKey: InkGround.storageKey)
     }
 
-    func selectRadius(_ radius: InkRadius) {
+    public func selectRadius(_ radius: InkRadius) {
         guard radius != self.radius else { return }
         self.radius = radius
         UserDefaults.standard.set(radius.rawValue, forKey: InkRadius.storageKey)
@@ -65,16 +65,16 @@ final class InkAppearanceStore {
     }
 }
 
-enum InkAppearance: String, CaseIterable, Identifiable {
+public enum InkAppearance: String, CaseIterable, Identifiable {
     case system
     case light
     case dark
 
     static let storageKey = "ink.appearance"
 
-    var id: String { rawValue }
+    public var id: String { rawValue }
 
-    var title: String {
+    public var title: String {
         switch self {
         case .system: "System"
         case .light: "Light"
@@ -82,7 +82,7 @@ enum InkAppearance: String, CaseIterable, Identifiable {
         }
     }
 
-    var colorScheme: ColorScheme? {
+    public var colorScheme: ColorScheme? {
         switch self {
         case .system: nil
         case .light: .light
@@ -98,19 +98,22 @@ enum InkAppearance: String, CaseIterable, Identifiable {
         }
     }
 
+    @MainActor
     func applyToOpenWindows() {
-        UIView.performWithoutAnimation {
-            for scene in UIApplication.shared.connectedScenes {
-                guard let windowScene = scene as? UIWindowScene else { continue }
-                for window in windowScene.windows {
-                    window.overrideUserInterfaceStyle = userInterfaceStyle
-                }
+        let style = userInterfaceStyle
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        for scene in UIApplication.shared.connectedScenes {
+            guard let windowScene = scene as? UIWindowScene else { continue }
+            for window in windowScene.windows {
+                window.overrideUserInterfaceStyle = style
             }
         }
+        CATransaction.commit()
     }
 }
 
-enum InkAccent: String, CaseIterable, Identifiable {
+public enum InkAccent: String, CaseIterable, Identifiable {
     case ink
     case red
     case blue
@@ -118,9 +121,9 @@ enum InkAccent: String, CaseIterable, Identifiable {
 
     static let storageKey = "ink.accent"
 
-    var id: String { rawValue }
+    public var id: String { rawValue }
 
-    var title: String {
+    public var title: String {
         switch self {
         case .ink: "Ink"
         case .red: "Red"
@@ -129,7 +132,7 @@ enum InkAccent: String, CaseIterable, Identifiable {
         }
     }
 
-    func resolved(against ink: Color) -> Color {
+    public func resolved(against ink: Color) -> Color {
         switch self {
         case .ink:
             ink
@@ -143,7 +146,7 @@ enum InkAccent: String, CaseIterable, Identifiable {
     }
 }
 
-enum InkGround: String, CaseIterable, Identifiable {
+public enum InkGround: String, CaseIterable, Identifiable {
     case black
     case red
     case blue
@@ -151,9 +154,9 @@ enum InkGround: String, CaseIterable, Identifiable {
 
     static let storageKey = "ink.ground"
 
-    var id: String { rawValue }
+    public var id: String { rawValue }
 
-    var title: String {
+    public var title: String {
         switch self {
         case .black: "Black"
         case .red: "Red"
@@ -162,7 +165,7 @@ enum InkGround: String, CaseIterable, Identifiable {
         }
     }
 
-    var color: Color {
+    public var color: Color {
         switch self {
         case .black:
             .black
@@ -176,7 +179,7 @@ enum InkGround: String, CaseIterable, Identifiable {
     }
 }
 
-enum InkRadius: String, CaseIterable, Identifiable {
+public enum InkRadius: String, CaseIterable, Identifiable, Sendable {
     case zero
     case sm
     case md
@@ -184,9 +187,9 @@ enum InkRadius: String, CaseIterable, Identifiable {
 
     static let storageKey = "ink.radius"
 
-    var id: String { rawValue }
+    public var id: String { rawValue }
 
-    var title: String {
+    public var title: String {
         switch self {
         case .zero: "Zero"
         case .sm: "Sm"
@@ -195,7 +198,7 @@ enum InkRadius: String, CaseIterable, Identifiable {
         }
     }
 
-    var value: CGFloat {
+    public var value: CGFloat {
         switch self {
         case .zero: 0
         case .sm: 6
@@ -204,10 +207,10 @@ enum InkRadius: String, CaseIterable, Identifiable {
         }
     }
 
-    var button: CGFloat { value }
+    public var button: CGFloat { value }
 
     /// Dialog card. Zero stays square; otherwise 4pt looser than buttons.
-    var dialog: CGFloat {
+    public var dialog: CGFloat {
         switch self {
         case .zero: 0
         case .sm, .md, .lg: value + 4
@@ -215,7 +218,7 @@ enum InkRadius: String, CaseIterable, Identifiable {
     }
 
     /// Switch track. `md` and `lg` are fully rounded; `sm` and `zero` use `value`.
-    var toggle: CGFloat {
+    public var toggle: CGFloat {
         switch self {
         case .md, .lg: Ink.toggleHeight / 2
         case .zero, .sm: value
@@ -223,7 +226,7 @@ enum InkRadius: String, CaseIterable, Identifiable {
     }
 
     /// Switch knob. At `sm`, 2pt tighter than the track so the inner corner sits inside the stroke.
-    var toggleKnob: CGFloat {
+    public var toggleKnob: CGFloat {
         switch self {
         case .sm: max(0, toggle - 2)
         case .zero, .md, .lg: toggle
@@ -231,16 +234,23 @@ enum InkRadius: String, CaseIterable, Identifiable {
     }
 }
 
-struct InkPalette: Equatable {
-    var ink: Color
-    var paper: Color
-    var accent: Color
-    var inverse: Color
+public struct InkPalette: Equatable, Sendable {
+    public var ink: Color
+    public var paper: Color
+    public var accent: Color
+    public var inverse: Color
 
-    static let light = InkPalette(ink: .black, paper: .white, accent: .black, inverse: .white)
-    static let dark = InkPalette(ink: .white, paper: .black, accent: .white, inverse: .black)
+    public static let light = InkPalette(ink: .black, paper: .white, accent: .black, inverse: .white)
+    public static let dark = InkPalette(ink: .white, paper: .black, accent: .white, inverse: .black)
 
-    static func resolved(
+    public init(ink: Color, paper: Color, accent: Color, inverse: Color) {
+        self.ink = ink
+        self.paper = paper
+        self.accent = accent
+        self.inverse = inverse
+    }
+
+    public static func resolved(
         appearance: InkAppearance,
         accent: InkAccent = .ink,
         ground: InkGround = .black,
@@ -275,19 +285,19 @@ private struct InkRadiusKey: EnvironmentKey {
 }
 
 extension EnvironmentValues {
-    var inkPalette: InkPalette {
+    public var inkPalette: InkPalette {
         get { self[InkPaletteKey.self] }
         set { self[InkPaletteKey.self] = newValue }
     }
 
-    var inkRadius: InkRadius {
+    public var inkRadius: InkRadius {
         get { self[InkRadiusKey.self] }
         set { self[InkRadiusKey.self] = newValue }
     }
 }
 
 extension View {
-    func inkAppearance(
+    public func inkAppearance(
         _ preference: InkAppearance,
         accent: InkAccent = .ink,
         ground: InkGround = .black,

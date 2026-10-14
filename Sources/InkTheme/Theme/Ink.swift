@@ -3,54 +3,54 @@ import SwiftUI
 import UIKit
 #endif
 
-enum Ink {
-    static let buttonHeight: CGFloat = 44
-    static let barButtonHeight: CGFloat = 32
-    static let cornerRadius: CGFloat = 12
-    static let sheetCornerRadius: CGFloat = 24
-    static let sheetScreenInset: CGFloat = 20
+public enum Ink {
+    public static let buttonHeight: CGFloat = 44
+    public static let barButtonHeight: CGFloat = 32
+    public static let cornerRadius: CGFloat = 12
+    public static let sheetCornerRadius: CGFloat = 24
+    public static let sheetScreenInset: CGFloat = 20
     /// Medium detent side inset — half of `sheetScreenInset`.
-    static let sheetMediumHorizontalInset: CGFloat = 10
+    public static let sheetMediumHorizontalInset: CGFloat = 10
     /// Large detent side inset — half of `sheetMediumHorizontalInset`. Full lerps to 0.
-    static let sheetLargeHorizontalInset: CGFloat = 5
+    public static let sheetLargeHorizontalInset: CGFloat = 5
     /// Large detent vertical inset — half of `sheetScreenInset`. Full lerps to 0.
-    static let sheetLargeVerticalInset: CGFloat = 10
+    public static let sheetLargeVerticalInset: CGFloat = 10
     /// Extra top padding inside full-bleed sheet, on top of the status-bar safe area.
-    static let sheetFullTopExtra: CGFloat = 40
+    public static let sheetFullTopExtra: CGFloat = 40
     /// Sheet grabber capsule.
-    static let sheetHandleWidth: CGFloat = 48
-    static let sheetHandleHeight: CGFloat = 4
-    static let sheetMediumFraction: CGFloat = 0.5
+    public static let sheetHandleWidth: CGFloat = 48
+    public static let sheetHandleHeight: CGFloat = 4
+    public static let sheetMediumFraction: CGFloat = 0.5
     /// Large detent height as a fraction of the full-screen frame (between medium and full).
-    static let sheetLargeFraction: CGFloat = 0.88
-    static let dialogMaxWidth: CGFloat = 320
-    static let dialogMoveInOffset: CGFloat = 40
-    static let borderWidth: CGFloat = 2
-    static let voiceSize: CGFloat = 72
-    static let listCoverSize: CGFloat = 48
-    static let toggleWidth: CGFloat = 52
-    static let toggleHeight: CGFloat = 32
-    static let toggleKnobSize: CGFloat = 20
-    static let checkboxSize: CGFloat = 32
+    public static let sheetLargeFraction: CGFloat = 0.88
+    public static let dialogMaxWidth: CGFloat = 320
+    public static let dialogMoveInOffset: CGFloat = 40
+    public static let borderWidth: CGFloat = 2
+    public static let voiceSize: CGFloat = 72
+    public static let listCoverSize: CGFloat = 48
+    public static let toggleWidth: CGFloat = 52
+    public static let toggleHeight: CGFloat = 32
+    public static let toggleKnobSize: CGFloat = 20
+    public static let checkboxSize: CGFloat = 32
 }
 
-enum InkFieldSize: CaseIterable, Identifiable {
+public enum InkFieldSize: CaseIterable, Identifiable {
     case sm
     case md
 
-    var id: Self { self }
+    public var id: Self { self }
 
-    var height: CGFloat {
+    public var height: CGFloat {
         switch self {
         case .sm: Ink.barButtonHeight
         case .md: Ink.buttonHeight
         }
     }
 
-    var padding: CGFloat { InkSpace.md }
+    public var padding: CGFloat { InkSpace.md }
 
     /// `sm` uses footnote at full ink — not caption’s 0.55 opacity.
-    var font: Font {
+    public var font: Font {
         switch self {
         case .sm: InkTextStyle.caption.font
         case .md: InkTextStyle.body.font
@@ -213,51 +213,51 @@ struct InkBarIconFillButtonStyle: ButtonStyle {
 }
 
 extension View {
-    func inkOutlineButton() -> some View {
+    public func inkOutlineButton() -> some View {
         buttonStyle(InkOutlineButtonStyle())
     }
 
-    func inkFillButton() -> some View {
+    public func inkFillButton() -> some View {
         buttonStyle(InkFillButtonStyle())
     }
 
-    func inkIconOutlineButton() -> some View {
+    public func inkIconOutlineButton() -> some View {
         buttonStyle(InkIconOutlineButtonStyle())
     }
 
-    func inkIconFillButton() -> some View {
+    public func inkIconFillButton() -> some View {
         buttonStyle(InkIconFillButtonStyle())
     }
 
-    func inkBarOutlineButton() -> some View {
+    public func inkBarOutlineButton() -> some View {
         buttonStyle(InkBarOutlineButtonStyle())
     }
 
-    func inkBarFillButton() -> some View {
+    public func inkBarFillButton() -> some View {
         buttonStyle(InkBarFillButtonStyle())
     }
 
-    func inkBarIconOutlineButton() -> some View {
+    public func inkBarIconOutlineButton() -> some View {
         buttonStyle(InkBarIconOutlineButtonStyle())
     }
 
-    func inkBarIconFillButton() -> some View {
+    public func inkBarIconFillButton() -> some View {
         buttonStyle(InkBarIconFillButtonStyle())
     }
 
-    func inkScreen() -> some View {
+    public func inkScreen() -> some View {
         modifier(InkScreenModifier())
     }
 
-    func inkStroke(enabled: Bool = true) -> some View {
+    public func inkStroke(enabled: Bool = true) -> some View {
         modifier(InkStrokeModifier(enabled: enabled))
     }
 
-    func inkField(size: InkFieldSize = .md, enabled: Bool = true) -> some View {
+    public func inkField(size: InkFieldSize = .md, enabled: Bool = true) -> some View {
         modifier(InkFieldModifier(size: size, enabled: enabled))
     }
 
-    func inkDismissKeyboardOnTap(_ isEnabled: Bool = true) -> some View {
+    public func inkDismissKeyboardOnTap(_ isEnabled: Bool = true) -> some View {
         modifier(InkDismissKeyboardOnTapModifier(isEnabled: isEnabled))
     }
 }

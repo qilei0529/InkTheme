@@ -1,6 +1,6 @@
 import SwiftUI
 
-enum InkSheetDetent: String, CaseIterable, Identifiable {
+public enum InkSheetDetent: String, CaseIterable, Identifiable {
     case medium
     case large
     case full
@@ -8,7 +8,7 @@ enum InkSheetDetent: String, CaseIterable, Identifiable {
     case largeAndFull
     case mediumAndFull
 
-    var id: String { rawValue }
+    public var id: String { rawValue }
 
     static func mediumHeight(available: CGFloat) -> CGFloat {
         available * Ink.sheetMediumFraction
@@ -182,9 +182,9 @@ enum InkSheetChrome {
     }
 }
 
-struct InkSheet<Actions: View, Footer: View, Content: View>: View {
+public struct InkSheet<Actions: View, Footer: View, Content: View>: View {
     let title: String
-    var showsDragIndicator: Bool = true
+    var showsDragIndicator: Bool
     @Environment(\.inkPalette) private var palette
     @Environment(\.inkRadius) private var inkRadius
     @Environment(\.inkSheetChromeRadius) private var chromeRadius
@@ -195,7 +195,21 @@ struct InkSheet<Actions: View, Footer: View, Content: View>: View {
     @ViewBuilder var footer: () -> Footer
     @ViewBuilder var content: () -> Content
 
-    var body: some View {
+    public init(
+        title: String,
+        showsDragIndicator: Bool = true,
+        @ViewBuilder actions: @escaping () -> Actions,
+        @ViewBuilder footer: @escaping () -> Footer,
+        @ViewBuilder content: @escaping () -> Content
+    ) {
+        self.title = title
+        self.showsDragIndicator = showsDragIndicator
+        self.actions = actions
+        self.footer = footer
+        self.content = content
+    }
+
+    public var body: some View {
         VStack(spacing: 0) {
             handle
             content()
@@ -248,17 +262,21 @@ struct InkSheet<Actions: View, Footer: View, Content: View>: View {
     }
 }
 
-struct InkSheetCloseButton: View {
+public struct InkSheetCloseButton: View {
     let action: () -> Void
 
-    var body: some View {
+    public init(action: @escaping () -> Void) {
+        self.action = action
+    }
+
+    public var body: some View {
         Button("Close", systemImage: "xmark", action: action)
             .inkBarIconOutlineButton()
     }
 }
 
 extension InkSheet where Actions == EmptyView, Footer == EmptyView {
-    init(
+    public init(
         title: String,
         showsDragIndicator: Bool = true,
         @ViewBuilder content: @escaping () -> Content
@@ -274,7 +292,7 @@ extension InkSheet where Actions == EmptyView, Footer == EmptyView {
 }
 
 extension InkSheet where Footer == EmptyView {
-    init(
+    public init(
         title: String,
         showsDragIndicator: Bool = true,
         @ViewBuilder actions: @escaping () -> Actions,
@@ -290,10 +308,14 @@ extension InkSheet where Footer == EmptyView {
     }
 }
 
-struct InkSheetBody<Content: View>: View {
+public struct InkSheetBody<Content: View>: View {
     @ViewBuilder var content: () -> Content
 
-    var body: some View {
+    public init(@ViewBuilder content: @escaping () -> Content) {
+        self.content = content
+    }
+
+    public var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: InkSpace.xl) {
                 content()
@@ -305,10 +327,14 @@ struct InkSheetBody<Content: View>: View {
     }
 }
 
-struct InkSheetList<Content: View>: View {
+public struct InkSheetList<Content: View>: View {
     @ViewBuilder var content: () -> Content
 
-    var body: some View {
+    public init(@ViewBuilder content: @escaping () -> Content) {
+        self.content = content
+    }
+
+    public var body: some View {
         List {
             content()
         }
@@ -320,11 +346,11 @@ struct InkSheetList<Content: View>: View {
 }
 
 extension View {
-    func inkSheetListRow() -> some View {
+    public func inkSheetListRow() -> some View {
         modifier(InkSheetListRowModifier())
     }
 
-    func inkSheet<Sheet: View>(
+    public func inkSheet<Sheet: View>(
         isPresented: Binding<Bool>,
         detent: InkSheetDetent = .large,
         dismissOnBackdrop: Bool = true,
@@ -352,12 +378,17 @@ private struct InkSheetListRowModifier: ViewModifier {
     }
 }
 
-struct InkSheetFooter<Content: View>: View {
-    var showsHairline: Bool = true
+public struct InkSheetFooter<Content: View>: View {
+    var showsHairline: Bool
     @Environment(\.inkPalette) private var palette
     @ViewBuilder var content: () -> Content
 
-    var body: some View {
+    public init(showsHairline: Bool = true, @ViewBuilder content: @escaping () -> Content) {
+        self.showsHairline = showsHairline
+        self.content = content
+    }
+
+    public var body: some View {
         VStack(spacing: InkSpace.md) {
             content()
         }
@@ -380,7 +411,7 @@ struct InkSheetDragHandlers {
 }
 
 private struct InkSheetDragKey: EnvironmentKey {
-    static let defaultValue: InkSheetDragHandlers? = nil
+    nonisolated(unsafe) static let defaultValue: InkSheetDragHandlers? = nil
 }
 
 private struct InkSheetChromeRadiusKey: EnvironmentKey {

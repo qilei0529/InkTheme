@@ -14,7 +14,7 @@ description: >-
 
 Source of truth: `/Users/qilei/Code/iOS/InkTheme`
 
-Copy files from that app. Do not reinvent tokens, type styles, button styles, or motion.
+Depend on the `InkTheme` Swift package. Do not copy theme files into the host app, and do not reinvent tokens, type styles, button styles, or motion.
 
 ## When to use
 
@@ -22,30 +22,19 @@ Copy files from that app. Do not reinvent tokens, type styles, button styles, or
 - Restyling an existing iOS app to black paper, system type, stroked buttons
 - Adding mic or sound-wave UI
 
-## Copy these files
+## Add the package
 
-From `InkTheme/InkTheme/` into the host app (keep names):
+Library sources live in `Sources/InkTheme/` (`Theme/` and `Components/`). The example app under `InkTheme/` is only the catalog. Minimum iOS is 17.
 
-| File | Role |
-| --- | --- |
-| `Theme/Ink.swift` | Color/layout tokens, fill/outline + bar buttons, `inkScreen()`, `inkStroke()`, `InkFieldSize`, `inkField()` |
-| `Theme/InkAppearance.swift` | `InkAppearance`, `InkAccent`, `InkGround`, `InkRadius` (zero / sm / md / lg), `.inkAppearance(_:accent:ground:radius:)` |
-| `Theme/InkAppearanceReveal.swift` | 12-point curved blob; each point expands at its own speed |
-| `Theme/InkText.swift` | `InkTextStyle`, `.inkText(_:)`, `InkSpace` |
-| `Theme/InkNav.swift` | `InkNavBar` — hero title + trailing actions |
-| `Theme/InkBottomNav.swift` | `InkBottomNav` — icon + capital label tabs |
-| `Theme/InkList.swift` | `InkListRow`, `InkListCover` — cover + title + caption + bar action |
-| `Theme/InkSheet.swift` | `InkSheet`, detents, `InkSheetBody`, `InkSheetList`, `InkSheetFooter` |
-| `Theme/InkDialog.swift` | Overlay `InkDialog`, `InkDialogFooter`, `InkAlert`, `.inkDialog` / `.inkAlert` |
-| `Theme/InkToggle.swift` | Capsule `Toggle` style `.ink` |
-| `Theme/InkCheckbox.swift` | Square `Toggle` style `.inkCheckbox` |
-| `Components/VoiceButton.swift` | 72pt circular mic |
-| `Components/SoundWaveView.swift` | Idle/active bars |
-| `DesignSystemPlaygroundView.swift` | Optional catalog; host as a debug sheet if useful |
+Add the local package (or the git repo) and link the `InkTheme` product. In the host app:
 
-If the host module already defines these types, reuse them. Do not duplicate.
+```swift
+import InkTheme
+```
 
-Xcode with a synchronized root group picks up new files automatically. Older `.pbxproj` file lists need the files added to the app target.
+If the host module already imports `InkTheme`, reuse those types. Do not duplicate them.
+
+`DesignSystemPlaygroundView` stays in the example app. It is not part of the library.
 
 ## Color and layout
 
@@ -100,6 +89,8 @@ Three modes, persisted on `InkAppearanceStore` under `ink.appearance`. Default i
 Host apps must hold one `InkAppearanceStore`, put it in the environment, and apply `.inkAppearance` at the `WindowGroup` root so colors invert on tap. Pass `accent`, `ground`, and `radius` from the same store:
 
 ```swift
+import InkTheme
+
 @main
 struct HostApp: App {
     @State private var appearanceStore = InkAppearanceStore()
@@ -118,6 +109,10 @@ struct HostApp: App {
     }
 }
 ```
+
+`InkAppearanceStore` persists to `UserDefaults.standard` under `ink.appearance`, `ink.accent`, `ink.ground`, and `ink.radius`. One app process shares those keys.
+
+`select` with a non-nil origin, and applying `.inkAppearance`, walks `UIApplication.shared.connectedScenes` and sets `overrideUserInterfaceStyle` on every open window. The reveal snapshots the key window. Use this from a normal iOS app scene. Widgets, app extensions, and scenes without a key window still update the store; they do not get the window override or the blob.
 
 Call `appearanceStore.select(.dark)` (or `.light` / `.system`) from settings. Pass the control’s window-space center as `origin` to expand a 12-point curved blob from that button. Each point has its own end radius and duration so the silhouette changes while it grows. Motion is regenerated on every switch:
 
@@ -409,6 +404,8 @@ Backdrop: custom dialog defaults to `dismissOnBackdrop: true`. Alert uses `false
 ## Apply to a host screen
 
 ```swift
+import InkTheme
+
 NavigationStack {
     VStack(alignment: .leading, spacing: InkSpace.lg) {
         Text("TITLE")

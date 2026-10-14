@@ -1,23 +1,28 @@
 import SwiftUI
 
-struct InkTabItem<ID: Hashable>: Identifiable {
-    let id: ID
-    let label: String
-    let systemImage: String
+public struct InkTabItem<ID: Hashable>: Identifiable {
+    public let id: ID
+    public let label: String
+    public let systemImage: String
 
-    init(id: ID, label: String, systemImage: String) {
+    public init(id: ID, label: String, systemImage: String) {
         self.id = id
         self.label = label
         self.systemImage = systemImage
     }
 }
 
-struct InkBottomNav<ID: Hashable>: View {
+public struct InkBottomNav<ID: Hashable>: View {
     let items: [InkTabItem<ID>]
     @Binding var selection: ID
     @Environment(\.inkPalette) private var palette
 
-    var body: some View {
+    public init(items: [InkTabItem<ID>], selection: Binding<ID>) {
+        self.items = items
+        _selection = selection
+    }
+
+    public var body: some View {
         HStack(spacing: 0) {
             ForEach(items) { item in
                 Button {

@@ -1,13 +1,13 @@
 import SwiftUI
 
-enum InkListCoverSize: CaseIterable, Identifiable {
+public enum InkListCoverSize: CaseIterable, Identifiable {
     case small
     case medium
     case large
 
-    var id: Self { self }
+    public var id: Self { self }
 
-    var width: CGFloat {
+    public var width: CGFloat {
         switch self {
         case .small:
             Ink.listCoverSize
@@ -18,7 +18,7 @@ enum InkListCoverSize: CaseIterable, Identifiable {
         }
     }
 
-    var height: CGFloat {
+    public var height: CGFloat {
         switch self {
         case .small:
             Ink.listCoverSize
@@ -28,13 +28,18 @@ enum InkListCoverSize: CaseIterable, Identifiable {
     }
 }
 
-struct InkListCover<Content: View>: View {
-    var size: InkListCoverSize = .small
+public struct InkListCover<Content: View>: View {
+    var size: InkListCoverSize
     @Environment(\.inkPalette) private var palette
     @Environment(\.inkRadius) private var inkRadius
     @ViewBuilder var content: () -> Content
 
-    var body: some View {
+    public init(size: InkListCoverSize = .small, @ViewBuilder content: @escaping () -> Content) {
+        self.size = size
+        self.content = content
+    }
+
+    public var body: some View {
         let shape = RoundedRectangle(cornerRadius: inkRadius.button, style: .continuous)
         ZStack {
             content()
@@ -48,15 +53,29 @@ struct InkListCover<Content: View>: View {
     }
 }
 
-struct InkListRow<Cover: View, Action: View>: View {
+public struct InkListRow<Cover: View, Action: View>: View {
     let title: String
     let description: String
-    var showsBottomBorder: Bool = true
+    var showsBottomBorder: Bool
     @Environment(\.inkPalette) private var palette
     @ViewBuilder var cover: () -> Cover
     @ViewBuilder var action: () -> Action
 
-    var body: some View {
+    public init(
+        title: String,
+        description: String,
+        showsBottomBorder: Bool = true,
+        @ViewBuilder cover: @escaping () -> Cover,
+        @ViewBuilder action: @escaping () -> Action
+    ) {
+        self.title = title
+        self.description = description
+        self.showsBottomBorder = showsBottomBorder
+        self.cover = cover
+        self.action = action
+    }
+
+    public var body: some View {
         VStack(spacing: 0) {
             HStack(alignment: .center, spacing: InkSpace.md) {
                 cover()

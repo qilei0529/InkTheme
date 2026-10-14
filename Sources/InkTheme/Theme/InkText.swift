@@ -1,16 +1,16 @@
 import SwiftUI
 
-enum InkSpace {
-    static let xxs: CGFloat = 4
-    static let xs: CGFloat = 6
-    static let sm: CGFloat = 8
-    static let md: CGFloat = 12
-    static let lg: CGFloat = 16
-    static let xl: CGFloat = 20
-    static let section: CGFloat = 28
+public enum InkSpace {
+    public static let xxs: CGFloat = 4
+    public static let xs: CGFloat = 6
+    public static let sm: CGFloat = 8
+    public static let md: CGFloat = 12
+    public static let lg: CGFloat = 16
+    public static let xl: CGFloat = 20
+    public static let section: CGFloat = 28
 }
 
-enum InkTextStyle: String, CaseIterable, Identifiable {
+public enum InkTextStyle: String, CaseIterable, Identifiable {
     case display
     case displaySmall
     case numeral
@@ -21,9 +21,9 @@ enum InkTextStyle: String, CaseIterable, Identifiable {
     case caption
     case capital
 
-    var id: String { rawValue }
+    public var id: String { rawValue }
 
-    var font: Font {
+    public var font: Font {
         switch self {
         case .display:
             Font.system(size: 64, weight: .bold, design: .default)
@@ -46,7 +46,7 @@ enum InkTextStyle: String, CaseIterable, Identifiable {
         }
     }
 
-    var tracking: CGFloat {
+    public var tracking: CGFloat {
         switch self {
         case .display: 4
         case .displaySmall: 3
@@ -55,7 +55,7 @@ enum InkTextStyle: String, CaseIterable, Identifiable {
         }
     }
 
-    var inkOpacity: Double {
+    public var inkOpacity: Double {
         switch self {
         case .caption: 0.55
         case .capital: 0.45
@@ -63,7 +63,7 @@ enum InkTextStyle: String, CaseIterable, Identifiable {
         }
     }
 
-    var pointSize: CGFloat? {
+    public var pointSize: CGFloat? {
         switch self {
         case .display: 64
         case .displaySmall: 48
@@ -73,7 +73,7 @@ enum InkTextStyle: String, CaseIterable, Identifiable {
         }
     }
 
-    var textStyle: Font.TextStyle? {
+    public var textStyle: Font.TextStyle? {
         switch self {
         case .title: .title2
         case .body, .bodyStrong: .body
@@ -82,7 +82,7 @@ enum InkTextStyle: String, CaseIterable, Identifiable {
         }
     }
 
-    var spec: String {
+    public var spec: String {
         switch self {
         case .display: "display · 64 bold · track 4"
         case .displaySmall: "displaySmall · 48 bold · track 3"
@@ -96,7 +96,7 @@ enum InkTextStyle: String, CaseIterable, Identifiable {
         }
     }
 
-    var sample: String {
+    public var sample: String {
         switch self {
         case .display: "INK"
         case .displaySmall: "ASK"
@@ -111,12 +111,12 @@ enum InkTextStyle: String, CaseIterable, Identifiable {
     }
 }
 
-enum InkSpaceToken: String, CaseIterable, Identifiable {
+public enum InkSpaceToken: String, CaseIterable, Identifiable {
     case xxs, xs, sm, md, lg, xl, section
 
-    var id: String { rawValue }
+    public var id: String { rawValue }
 
-    var value: CGFloat {
+    public var value: CGFloat {
         switch self {
         case .xxs: InkSpace.xxs
         case .xs: InkSpace.xs
@@ -128,7 +128,7 @@ enum InkSpaceToken: String, CaseIterable, Identifiable {
         }
     }
 
-    var usage: String {
+    public var usage: String {
         switch self {
         case .xxs: "title + note in one row item"
         case .xs: "label to body, wave to caption"
@@ -142,7 +142,7 @@ enum InkSpaceToken: String, CaseIterable, Identifiable {
 }
 
 extension View {
-    func inkText(_ style: InkTextStyle) -> some View {
+    public func inkText(_ style: InkTextStyle) -> some View {
         modifier(InkTextModifier(style: style))
     }
 }

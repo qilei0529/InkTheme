@@ -4,11 +4,11 @@ import UIKit
 #endif
 
 extension View {
-    func inkKeyboardBar() -> some View {
+    public func inkKeyboardBar() -> some View {
         inkKeyboardBar { EmptyView() }
     }
 
-    func inkKeyboardBar<Actions: View>(
+    public func inkKeyboardBar<Actions: View>(
         @ViewBuilder actions: @escaping () -> Actions
     ) -> some View {
         modifier(InkKeyboardBarModifier(actions: actions))

@@ -5,6 +5,7 @@
 //  Created by Qilei on 2026/9/9.
 //
 
+import InkTheme
 import SwiftUI
 
 @main

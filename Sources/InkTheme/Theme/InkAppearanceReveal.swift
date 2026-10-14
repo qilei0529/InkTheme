@@ -122,11 +122,12 @@ struct InkBlobMotion: Equatable {
 enum InkThemeReveal {
     static let startRadius: CGFloat = 22
 
-    private static var isRevealing = false
-    private static var driver: InkThemeRevealDriver?
+    @MainActor private static var isRevealing = false
+    @MainActor private static var driver: InkThemeRevealDriver?
 
-    static var inProgress: Bool { isRevealing }
+    @MainActor static var inProgress: Bool { isRevealing }
 
+    @MainActor
     static func play(from origin: CGPoint, apply: () -> Void) {
         guard !isRevealing, let window = keyWindow() else {
             apply()
@@ -146,7 +147,7 @@ enum InkThemeReveal {
         apply()
 
         let motion = InkBlobMotion.random(origin: origin, bounds: window.bounds)
-        DispatchQueue.main.async {
+        Task { @MainActor in
             let mask = CAShapeLayer()
             mask.fillRule = .evenOdd
             mask.path = motion.holePath(at: 0)
@@ -170,11 +171,15 @@ enum InkThemeReveal {
         return corners.map { hypot($0.x - origin.x, $0.y - origin.y) }.max() ?? bounds.width
     }
 
+    @MainActor
     private static func keyWindow() -> UIWindow? {
-        UIApplication.shared.connectedScenes
-            .compactMap { $0 as? UIWindowScene }
-            .flatMap(\.windows)
-            .first(where: \.isKeyWindow)
+        for scene in UIApplication.shared.connectedScenes {
+            guard let windowScene = scene as? UIWindowScene else { continue }
+            for window in windowScene.windows where window.isKeyWindow {
+                return window
+            }
+        }
+        return nil
     }
 }
 

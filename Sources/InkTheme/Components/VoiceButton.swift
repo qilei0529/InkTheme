@@ -1,10 +1,14 @@
 import SwiftUI
 
-struct VoiceButton: View {
+public struct VoiceButton: View {
     @Binding var isListening: Bool
     @Environment(\.inkPalette) private var palette
 
-    var body: some View {
+    public init(isListening: Binding<Bool>) {
+        _isListening = isListening
+    }
+
+    public var body: some View {
         Button {
             withAnimation(.easeInOut(duration: 0.2)) {
                 isListening.toggle()

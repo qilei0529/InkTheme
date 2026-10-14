@@ -6,14 +6,11 @@
 	objectVersion = 110;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		A1B2C3D4305156F500B35001 /* InkTheme in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D4305156F500B35002 /* InkTheme */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
-		BFC166F5305156F500B35053 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = BFC166DF305156F300B35053 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = BFC166E6305156F300B35053;
-			remoteInfo = InkTheme;
-		};
 		BFC166FF305156F500B35053 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = BFC166DF305156F300B35053 /* Project object */;
@@ -25,7 +22,6 @@
 
 /* Begin PBXFileReference section */
 		BFC166E7305156F300B35053 /* InkTheme.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InkTheme.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		BFC166F4305156F500B35053 /* InkThemeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = InkThemeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BFC166FE305156F500B35053 /* InkThemeUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = InkThemeUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -33,11 +29,6 @@
 		BFC166E9305156F300B35053 /* InkTheme */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = InkTheme;
-			sourceTree = "<group>";
-		};
-		BFC166F7305156F500B35053 /* InkThemeTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = InkThemeTests;
 			sourceTree = "<group>";
 		};
 		BFC16701305156F500B35053 /* InkThemeUITests */ = {
@@ -51,11 +42,7 @@
 		BFC166E4305156F300B35053 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
-			);
-		};
-		BFC166F1305156F500B35053 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			files = (
+				A1B2C3D4305156F500B35001 /* InkTheme in Frameworks */,
 			);
 		};
 		BFC166FB305156F500B35053 /* Frameworks */ = {
@@ -70,7 +57,6 @@
 			isa = PBXGroup;
 			children = (
 				BFC166E9305156F300B35053 /* InkTheme */,
-				BFC166F7305156F500B35053 /* InkThemeTests */,
 				BFC16701305156F500B35053 /* InkThemeUITests */,
 				BFC166E8305156F300B35053 /* Products */,
 			);
@@ -80,7 +66,6 @@
 			isa = PBXGroup;
 			children = (
 				BFC166E7305156F300B35053 /* InkTheme.app */,
-				BFC166F4305156F500B35053 /* InkThemeTests.xctest */,
 				BFC166FE305156F500B35053 /* InkThemeUITests.xctest */,
 			);
 			name = Products;
@@ -103,30 +88,12 @@
 				BFC166E9305156F300B35053 /* InkTheme */,
 			);
 			name = InkTheme;
+			packageProductDependencies = (
+				A1B2C3D4305156F500B35002 /* InkTheme */,
+			);
 			productName = InkTheme;
 			productReference = BFC166E7305156F300B35053 /* InkTheme.app */;
 			productType = "com.apple.product-type.application";
-		};
-		BFC166F3305156F500B35053 /* InkThemeTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = BFC16709305156F500B35053 /* Build configuration list for PBXNativeTarget "InkThemeTests" */;
-			buildPhases = (
-				BFC166F0305156F500B35053 /* Sources */,
-				BFC166F1305156F500B35053 /* Frameworks */,
-				BFC166F2305156F500B35053 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				BFC166F6305156F500B35053 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				BFC166F7305156F500B35053 /* InkThemeTests */,
-			);
-			name = InkThemeTests;
-			productName = InkThemeTests;
-			productReference = BFC166F4305156F500B35053 /* InkThemeTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		BFC166FD305156F500B35053 /* InkThemeUITests */ = {
 			isa = PBXNativeTarget;
@@ -162,10 +129,6 @@
 					BFC166E6305156F300B35053 = {
 						CreatedOnToolsVersion = 27.0;
 					};
-					BFC166F3305156F500B35053 = {
-						CreatedOnToolsVersion = 27.0;
-						TestTargetID = BFC166E6305156F300B35053;
-					};
 					BFC166FD305156F500B35053 = {
 						CreatedOnToolsVersion = 27.0;
 						TestTargetID = BFC166E6305156F300B35053;
@@ -182,12 +145,14 @@
 			mainGroup = BFC166DE305156F300B35053;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
+			packageReferences = (
+				A1B2C3D4305156F500B35003 /* XCLocalSwiftPackageReference "." */,
+			);
 			productRefGroup = BFC166E8305156F300B35053 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				BFC166E6305156F300B35053 /* InkTheme */,
-				BFC166F3305156F500B35053 /* InkThemeTests */,
 				BFC166FD305156F500B35053 /* InkThemeUITests */,
 			);
 		};
@@ -195,11 +160,6 @@
 
 /* Begin PBXResourcesBuildPhase section */
 		BFC166E5305156F300B35053 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			files = (
-			);
-		};
-		BFC166F2305156F500B35053 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
 			);
@@ -217,11 +177,6 @@
 			files = (
 			);
 		};
-		BFC166F0305156F500B35053 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			files = (
-			);
-		};
 		BFC166FA305156F500B35053 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
@@ -230,11 +185,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		BFC166F6305156F500B35053 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = BFC166E6305156F300B35053 /* InkTheme */;
-			targetProxy = BFC166F5305156F500B35053 /* PBXContainerItemProxy */;
-		};
 		BFC16700305156F500B35053 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = BFC166E6305156F300B35053 /* InkTheme */;
@@ -386,6 +336,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = app.ios.InkTheme;
+				PRODUCT_MODULE_NAME = InkThemeDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -421,6 +372,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = app.ios.InkTheme;
+				PRODUCT_MODULE_NAME = InkThemeDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -431,50 +383,6 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
-			};
-			name = Release;
-		};
-		BFC1670A305156F500B35053 /* Debug configuration for PBXNativeTarget "InkThemeTests" */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = VRA693K4UM;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = app.ios.InkThemeTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/InkTheme.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/InkTheme";
-			};
-			name = Debug;
-		};
-		BFC1670B305156F500B35053 /* Release configuration for PBXNativeTarget "InkThemeTests" */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = VRA693K4UM;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = app.ios.InkThemeTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/InkTheme.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/InkTheme";
 			};
 			name = Release;
 		};
@@ -537,14 +445,6 @@
 			);
 			defaultConfigurationName = Release;
 		};
-		BFC16709305156F500B35053 /* Build configuration list for PBXNativeTarget "InkThemeTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				BFC1670A305156F500B35053 /* Debug configuration for PBXNativeTarget "InkThemeTests" */,
-				BFC1670B305156F500B35053 /* Release configuration for PBXNativeTarget "InkThemeTests" */,
-			);
-			defaultConfigurationName = Release;
-		};
 		BFC1670C305156F500B35053 /* Build configuration list for PBXNativeTarget "InkThemeUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -554,6 +454,21 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		A1B2C3D4305156F500B35003 /* XCLocalSwiftPackageReference "." */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ".";
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A1B2C3D4305156F500B35002 /* InkTheme */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A1B2C3D4305156F500B35003 /* XCLocalSwiftPackageReference "." */;
+			productName = InkTheme;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = BFC166DF305156F300B35053 /* Project object */;
 	validationLevel = 1;

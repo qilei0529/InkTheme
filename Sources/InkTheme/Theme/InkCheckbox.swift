@@ -10,8 +10,10 @@ struct InkCheckmarkShape: Shape {
     }
 }
 
-struct InkCheckboxStyle: ToggleStyle {
-    func makeBody(configuration: Configuration) -> some View {
+public struct InkCheckboxStyle: ToggleStyle {
+    public init() {}
+
+    public func makeBody(configuration: Configuration) -> some View {
         InkCheckboxBody(configuration: configuration)
     }
 }
@@ -71,6 +73,6 @@ private struct InkCheckboxBody: View {
     }
 }
 
-extension ToggleStyle where Self == InkCheckboxStyle {
+public extension ToggleStyle where Self == InkCheckboxStyle {
     static var inkCheckbox: InkCheckboxStyle { InkCheckboxStyle() }
 }

@@ -1,12 +1,22 @@
 import SwiftUI
 
-struct InkNavBar<Actions: View>: View {
+public struct InkNavBar<Actions: View>: View {
     let title: String
-    var topPadding: CGFloat = InkSpace.sm
+    var topPadding: CGFloat
     @Environment(\.inkPalette) private var palette
     @ViewBuilder var actions: () -> Actions
 
-    var body: some View {
+    public init(
+        title: String,
+        topPadding: CGFloat = InkSpace.sm,
+        @ViewBuilder actions: @escaping () -> Actions
+    ) {
+        self.title = title
+        self.topPadding = topPadding
+        self.actions = actions
+    }
+
+    public var body: some View {
         HStack(alignment: .center, spacing: InkSpace.sm) {
             Text(title)
                 .inkText(.hero)
@@ -26,7 +36,7 @@ struct InkNavBar<Actions: View>: View {
 }
 
 extension InkNavBar where Actions == EmptyView {
-    init(title: String, topPadding: CGFloat = InkSpace.sm) {
+    public init(title: String, topPadding: CGFloat = InkSpace.sm) {
         self.init(title: title, topPadding: topPadding) { EmptyView() }
     }
 }

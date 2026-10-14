@@ -1,12 +1,14 @@
 import SwiftUI
 
-struct InkToggleStyle: ToggleStyle {
+public struct InkToggleStyle: ToggleStyle {
+    public init() {}
+
     @Environment(\.isEnabled) private var isEnabled
     @Environment(\.inkPalette) private var palette
     @Environment(\.inkRadius) private var inkRadius
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    func makeBody(configuration: Configuration) -> some View {
+    public func makeBody(configuration: Configuration) -> some View {
         Button {
             configuration.isOn.toggle()
         } label: {
@@ -44,6 +46,6 @@ struct InkToggleStyle: ToggleStyle {
     }
 }
 
-extension ToggleStyle where Self == InkToggleStyle {
+public extension ToggleStyle where Self == InkToggleStyle {
     static var ink: InkToggleStyle { InkToggleStyle() }
 }

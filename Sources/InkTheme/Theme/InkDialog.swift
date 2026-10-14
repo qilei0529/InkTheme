@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct InkDialog<Actions: View, Footer: View, Content: View>: View {
+public struct InkDialog<Actions: View, Footer: View, Content: View>: View {
     let title: String
     @Environment(\.inkPalette) private var palette
     @Environment(\.inkRadius) private var inkRadius
@@ -8,7 +8,19 @@ struct InkDialog<Actions: View, Footer: View, Content: View>: View {
     @ViewBuilder var footer: () -> Footer
     @ViewBuilder var content: () -> Content
 
-    var body: some View {
+    public init(
+        title: String,
+        @ViewBuilder actions: @escaping () -> Actions,
+        @ViewBuilder footer: @escaping () -> Footer,
+        @ViewBuilder content: @escaping () -> Content
+    ) {
+        self.title = title
+        self.actions = actions
+        self.footer = footer
+        self.content = content
+    }
+
+    public var body: some View {
         VStack(alignment: .leading, spacing: InkSpace.sm) {
             header
             content()
@@ -39,7 +51,7 @@ struct InkDialog<Actions: View, Footer: View, Content: View>: View {
 }
 
 extension InkDialog where Actions == EmptyView, Footer == EmptyView {
-    init(
+    public init(
         title: String,
         @ViewBuilder content: @escaping () -> Content
     ) {
@@ -53,7 +65,7 @@ extension InkDialog where Actions == EmptyView, Footer == EmptyView {
 }
 
 extension InkDialog where Footer == EmptyView {
-    init(
+    public init(
         title: String,
         @ViewBuilder actions: @escaping () -> Actions,
         @ViewBuilder content: @escaping () -> Content
@@ -67,10 +79,14 @@ extension InkDialog where Footer == EmptyView {
     }
 }
 
-struct InkDialogFooter<Content: View>: View {
+public struct InkDialogFooter<Content: View>: View {
     @ViewBuilder var content: () -> Content
 
-    var body: some View {
+    public init(@ViewBuilder content: @escaping () -> Content) {
+        self.content = content
+    }
+
+    public var body: some View {
         VStack(spacing: InkSpace.md) {
             content()
         }
@@ -79,7 +95,7 @@ struct InkDialogFooter<Content: View>: View {
     }
 }
 
-struct InkAlert: View {
+public struct InkAlert: View {
     let title: String
     var message: String?
     let primaryTitle: String
@@ -87,7 +103,23 @@ struct InkAlert: View {
     var primaryAction: () -> Void
     var secondaryAction: (() -> Void)?
 
-    var body: some View {
+    public init(
+        title: String,
+        message: String? = nil,
+        primaryTitle: String,
+        secondaryTitle: String? = nil,
+        primaryAction: @escaping () -> Void,
+        secondaryAction: (() -> Void)? = nil
+    ) {
+        self.title = title
+        self.message = message
+        self.primaryTitle = primaryTitle
+        self.secondaryTitle = secondaryTitle
+        self.primaryAction = primaryAction
+        self.secondaryAction = secondaryAction
+    }
+
+    public var body: some View {
         InkDialog(
             title: title,
             actions: { EmptyView() },
@@ -113,7 +145,7 @@ struct InkAlert: View {
 }
 
 extension View {
-    func inkDialog<Dialog: View>(
+    public func inkDialog<Dialog: View>(
         isPresented: Binding<Bool>,
         dismissOnBackdrop: Bool = true,
         @ViewBuilder dialog: @escaping () -> Dialog
@@ -127,7 +159,7 @@ extension View {
         )
     }
 
-    func inkAlert(
+    public func inkAlert(
         isPresented: Binding<Bool>,
         title: String,
         message: String? = nil,
