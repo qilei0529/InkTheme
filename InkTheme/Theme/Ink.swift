@@ -136,6 +136,44 @@ struct InkBarFillButtonStyle: ButtonStyle {
     }
 }
 
+struct InkIconOutlineButtonStyle: ButtonStyle {
+    @Environment(\.isEnabled) private var isEnabled
+    @Environment(\.inkPalette) private var palette
+    @Environment(\.inkRadius) private var inkRadius
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .labelStyle(.iconOnly)
+            .font(.system(size: 20, weight: .semibold))
+            .foregroundStyle(palette.ink.opacity(isEnabled ? 1 : 0.35))
+            .frame(width: Ink.buttonHeight, height: Ink.buttonHeight)
+            .background(palette.paper)
+            .clipShape(RoundedRectangle(cornerRadius: inkRadius.button, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: inkRadius.button, style: .continuous)
+                    .strokeBorder(palette.ink.opacity(isEnabled ? 1 : 0.25), lineWidth: Ink.borderWidth)
+            }
+            .opacity(configuration.isPressed ? 0.55 : 1)
+    }
+}
+
+struct InkIconFillButtonStyle: ButtonStyle {
+    @Environment(\.isEnabled) private var isEnabled
+    @Environment(\.inkPalette) private var palette
+    @Environment(\.inkRadius) private var inkRadius
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .labelStyle(.iconOnly)
+            .font(.system(size: 20, weight: .semibold))
+            .foregroundStyle(palette.inverse.opacity(isEnabled ? 1 : 0.7))
+            .frame(width: Ink.buttonHeight, height: Ink.buttonHeight)
+            .background(palette.accent.opacity(isEnabled ? 1 : 0.25))
+            .clipShape(RoundedRectangle(cornerRadius: inkRadius.button, style: .continuous))
+            .opacity(configuration.isPressed ? 0.7 : 1)
+    }
+}
+
 struct InkBarIconOutlineButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
     @Environment(\.inkPalette) private var palette
@@ -181,6 +219,14 @@ extension View {
 
     func inkFillButton() -> some View {
         buttonStyle(InkFillButtonStyle())
+    }
+
+    func inkIconOutlineButton() -> some View {
+        buttonStyle(InkIconOutlineButtonStyle())
+    }
+
+    func inkIconFillButton() -> some View {
+        buttonStyle(InkIconFillButtonStyle())
     }
 
     func inkBarOutlineButton() -> some View {

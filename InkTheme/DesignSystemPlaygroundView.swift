@@ -18,38 +18,26 @@ struct DesignSystemPlaygroundView: View {
     @State private var fieldText = "Could you stay a bit later?"
     @State private var fieldSearch = "Search"
     @State private var fieldDisabled = "Disabled field"
+    @State private var bottomTab = PlaygroundTab.home
     @Environment(InkAppearanceStore.self) private var appearanceStore
     @Environment(\.inkPalette) private var palette
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: InkSpace.section) {
-                    intro
-                    appearanceCatalog
-                    accentCatalog
-                    paperCatalog
-                    radiusCatalog
-                    typeCatalog
-                    spaceCatalog
-                    navCatalog
-                    listCatalog
-                    fieldCatalog
-                    sheetCatalog
-                    dialogCatalog
-                    buttons
-                    toggles
-                    checkboxes
-                    voice
+            Group {
+                switch bottomTab {
+                case .home:
+                    catalog
+                case .ask:
+                    askDemo
+                case .history:
+                    historyDemo
                 }
-                .padding(InkSpace.xl)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .inkDismissKeyboardOnTap()
             }
             .inkScreen()
             .toolbar(.hidden, for: .navigationBar)
             .safeAreaInset(edge: .top) {
-                InkNavBar(title: "Ink") {
+                InkNavBar(title: bottomTab.title) {
                     Button("Settings") {}
                         .inkBarOutlineButton()
                     Button("Add", systemImage: "plus") {}
@@ -60,6 +48,9 @@ struct DesignSystemPlaygroundView: View {
                         .fill(palette.ink)
                         .frame(height: Ink.borderWidth)
                 }
+            }
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                InkBottomNav(items: PlaygroundTab.items, selection: $bottomTab)
             }
             .inkSheet(isPresented: $showListSheet) {
                 listSheet
@@ -82,6 +73,76 @@ struct DesignSystemPlaygroundView: View {
                 customDialog
             }
         }
+    }
+
+    private var catalog: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: InkSpace.section) {
+                intro
+                appearanceCatalog
+                accentCatalog
+                paperCatalog
+                radiusCatalog
+                typeCatalog
+                spaceCatalog
+                navCatalog
+                bottomNavCatalog
+                listCatalog
+                fieldCatalog
+                sheetCatalog
+                dialogCatalog
+                buttons
+                toggles
+                checkboxes
+                voice
+            }
+            .padding(InkSpace.xl)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .inkDismissKeyboardOnTap()
+        }
+    }
+
+    private var askDemo: some View {
+        VStack(alignment: .leading, spacing: InkSpace.lg) {
+            Text("PROMPT")
+                .inkText(.capital)
+            Text("Could you stay a bit later?")
+                .inkText(.hero)
+            Text("Ask is the selected tab. The bar stays pinned while this screen replaces the catalog.")
+                .inkText(.body)
+            Spacer(minLength: 0)
+        }
+        .padding(InkSpace.xl)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+    }
+
+    private var historyDemo: some View {
+        VStack(spacing: 0) {
+            InkListRow(title: "Pat", description: "English · A1") {
+                InkListCover {
+                    Image(systemName: "person.fill")
+                        .font(.system(size: 20, weight: .semibold))
+                        .foregroundStyle(palette.ink)
+                }
+            } action: {
+                Button("Start") {}
+                    .inkBarFillButton()
+            }
+            InkListRow(title: "Sam", description: "Yesterday", showsBottomBorder: false) {
+                InkListCover {
+                    Image(systemName: "person.fill")
+                        .font(.system(size: 20, weight: .semibold))
+                        .foregroundStyle(palette.ink)
+                }
+            } action: {
+                Button("Start") {}
+                    .inkBarOutlineButton()
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, InkSpace.xl)
+        .padding(.top, InkSpace.sm)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 
     private var intro: some View {
@@ -209,6 +270,14 @@ struct DesignSystemPlaygroundView: View {
                 Button("History", systemImage: "list.bullet") {}
                     .inkBarIconOutlineButton()
             }
+        }
+    }
+
+    private var bottomNavCatalog: some View {
+        VStack(alignment: .leading, spacing: InkSpace.md) {
+            sectionTitle("Bottom Nav")
+            Text("This page pins the bar and switches HOME, ASK, and HISTORY. Selected is full ink; the rest stay at capital opacity.")
+                .inkText(.body)
         }
     }
 
@@ -403,6 +472,12 @@ struct DesignSystemPlaygroundView: View {
                 Button("No") {}
                     .inkOutlineButton()
             }
+            HStack(spacing: InkSpace.md) {
+                Button("Add", systemImage: "plus") {}
+                    .inkIconFillButton()
+                Button("Close", systemImage: "xmark") {}
+                    .inkIconOutlineButton()
+            }
         }
     }
 
@@ -551,6 +626,40 @@ private struct AppearanceOptionStyle: ViewModifier {
         } else {
             content.inkOutlineButton()
         }
+    }
+}
+
+private enum PlaygroundTab: String, CaseIterable, Hashable {
+    case home
+    case ask
+    case history
+
+    var title: String {
+        switch self {
+        case .home: "Ink"
+        case .ask: "Ask"
+        case .history: "History"
+        }
+    }
+
+    var label: String {
+        switch self {
+        case .home: "HOME"
+        case .ask: "ASK"
+        case .history: "HISTORY"
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .home: "house"
+        case .ask: "mic"
+        case .history: "clock"
+        }
+    }
+
+    static var items: [InkTabItem<PlaygroundTab>] {
+        allCases.map { InkTabItem(id: $0, label: $0.label, systemImage: $0.systemImage) }
     }
 }
 

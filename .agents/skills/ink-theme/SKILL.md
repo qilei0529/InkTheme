@@ -33,6 +33,7 @@ From `InkTheme/InkTheme/` into the host app (keep names):
 | `Theme/InkAppearanceReveal.swift` | 12-point curved blob; each point expands at its own speed |
 | `Theme/InkText.swift` | `InkTextStyle`, `.inkText(_:)`, `InkSpace` |
 | `Theme/InkNav.swift` | `InkNavBar` — hero title + trailing actions |
+| `Theme/InkBottomNav.swift` | `InkBottomNav` — icon + capital label tabs |
 | `Theme/InkList.swift` | `InkListRow`, `InkListCover` — cover + title + caption + bar action |
 | `Theme/InkSheet.swift` | `InkSheet`, detents, `InkSheetBody`, `InkSheetList`, `InkSheetFooter` |
 | `Theme/InkDialog.swift` | Overlay `InkDialog`, `InkDialogFooter`, `InkAlert`, `.inkDialog` / `.inkAlert` |
@@ -233,6 +234,24 @@ Icon actions: `Button("Add", systemImage: "plus")` plus an **icon** style (`.ico
 }
 ```
 
+## Bottom Nav
+
+Pin `InkBottomNav` with a bottom safe area inset. It is chrome only — the host switches content from `selection`. Each `InkTabItem` takes an `id`, an SF Symbol `systemImage`, and a `label`. Uppercase the label at the call site.
+
+Paper background extends under the Home Indicator. A 2pt ink hairline sits on top. Items share the width. Each item is at least 44pt tall: a 20pt semibold icon and a `capital` label, spaced `xxs`. Selected ink is full opacity. Unselected ink uses the capital opacity (0.45). Pressed opacity is 0.55. No fill, accent, or gray.
+
+```swift
+.safeAreaInset(edge: .bottom, spacing: 0) {
+    InkBottomNav(
+        items: [
+            InkTabItem(id: .home, label: "HOME", systemImage: "house"),
+            InkTabItem(id: .ask, label: "ASK", systemImage: "mic"),
+        ],
+        selection: $tab
+    )
+}
+```
+
 ## List
 
 Use `InkListRow` for cover + title + description + trailing action. Cover is `InkListCover(size:)` (default **small**), paper + the button radius + an inside ink stroke. Title `bodyStrong`, description `caption`, spacing `xxs`. Trailing actions are **bar** styles (32pt), never 44pt page buttons. Bottom hairline is 2pt ink. Last row: `showsBottomBorder: false`.
@@ -373,6 +392,7 @@ Backdrop: custom dialog defaults to `dismissOnBackdrop: true`. Alert uses `false
 8. Checkbox: `Toggle(...).toggleStyle(.inkCheckbox)`. 32 square; off 6% ink + waiting inverse hook + ink stroke; on accent fill + ink stroke. Tap pops the hook bigger then back.
 9. Sheets: `.inkSheet` + `InkSheet` + `InkSheetBody` / `InkSheetList` / `InkSheetFooter`. Lists: `InkListRow`. No system `.sheet`. No gray grouped lists.
 10. Dialogs: `InkDialog` / `InkAlert` via `.inkDialog` / `.inkAlert`. No system `.alert`.
+11. Bottom nav: `InkBottomNav` with `InkTabItem` (icon + capital label). Pin with `.safeAreaInset(edge: .bottom)`. No system tab bar.
 
 ## Do not
 
@@ -421,7 +441,7 @@ Lists: `InkListRow` + `listRowBackground(Ink.paper)`. Hide system separators whe
 
 ## Verify
 
-- Playground Appearance, Accent, Paper, Radius, Type, Space, Nav, List, Field, Sheet, and Dialog sections match the tables above
+- Playground Appearance, Accent, Paper, Radius, Type, Space, Nav, Bottom Nav, List, Field, Sheet, and Dialog sections match the tables above
 - Host app root applies `.inkAppearance(store.appearance, accent: store.accent, ground: store.ground, radius: store.radius)` so Light / Dark / System, accent, dark paper, and radius work
 - Host screens use `.inkText`, `InkSpace`, `InkNavBar`, `InkListRow`, `.inkSheet` / `InkSheet`, and `InkDialog` / `InkAlert`, not ad-hoc sizes or system inline titles / alerts / sheets
 - No remaining `AskTheme` / `askFillButton` / `askOutlineButton` after a migration
