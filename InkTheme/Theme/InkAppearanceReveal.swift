@@ -132,14 +132,16 @@ enum InkThemeReveal {
             apply()
             return
         }
-        guard let snapshot = window.snapshotView(afterScreenUpdates: false) else {
-            apply()
-            return
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = window.screen.scale
+        let image = UIGraphicsImageRenderer(bounds: window.bounds, format: format).image { _ in
+            window.drawHierarchy(in: window.bounds, afterScreenUpdates: false)
         }
-
-        isRevealing = true
+        let snapshot = UIImageView(image: image)
         snapshot.frame = window.bounds
         snapshot.isUserInteractionEnabled = false
+
+        isRevealing = true
         window.addSubview(snapshot)
         apply()
 
@@ -223,6 +225,7 @@ enum InkAppearanceTransition {
     static func currentSystemColorScheme() -> ColorScheme {
         let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
         let scene = scenes.first { $0.activationState == .foregroundActive } ?? scenes.first
-        return scene?.traitCollection.userInterfaceStyle == .dark ? .dark : .light
+        let style = scene?.screen.traitCollection.userInterfaceStyle
+        return style == .dark ? .dark : .light
     }
 }

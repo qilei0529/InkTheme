@@ -99,10 +99,12 @@ enum InkAppearance: String, CaseIterable, Identifiable {
     }
 
     func applyToOpenWindows() {
-        for scene in UIApplication.shared.connectedScenes {
-            guard let windowScene = scene as? UIWindowScene else { continue }
-            for window in windowScene.windows {
-                window.overrideUserInterfaceStyle = userInterfaceStyle
+        UIView.performWithoutAnimation {
+            for scene in UIApplication.shared.connectedScenes {
+                guard let windowScene = scene as? UIWindowScene else { continue }
+                for window in windowScene.windows {
+                    window.overrideUserInterfaceStyle = userInterfaceStyle
+                }
             }
         }
     }
