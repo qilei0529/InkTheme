@@ -471,9 +471,17 @@ private struct InkSheetOverlayModifier<Sheet: View>: ViewModifier {
 
     func body(content: Content) -> some View {
         content
+            .onChange(of: isPresented) { _, presented in
+                if presented {
+                    present()
+                } else {
+                    dismissAnimated()
+                }
+            }
             .overlay {
+                let showsSheet = isPresented || isVisible
                 ZStack {
-                    if isVisible {
+                    if showsSheet {
                         palette.ink
                             .opacity(0.45)
                             .ignoresSafeArea()
@@ -514,10 +522,8 @@ private struct InkSheetOverlayModifier<Sheet: View>: ViewModifier {
                                 .padding(outer)
                                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
                                 .offset(y: verticalOffset)
-                                .opacity(available > 0 ? 1 : 0)
                                 .onAppear {
                                     syncAvailable(available, animated: false)
-                                    runAppearAnimationIfNeeded()
                                 }
                                 .onChange(of: geo.size.height) { _, newHeight in
                                     syncAvailable(newHeight, animated: false)
@@ -525,17 +531,15 @@ private struct InkSheetOverlayModifier<Sheet: View>: ViewModifier {
                                 .accessibilityAddTraits(.isModal)
                         }
                         .ignoresSafeArea()
-                        .transition(.identity)
+                        .transition(
+                            reduceMotion
+                                ? .identity
+                                : .asymmetric(insertion: .move(edge: .bottom), removal: .identity)
+                        )
                     }
                 }
-                .allowsHitTesting(isVisible && isAtRest)
-                .onChange(of: isPresented) { _, presented in
-                    if presented {
-                        present()
-                    } else {
-                        dismissAnimated()
-                    }
-                }
+                .animation(reduceMotion ? nil : .easeOut(duration: appearDuration), value: showsSheet)
+                .allowsHitTesting(showsSheet)
             }
     }
 
@@ -595,28 +599,9 @@ private struct InkSheetOverlayModifier<Sheet: View>: ViewModifier {
         dragTranslation = 0
         settledHeight = 0
         availableHeight = 0
-        isAtRest = false
-        verticalOffset = reduceMotion ? 0 : 10_000
+        verticalOffset = 0
+        isAtRest = true
         isVisible = true
-    }
-
-    private func runAppearAnimationIfNeeded() {
-        guard isVisible, !isAtRest else { return }
-        guard !reduceMotion else {
-            verticalOffset = 0
-            isAtRest = true
-            return
-        }
-        let distance = max(settledHeight, 0)
-        var transaction = Transaction()
-        transaction.disablesAnimations = true
-        withTransaction(transaction) {
-            verticalOffset = distance
-        }
-        withAnimation(.easeOut(duration: appearDuration)) {
-            verticalOffset = 0
-            isAtRest = true
-        }
     }
 
     private func dismiss() {
