@@ -38,12 +38,14 @@ If the host module already imports `InkTheme`, reuse those types. Do not duplica
 
 ## Color and layout
 
-| Token | Light | Dark |
-| --- | --- | --- |
-| `inkPalette.ink` | black | white |
-| `inkPalette.paper` | white | `InkGround` (default black) |
-| `inkPalette.accent` | follows `InkAccent` | same hue for red / blue / green; ink accent inverts with `ink` |
-| `inkPalette.inverse` | white | black |
+Colors come from the selected `InkColorTheme`. Each theme owns a full light and dark `InkPalette`. Appearance picks which side is active.
+
+| Token | Role |
+| --- | --- |
+| `inkPalette.ink` | Type, outlines, hairlines, off-toggle knob |
+| `inkPalette.paper` | Screens, nav, sheets, outline fills, off-toggle track |
+| `inkPalette.accent` | Fill buttons, listening mic, sound wave, on toggle / checkbox |
+| `inkPalette.inverse` | Fill labels, listening mic icon, on-toggle knob, checkbox hook |
 
 Read colors from `@Environment(\.inkPalette)` after the host root applies `.inkAppearance`. Do not use `Color.black` / `Color.white` for chrome.
 
@@ -70,9 +72,16 @@ Read colors from `@Environment(\.inkPalette)` after the host root applies `.inkA
 | `Ink.toggleKnobSize` | `20` |
 | `Ink.checkboxSize` | `32` |
 
-`ink` inverts with appearance. Light paper is always white. Dark paper follows `InkGround`: black `#000000`, deep red `#1E080B`, deep blue `#000E1F`, deep green `#04180B`. `inverse` is the untinted partner of ink (white in light, black in dark) for fill labels.
+Shipped themes (`InkColorTheme.all`):
 
-`accent` is a separate axis: default **ink** matches `ink`. Red `#F6465D`, Blue `#0077FF`, and Green `#22C55E` are fixed in both appearances.
+| Theme | Light paper | Dark paper | Accent (both) |
+| --- | --- | --- | --- |
+| ink | `#FFFFFF` | `#000000` | follows ink (black / white) |
+| red | `#FFF5F6` | `#1E080B` | `#F6465D` |
+| blue | `#F5F9FF` | `#000E1F` | `#0077FF` |
+| green | `#F3FBF6` | `#04180B` | `#22C55E` |
+
+Ink stays black in light and white in dark. `inverse` stays white in light and black in dark for fill labels. Add a new theme by defining one `InkColorTheme` static and appending it to `InkColorTheme.all` — no new enums.
 
 Use `accent` for fill button backgrounds, listening `VoiceButton` fill, `SoundWaveView` bars, **on** Ink toggles, and **on** Ink checkboxes. Use `inverse` for fill button labels, the listening mic icon, the on-toggle knob, and the checkbox hook. Keep `ink` for type, outlines, hairlines, list covers, and the off-toggle knob. Use `paper` for screens, nav, sheets, outline fills, and the off-toggle track. No SF Rounded. No extra grays.
 
@@ -83,10 +92,10 @@ Three modes, persisted on `InkAppearanceStore` under `ink.appearance`. Default i
 | Mode | Effect |
 | --- | --- |
 | `system` | Follow iOS appearance (`preferredColorScheme` is `nil`) |
-| `light` | Lock black ink on white paper |
-| `dark` | Lock white ink; paper follows `InkGround` |
+| `light` | Use the theme’s `light` palette |
+| `dark` | Use the theme’s `dark` palette |
 
-Host apps must hold one `InkAppearanceStore`, put it in the environment, and apply `.inkAppearance` at the `WindowGroup` root so colors invert on tap. Pass `accent`, `ground`, and `radius` from the same store:
+Host apps must hold one `InkAppearanceStore`, put it in the environment, and apply `.inkAppearance` at the `WindowGroup` root so colors invert on tap. Pass `theme` and `radius` from the same store:
 
 ```swift
 import InkTheme
@@ -101,8 +110,7 @@ struct HostApp: App {
                 .environment(appearanceStore)
                 .inkAppearance(
                     appearanceStore.appearance,
-                    accent: appearanceStore.accent,
-                    ground: appearanceStore.ground,
+                    theme: appearanceStore.theme,
                     radius: appearanceStore.radius
                 )
         }
@@ -110,7 +118,7 @@ struct HostApp: App {
 }
 ```
 
-`InkAppearanceStore` persists to `UserDefaults.standard` under `ink.appearance`, `ink.accent`, `ink.ground`, and `ink.radius`. One app process shares those keys.
+`InkAppearanceStore` persists to `UserDefaults.standard` under `ink.appearance`, `ink.theme`, and `ink.radius`. One app process shares those keys. Legacy `ink.accent` migrates into `ink.theme` when present.
 
 `select` with a non-nil origin, and applying `.inkAppearance`, walks `UIApplication.shared.connectedScenes` and sets `overrideUserInterfaceStyle` on every open window. The reveal snapshots the key window. Use this from a normal iOS app scene. Widgets, app extensions, and scenes without a key window still update the store; they do not get the window override or the blob.
 
@@ -120,43 +128,34 @@ Call `appearanceStore.select(.dark)` (or `.light` / `.system`) from settings. Pa
 appearanceStore.select(.dark, origin: buttonCenterInGlobal)
 ```
 
-`origin: nil` (the default) switches instantly. Skip the reveal when Reduce Motion is on, or when the resolved ink/paper palette does not change (for example Light while the system is already light). Accent, ground, and radius changes do not play the blob.
+`origin: nil` (the default) switches instantly. Skip the reveal when Reduce Motion is on, or when the resolved ink/paper palette does not change (for example Light while the system is already light). Theme and radius changes do not play the blob.
 
-## Accent
+## Color theme
 
-Four values, persisted on the same `InkAppearanceStore` under `ink.accent`. Default is **ink**. Independent of Light / Dark / System.
-
-| Accent | Effect |
-| --- | --- |
-| `ink` | `palette.accent` equals `palette.ink` |
-| `red` / `blue` / `green` | Fixed hue in both appearances |
+Four shipped configs on `InkColorTheme.all`, persisted under `ink.theme`. Default is **ink**. Independent of Light / Dark / System — appearance only picks `theme.light` vs `theme.dark`.
 
 ```swift
-appearanceStore.selectAccent(.red)
+appearanceStore.selectTheme(.red)
 ```
 
-Switch is instant. Read fill from `@Environment(\.inkPalette).accent`.
+Switch is instant. The whole palette updates: paper (soft tint in light, deep hue in dark), accent fill, ink, and inverse. Read from `@Environment(\.inkPalette)`.
 
-## Ground
-
-Four values, persisted on the same `InkAppearanceStore` under `ink.ground`. Default is **black**. Independent of accent. Light paper stays white.
-
-| Ground | Dark paper |
-| --- | --- |
-| `black` | `#000000` |
-| `red` | `#1E080B` |
-| `blue` | `#000E1F` |
-| `green` | `#04180B` |
+To add a theme, define one static and append it to `InkColorTheme.all`:
 
 ```swift
-appearanceStore.selectGround(.red)
+static let coral = InkColorTheme(
+    id: "coral",
+    title: "Coral",
+    swatch: /* accent */,
+    light: InkPalette(ink: .black, paper: /* soft */, accent: /* hue */, inverse: .white),
+    dark: InkPalette(ink: .white, paper: /* deep */, accent: /* hue */, inverse: .black)
+)
+// then include `.coral` in `InkColorTheme.all`
 ```
-
-Switch is instant. Read screens from `@Environment(\.inkPalette).paper`. Fill labels use `inverse`, not tinted paper.
 
 ## Radius
 
-Four values, persisted on the same `InkAppearanceStore` under `ink.radius`. Default is **md**. Independent of color axes.
+Four values, persisted on the same `InkAppearanceStore` under `ink.radius`. Default is **md**. Independent of the color theme.
 
 | Radius | Button / Checkbox / Cover / Field | Dialog | Switch track | Switch knob |
 | --- | --- | --- | --- | --- |
@@ -173,7 +172,7 @@ appearanceStore.selectRadius(.lg)
 
 Switch is instant. At `sm` the knob is 2pt tighter than the track.
 
-Do not invent extra dark-mode grays or materials. Dark ink is still white; only paper can be a deep hue.
+Do not invent extra dark-mode grays or materials. Prefer black/white ink; tint paper and accent through the theme config.
 
 ## Type — `.inkText(_:)`
 
@@ -438,7 +437,7 @@ Lists: `InkListRow` + `listRowBackground(Ink.paper)`. Hide system separators whe
 
 ## Verify
 
-- Playground Appearance, Accent, Paper, Radius, Type, Space, Nav, Bottom Nav, List, Field, Sheet, and Dialog sections match the tables above
-- Host app root applies `.inkAppearance(store.appearance, accent: store.accent, ground: store.ground, radius: store.radius)` so Light / Dark / System, accent, dark paper, and radius work
+- Playground Appearance, Theme, Radius, Type, Space, Nav, Bottom Nav, List, Field, Sheet, and Dialog sections match the tables above
+- Host app root applies `.inkAppearance(store.appearance, theme: store.theme, radius: store.radius)` so Light / Dark / System, color theme, and radius work
 - Host screens use `.inkText`, `InkSpace`, `InkNavBar`, `InkListRow`, `.inkSheet` / `InkSheet`, and `InkDialog` / `InkAlert`, not ad-hoc sizes or system inline titles / alerts / sheets
 - No remaining `AskTheme` / `askFillButton` / `askOutlineButton` after a migration

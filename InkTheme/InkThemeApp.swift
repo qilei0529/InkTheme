@@ -18,8 +18,7 @@ struct InkThemeApp: App {
                 .environment(appearanceStore)
                 .inkAppearance(
                     appearanceStore.appearance,
-                    accent: appearanceStore.accent,
-                    ground: appearanceStore.ground,
+                    theme: appearanceStore.theme,
                     radius: appearanceStore.radius
                 )
                 .inkKeyboardBar()

@@ -51,72 +51,58 @@ struct InkThemeTests {
         #expect(InkPalette.resolved(appearance: .dark, system: .light) == .dark)
         #expect(InkPalette.resolved(appearance: .system, system: .dark) == .dark)
         #expect(InkPalette.resolved(appearance: .system, system: .light) == .light)
-        #expect(InkPalette.resolved(appearance: .light, accent: .ink, system: .dark) == .light)
+        #expect(InkPalette.resolved(appearance: .light, theme: .ink, system: .dark) == .light)
     }
 
-    @Test func accentIsIndependentOfAppearance() {
-        #expect(InkAccent.storageKey == "ink.accent")
-        #expect(InkAccent.allCases.map(\.rawValue) == ["ink", "red", "blue", "green"])
+    @Test func colorThemesOwnFullPalettes() {
+        #expect(InkColorTheme.storageKey == "ink.theme")
+        #expect(InkColorTheme.all.map(\.id) == ["ink", "red", "blue", "green"])
+        #expect(InkColorTheme.named("red") == .red)
+        #expect(InkColorTheme.named("missing") == nil)
 
-        let lightInk = InkPalette.resolved(appearance: .light, accent: .ink, system: .dark)
-        let darkInk = InkPalette.resolved(appearance: .dark, accent: .ink, system: .light)
+        let lightInk = InkPalette.resolved(appearance: .light, theme: .ink, system: .dark)
+        let darkInk = InkPalette.resolved(appearance: .dark, theme: .ink, system: .light)
+        #expect(lightInk == .light)
+        #expect(darkInk == .dark)
         #expect(lightInk.accent == lightInk.ink)
         #expect(darkInk.accent == darkInk.ink)
 
-        let lightRed = InkPalette.resolved(appearance: .light, accent: .red, system: .light)
-        let darkRed = InkPalette.resolved(appearance: .dark, accent: .red, system: .dark)
+        let lightRed = InkPalette.resolved(appearance: .light, theme: .red, system: .light)
+        let darkRed = InkPalette.resolved(appearance: .dark, theme: .red, system: .dark)
+        #expect(lightRed == InkColorTheme.red.light)
+        #expect(darkRed == InkColorTheme.red.dark)
         #expect(lightRed.ink == .black)
-        #expect(lightRed.paper == .white)
+        #expect(lightRed.paper != .white)
+        #expect(lightRed.paper == InkThemeColor.redLightPaper)
         #expect(darkRed.ink == .white)
-        #expect(darkRed.paper == .black)
+        #expect(darkRed.paper == InkThemeColor.redDarkPaper)
         #expect(lightRed.accent == darkRed.accent)
-        #expect(lightRed.accent != lightRed.ink)
-
-        let lightBlue = InkPalette.resolved(appearance: .light, accent: .blue, system: .dark)
-        let darkBlue = InkPalette.resolved(appearance: .dark, accent: .blue, system: .light)
-        #expect(lightBlue.accent == darkBlue.accent)
-        #expect(lightBlue.paper == .white)
-        #expect(darkBlue.paper == .black)
-    }
-
-    @Test func groundTintsDarkPaperOnly() {
-        #expect(InkGround.storageKey == "ink.ground")
-        #expect(InkGround.allCases.map(\.rawValue) == ["black", "red", "blue", "green"])
-
-        let lightRedGround = InkPalette.resolved(
-            appearance: .light,
-            ground: .red,
-            system: .dark
-        )
-        #expect(lightRedGround == .light)
-        #expect(lightRedGround.paper == .white)
-        #expect(lightRedGround.inverse == .white)
-
-        let darkBlack = InkPalette.resolved(appearance: .dark, ground: .black, system: .light)
-        #expect(darkBlack == .dark)
-        #expect(darkBlack.inverse == .black)
-
-        let darkRed = InkPalette.resolved(appearance: .dark, ground: .red, system: .light)
-        #expect(darkRed.ink == .white)
-        #expect(darkRed.paper == InkGround.red.color)
+        #expect(lightRed.accent == InkThemeColor.redAccent)
+        #expect(lightRed.inverse == .white)
         #expect(darkRed.inverse == .black)
-        #expect(darkRed.paper != darkBlack.paper)
+
+        let lightBlue = InkPalette.resolved(appearance: .light, theme: .blue, system: .dark)
+        let darkBlue = InkPalette.resolved(appearance: .dark, theme: .blue, system: .light)
+        #expect(lightBlue.paper == InkThemeColor.blueLightPaper)
+        #expect(darkBlue.paper == InkThemeColor.blueDarkPaper)
+        #expect(lightBlue.accent == darkBlue.accent)
 
         let systemDarkGreen = InkPalette.resolved(
             appearance: .system,
-            ground: .green,
+            theme: .green,
             system: .dark
         )
-        #expect(systemDarkGreen.paper == InkGround.green.color)
-        #expect(systemDarkGreen.inverse == .black)
+        #expect(systemDarkGreen == InkColorTheme.green.dark)
+        #expect(systemDarkGreen.paper == InkThemeColor.greenDarkPaper)
 
         let systemLightGreen = InkPalette.resolved(
             appearance: .system,
-            ground: .green,
+            theme: .green,
             system: .light
         )
-        #expect(systemLightGreen.paper == .white)
-        #expect(systemLightGreen.inverse == .white)
+        #expect(systemLightGreen == InkColorTheme.green.light)
+        #expect(systemLightGreen.paper == InkThemeColor.greenLightPaper)
+        #expect(systemLightGreen.paper != .white)
     }
 
     @Test func radiusTokensMatchSpec() {

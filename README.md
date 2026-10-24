@@ -25,8 +25,7 @@ struct HostApp: App {
                 .environment(appearanceStore)
                 .inkAppearance(
                     appearanceStore.appearance,
-                    accent: appearanceStore.accent,
-                    ground: appearanceStore.ground,
+                    theme: appearanceStore.theme,
                     radius: appearanceStore.radius
                 )
         }
@@ -38,6 +37,6 @@ The example app in `InkTheme/` is a catalog. It is not part of the library.
 
 ## Side effects
 
-`InkAppearanceStore` reads and writes `UserDefaults.standard` under `ink.appearance`, `ink.accent`, `ink.ground`, and `ink.radius`. One process shares one set of keys. A second store in the same app overwrites the same values.
+`InkAppearanceStore` reads and writes `UserDefaults.standard` under `ink.appearance`, `ink.theme`, and `ink.radius`. One process shares one set of keys. A second store in the same app overwrites the same values. Legacy `ink.accent` is migrated into `ink.theme` when present.
 
 Changing appearance calls `UIApplication.shared` and sets `overrideUserInterfaceStyle` on every window in the connected scenes. The optional reveal animation snapshots the key window. This fits a normal iOS app. It does not apply in widgets, app extensions, or a scene that has no key window — those switches still update the store, without the window override or the blob.

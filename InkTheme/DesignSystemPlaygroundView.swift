@@ -81,8 +81,7 @@ struct DesignSystemPlaygroundView: View {
             VStack(alignment: .leading, spacing: InkSpace.section) {
                 intro
                 appearanceCatalog
-                accentCatalog
-                paperCatalog
+                themeCatalog
                 radiusCatalog
                 typeCatalog
                 spaceCatalog
@@ -150,7 +149,7 @@ struct DesignSystemPlaygroundView: View {
         VStack(alignment: .leading, spacing: InkSpace.sm) {
             Text("INK / PAPER")
                 .inkText(.caption)
-            Text("Named type styles and spacing. Light is black ink on white paper; dark inverts. Fill uses accent. Dark paper can be black or a deep hue — Light stays white.")
+            Text("Named type styles and spacing. Each color theme owns a full light and dark palette — ink, paper, accent, and inverse. Appearance flips between those two sides.")
                 .inkText(.body)
         }
     }
@@ -168,38 +167,19 @@ struct DesignSystemPlaygroundView: View {
         }
     }
 
-    private var accentCatalog: some View {
+    private var themeCatalog: some View {
         VStack(alignment: .leading, spacing: InkSpace.md) {
-            sectionTitle("Accent")
-            Text("Ink follows appearance. Red, Blue, and Green stay the same in Light and Dark.")
+            sectionTitle("Theme")
+            Text("One config per color. Red, Blue, and Green tint light paper and deep dark paper; fill uses accent in both.")
                 .inkText(.body)
             HStack(spacing: InkSpace.md) {
-                ForEach(InkAccent.allCases) { option in
+                ForEach(InkColorTheme.all) { option in
                     PaletteSwatchButton(
-                        fill: option.resolved(against: palette.ink),
+                        fill: option.swatch,
                         title: option.title,
-                        isSelected: appearanceStore.accent == option
+                        isSelected: appearanceStore.theme.id == option.id
                     ) {
-                        appearanceStore.selectAccent(option)
-                    }
-                }
-            }
-        }
-    }
-
-    private var paperCatalog: some View {
-        VStack(alignment: .leading, spacing: InkSpace.md) {
-            sectionTitle("Paper")
-            Text("Dark paper only. Light stays white.")
-                .inkText(.body)
-            HStack(spacing: InkSpace.md) {
-                ForEach(InkGround.allCases) { option in
-                    PaletteSwatchButton(
-                        fill: option.color,
-                        title: option.title,
-                        isSelected: appearanceStore.ground == option
-                    ) {
-                        appearanceStore.selectGround(option)
+                        appearanceStore.selectTheme(option)
                     }
                 }
             }
@@ -667,6 +647,6 @@ private enum PlaygroundTab: String, CaseIterable, Hashable {
 #Preview {
     DesignSystemPlaygroundView()
         .environment(InkAppearanceStore())
-        .inkAppearance(.system, accent: .ink, ground: .black, radius: .md)
+        .inkAppearance(.system, theme: .ink, radius: .md)
         .inkKeyboardBar()
 }

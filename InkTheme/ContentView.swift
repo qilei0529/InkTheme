@@ -10,6 +10,6 @@ struct ContentView: View {
 #Preview {
     ContentView()
         .environment(InkAppearanceStore())
-        .inkAppearance(.system, accent: .ink, ground: .black, radius: .md)
+        .inkAppearance(.system, theme: .ink, radius: .md)
         .inkKeyboardBar()
 }
