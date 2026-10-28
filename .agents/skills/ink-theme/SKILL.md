@@ -42,11 +42,16 @@ Colors come from the selected `InkColorTheme`. Each theme owns a full light and 
 
 | Token | Role |
 | --- | --- |
-| `inkPalette.ink` | Type, scrims, off-toggle knob |
-| `inkPalette.paper` | Screens, nav, sheets, outline fills, off-toggle track |
-| `inkPalette.accent` | Fill buttons, listening mic, sound wave, on toggle / checkbox |
-| `inkPalette.inverse` | Fill labels, listening mic icon, on-toggle knob, checkbox hook |
-| `inkPalette.border` | Outlines, hairlines, field / card strokes (defaults to `ink`) |
+| `inkPalette.background` | Screens, nav, sheets, outline fills (`paper` alias) |
+| `inkPalette.foreground` | Type, scrims, off-toggle knob (`ink` alias) |
+| `inkPalette.muted` | Subtle surfaces |
+| `inkPalette.mutedForeground` | Secondary / caption type |
+| `inkPalette.border` | Outlines, hairlines, field / card strokes |
+| `inkPalette.primary` | Fill buttons, listening mic, on toggle / checkbox (`accent` alias) |
+| `inkPalette.primaryForeground` | Fill labels, on-toggle knob, checkbox hook (`inverse` alias) |
+| `inkPalette.gray` | Neutral surface |
+| `inkPalette.grayForeground` | Type on gray surfaces |
+| `inkPalette.ring` | Focus / emphasis ring |
 
 Read colors from `@Environment(\.inkPalette)` after the host root applies `.inkAppearance`. Do not use `Color.black` / `Color.white` for chrome.
 

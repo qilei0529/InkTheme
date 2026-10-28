@@ -161,7 +161,7 @@ struct DesignSystemPlaygroundView: View {
         VStack(alignment: .leading, spacing: InkSpace.sm) {
             Text("INK / PAPER")
                 .inkText(.caption)
-            Text("Named type styles and spacing. Each color theme owns a full light and dark palette — ink, paper, accent, and inverse. Appearance flips between those two sides.")
+            Text("Named type styles and spacing. Each color theme owns a full light and dark palette — background, foreground, muted, border, primary, gray, ring (plus legacy ink/paper/accent/inverse aliases). Appearance flips between those two sides.")
                 .inkText(.body)
         }
     }

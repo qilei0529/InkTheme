@@ -175,25 +175,23 @@ public extension InkColorTheme {
         id: "ink",
         title: "Ink",
         swatch: .black,
-        light: InkPalette(ink: .black, paper: .white, accent: .black, inverse: .white),
-        dark: InkPalette(ink: .white, paper: .black, accent: .white, inverse: .black)
+        light: .light,
+        dark: .dark
     )
 
     static let red = InkColorTheme(
         id: "red",
         title: "Red",
         swatch: InkThemeColor.redAccent,
-        light: InkPalette(
-            ink: .black,
-            paper: InkThemeColor.redLightPaper,
-            accent: InkThemeColor.redAccent,
-            inverse: .white
+        light: InkPalette.colored(
+            background: InkThemeColor.redLightPaper,
+            primary: InkThemeColor.redAccent,
+            dark: false
         ),
-        dark: InkPalette(
-            ink: .white,
-            paper: InkThemeColor.redDarkPaper,
-            accent: InkThemeColor.redAccent,
-            inverse: .black
+        dark: InkPalette.colored(
+            background: InkThemeColor.redDarkPaper,
+            primary: InkThemeColor.redAccent,
+            dark: true
         )
     )
 
@@ -201,17 +199,15 @@ public extension InkColorTheme {
         id: "blue",
         title: "Blue",
         swatch: InkThemeColor.blueAccent,
-        light: InkPalette(
-            ink: .black,
-            paper: InkThemeColor.blueLightPaper,
-            accent: InkThemeColor.blueAccent,
-            inverse: .white
+        light: InkPalette.colored(
+            background: InkThemeColor.blueLightPaper,
+            primary: InkThemeColor.blueAccent,
+            dark: false
         ),
-        dark: InkPalette(
-            ink: .white,
-            paper: InkThemeColor.blueDarkPaper,
-            accent: InkThemeColor.blueAccent,
-            inverse: .black
+        dark: InkPalette.colored(
+            background: InkThemeColor.blueDarkPaper,
+            primary: InkThemeColor.blueAccent,
+            dark: true
         )
     )
 
@@ -219,17 +215,15 @@ public extension InkColorTheme {
         id: "green",
         title: "Green",
         swatch: InkThemeColor.greenAccent,
-        light: InkPalette(
-            ink: .black,
-            paper: InkThemeColor.greenLightPaper,
-            accent: InkThemeColor.greenAccent,
-            inverse: .white
+        light: InkPalette.colored(
+            background: InkThemeColor.greenLightPaper,
+            primary: InkThemeColor.greenAccent,
+            dark: false
         ),
-        dark: InkPalette(
-            ink: .white,
-            paper: InkThemeColor.greenDarkPaper,
-            accent: InkThemeColor.greenAccent,
-            inverse: .black
+        dark: InkPalette.colored(
+            background: InkThemeColor.greenDarkPaper,
+            primary: InkThemeColor.greenAccent,
+            dark: true
         )
     )
 
@@ -248,6 +242,17 @@ enum InkThemeColor {
     static let redDarkPaper = Color(red: 30 / 255, green: 8 / 255, blue: 11 / 255)
     static let blueDarkPaper = Color(red: 0, green: 14 / 255, blue: 31 / 255)
     static let greenDarkPaper = Color(red: 4 / 255, green: 24 / 255, blue: 11 / 255)
+
+    // Tailwind zinc scale
+    static let zinc50 = Color(red: 250 / 255, green: 250 / 255, blue: 250 / 255)
+    static let zinc100 = Color(red: 244 / 255, green: 244 / 255, blue: 245 / 255)
+    static let zinc200 = Color(red: 228 / 255, green: 228 / 255, blue: 231 / 255)
+    static let zinc300 = Color(red: 212 / 255, green: 212 / 255, blue: 216 / 255)
+    static let zinc400 = Color(red: 161 / 255, green: 161 / 255, blue: 170 / 255)
+    static let zinc500 = Color(red: 113 / 255, green: 113 / 255, blue: 122 / 255)
+    static let zinc800 = Color(red: 39 / 255, green: 39 / 255, blue: 42 / 255)
+    static let zinc900 = Color(red: 24 / 255, green: 24 / 255, blue: 27 / 255)
+    static let zinc950 = Color(red: 9 / 255, green: 9 / 255, blue: 11 / 255)
 }
 
 public enum InkRadius: String, CaseIterable, Identifiable, Sendable {
@@ -305,29 +310,151 @@ public enum InkRadius: String, CaseIterable, Identifiable, Sendable {
     }
 }
 
+/// Semantic color tokens for a single appearance side (light or dark).
+///
+/// Prefer the shadcn-style names. Legacy `ink` / `paper` / `accent` / `inverse`
+/// aliases map to `foreground` / `background` / `primary` / `primaryForeground`.
 public struct InkPalette: Equatable, Sendable {
-    public var ink: Color
-    public var paper: Color
-    public var accent: Color
-    public var inverse: Color
-    /// Outlines, hairlines, and field strokes. Defaults to `ink` when omitted.
+    public var background: Color
+    public var foreground: Color
+    public var muted: Color
+    public var mutedForeground: Color
     public var border: Color
+    public var primary: Color
+    public var primaryForeground: Color
+    public var gray: Color
+    public var grayForeground: Color
+    public var ring: Color
 
-    public static let light = InkPalette(ink: .black, paper: .white, accent: .black, inverse: .white)
-    public static let dark = InkPalette(ink: .white, paper: .black, accent: .white, inverse: .black)
+    /// Type, scrims, off-toggle knob. Alias of `foreground`.
+    public var ink: Color {
+        get { foreground }
+        set { foreground = newValue }
+    }
 
+    /// Screens, nav, sheets, outline fills. Alias of `background`.
+    public var paper: Color {
+        get { background }
+        set { background = newValue }
+    }
+
+    /// Fill buttons, listening mic, on toggle / checkbox. Alias of `primary`.
+    public var accent: Color {
+        get { primary }
+        set { primary = newValue }
+    }
+
+    /// Fill labels, on-toggle knob, checkbox hook. Alias of `primaryForeground`.
+    public var inverse: Color {
+        get { primaryForeground }
+        set { primaryForeground = newValue }
+    }
+
+    public static let light = InkPalette(
+        background: .white,
+        foreground: .black,
+        muted: InkThemeColor.zinc100,
+        mutedForeground: InkThemeColor.zinc500,
+        border: InkThemeColor.zinc200,
+        primary: .black,
+        primaryForeground: .white,
+        gray: InkThemeColor.zinc100,
+        grayForeground: InkThemeColor.zinc900,
+        ring: .black
+    )
+
+    public static let dark = InkPalette(
+        background: .black,
+        foreground: .white,
+        muted: InkThemeColor.zinc800,
+        mutedForeground: InkThemeColor.zinc400,
+        border: InkThemeColor.zinc800,
+        primary: .white,
+        primaryForeground: .black,
+        gray: InkThemeColor.zinc800,
+        grayForeground: InkThemeColor.zinc50,
+        ring: InkThemeColor.zinc300
+    )
+
+    public init(
+        background: Color,
+        foreground: Color,
+        muted: Color,
+        mutedForeground: Color,
+        border: Color,
+        primary: Color,
+        primaryForeground: Color,
+        gray: Color,
+        grayForeground: Color,
+        ring: Color
+    ) {
+        self.background = background
+        self.foreground = foreground
+        self.muted = muted
+        self.mutedForeground = mutedForeground
+        self.border = border
+        self.primary = primary
+        self.primaryForeground = primaryForeground
+        self.gray = gray
+        self.grayForeground = grayForeground
+        self.ring = ring
+    }
+
+    /// Legacy initializer. Fills muted / gray / ring from zinc neutrals when omitted.
     public init(
         ink: Color,
         paper: Color,
         accent: Color,
         inverse: Color,
-        border: Color? = nil
+        border: Color? = nil,
+        muted: Color? = nil,
+        mutedForeground: Color? = nil,
+        gray: Color? = nil,
+        grayForeground: Color? = nil,
+        ring: Color? = nil
     ) {
-        self.ink = ink
-        self.paper = paper
-        self.accent = accent
-        self.inverse = inverse
-        self.border = border ?? ink
+        let resolvedBorder = border ?? ink
+        self.background = paper
+        self.foreground = ink
+        self.muted = muted ?? paper
+        self.mutedForeground = mutedForeground ?? ink
+        self.border = resolvedBorder
+        self.primary = accent
+        self.primaryForeground = inverse
+        self.gray = gray ?? paper
+        self.grayForeground = grayForeground ?? ink
+        self.ring = ring ?? resolvedBorder
+    }
+
+    /// Tinted paper theme (red / blue / green) with shared zinc neutrals.
+    static func colored(background: Color, primary: Color, dark: Bool) -> InkPalette {
+        if dark {
+            InkPalette(
+                background: background,
+                foreground: .white,
+                muted: InkThemeColor.zinc800,
+                mutedForeground: InkThemeColor.zinc400,
+                border: .white,
+                primary: primary,
+                primaryForeground: .black,
+                gray: InkThemeColor.zinc800,
+                grayForeground: InkThemeColor.zinc50,
+                ring: InkThemeColor.zinc300
+            )
+        } else {
+            InkPalette(
+                background: background,
+                foreground: .black,
+                muted: InkThemeColor.zinc100,
+                mutedForeground: InkThemeColor.zinc500,
+                border: .black,
+                primary: primary,
+                primaryForeground: .white,
+                gray: InkThemeColor.zinc100,
+                grayForeground: InkThemeColor.zinc900,
+                ring: .black
+            )
+        }
     }
 
     public static func resolved(

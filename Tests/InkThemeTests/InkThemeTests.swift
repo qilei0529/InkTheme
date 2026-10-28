@@ -64,32 +64,36 @@ struct InkThemeTests {
         let darkInk = InkPalette.resolved(appearance: .dark, theme: .ink, system: .light)
         #expect(lightInk == .light)
         #expect(darkInk == .dark)
+        #expect(lightInk.primary == lightInk.foreground)
+        #expect(darkInk.primary == darkInk.foreground)
         #expect(lightInk.accent == lightInk.ink)
         #expect(darkInk.accent == darkInk.ink)
-        #expect(lightInk.border == lightInk.ink)
-        #expect(darkInk.border == darkInk.ink)
-        #expect(InkColorTheme.red.light.border == InkColorTheme.red.light.ink)
-        #expect(InkColorTheme.red.dark.border == InkColorTheme.red.dark.ink)
+        #expect(lightInk.border == InkThemeColor.zinc200)
+        #expect(darkInk.border == InkThemeColor.zinc800)
+        #expect(lightInk.muted == InkThemeColor.zinc100)
+        #expect(darkInk.mutedForeground == InkThemeColor.zinc400)
+        #expect(InkColorTheme.red.light.border == InkColorTheme.red.light.foreground)
+        #expect(InkColorTheme.red.dark.border == InkColorTheme.red.dark.foreground)
 
         let lightRed = InkPalette.resolved(appearance: .light, theme: .red, system: .light)
         let darkRed = InkPalette.resolved(appearance: .dark, theme: .red, system: .dark)
         #expect(lightRed == InkColorTheme.red.light)
         #expect(darkRed == InkColorTheme.red.dark)
-        #expect(lightRed.ink == .black)
-        #expect(lightRed.paper != .white)
-        #expect(lightRed.paper == InkThemeColor.redLightPaper)
-        #expect(darkRed.ink == .white)
-        #expect(darkRed.paper == InkThemeColor.redDarkPaper)
-        #expect(lightRed.accent == darkRed.accent)
-        #expect(lightRed.accent == InkThemeColor.redAccent)
-        #expect(lightRed.inverse == .white)
-        #expect(darkRed.inverse == .black)
+        #expect(lightRed.foreground == .black)
+        #expect(lightRed.background != .white)
+        #expect(lightRed.background == InkThemeColor.redLightPaper)
+        #expect(darkRed.foreground == .white)
+        #expect(darkRed.background == InkThemeColor.redDarkPaper)
+        #expect(lightRed.primary == darkRed.primary)
+        #expect(lightRed.primary == InkThemeColor.redAccent)
+        #expect(lightRed.primaryForeground == .white)
+        #expect(darkRed.primaryForeground == .black)
 
         let lightBlue = InkPalette.resolved(appearance: .light, theme: .blue, system: .dark)
         let darkBlue = InkPalette.resolved(appearance: .dark, theme: .blue, system: .light)
-        #expect(lightBlue.paper == InkThemeColor.blueLightPaper)
-        #expect(darkBlue.paper == InkThemeColor.blueDarkPaper)
-        #expect(lightBlue.accent == darkBlue.accent)
+        #expect(lightBlue.background == InkThemeColor.blueLightPaper)
+        #expect(darkBlue.background == InkThemeColor.blueDarkPaper)
+        #expect(lightBlue.primary == darkBlue.primary)
 
         let systemDarkGreen = InkPalette.resolved(
             appearance: .system,
@@ -97,7 +101,7 @@ struct InkThemeTests {
             system: .dark
         )
         #expect(systemDarkGreen == InkColorTheme.green.dark)
-        #expect(systemDarkGreen.paper == InkThemeColor.greenDarkPaper)
+        #expect(systemDarkGreen.background == InkThemeColor.greenDarkPaper)
 
         let systemLightGreen = InkPalette.resolved(
             appearance: .system,
@@ -105,8 +109,8 @@ struct InkThemeTests {
             system: .light
         )
         #expect(systemLightGreen == InkColorTheme.green.light)
-        #expect(systemLightGreen.paper == InkThemeColor.greenLightPaper)
-        #expect(systemLightGreen.paper != .white)
+        #expect(systemLightGreen.background == InkThemeColor.greenLightPaper)
+        #expect(systemLightGreen.background != .white)
     }
 
     @Test func paletteBorderDefaultsToInkAndAcceptsOverride() {
@@ -119,8 +123,9 @@ struct InkThemeTests {
             border: soft
         )
         #expect(custom.border == soft)
-        #expect(custom.border != custom.ink)
-        #expect(InkPalette.light.border == InkPalette.light.ink)
+        #expect(custom.border != custom.foreground)
+        #expect(InkPalette.light.border == InkThemeColor.zinc200)
+        #expect(InkPalette.light.primary == InkPalette.light.foreground)
     }
 
     @Test @MainActor func appearanceConfigurationOwnsSwitchableThemes() {
