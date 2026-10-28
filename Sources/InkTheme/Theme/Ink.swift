@@ -32,6 +32,42 @@ public enum Ink {
     public static let toggleHeight: CGFloat = 32
     public static let toggleKnobSize: CGFloat = 20
     public static let checkboxSize: CGFloat = 32
+    /// Fixed title / actions row height for `InkNavBar` (excludes safe area and vertical padding).
+    public static let navBarHeight: CGFloat = 44
+    /// Paper alpha over blur when chrome is frosted (Flutter `frostedOpacity`).
+    public static let frostedOpacity: CGFloat = 0.86
+}
+
+/// Shared opaque / frosted paper fill for overlay chrome (nav + bottom tab).
+public struct InkChromeBackground: View {
+    var frosted: Bool
+    var frostedOpacity: CGFloat
+    var safeEdges: Edge.Set
+    @Environment(\.inkPalette) private var palette
+
+    public init(
+        frosted: Bool = false,
+        frostedOpacity: CGFloat = Ink.frostedOpacity,
+        safeEdges: Edge.Set = []
+    ) {
+        self.frosted = frosted
+        self.frostedOpacity = frostedOpacity
+        self.safeEdges = safeEdges
+    }
+
+    public var body: some View {
+        Group {
+            if frosted {
+                ZStack {
+                    Rectangle().fill(.ultraThinMaterial)
+                    palette.paper.opacity(frostedOpacity)
+                }
+            } else {
+                palette.paper
+            }
+        }
+        .ignoresSafeArea(edges: safeEdges)
+    }
 }
 
 public enum InkFieldSize: CaseIterable, Identifiable {

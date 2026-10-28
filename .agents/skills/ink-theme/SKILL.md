@@ -227,7 +227,7 @@ Label to body: `xs` (6) or `sm` (8). Sections: `section` (28). Screen inset: `xl
 
 ## Nav
 
-Do not use system `.navigationTitle` + `.inline`. Hide the UIKit bar and pin `InkNavBar` (hero 28, single line, scales down).
+Do not use system `.navigationTitle` + `.inline`. Hide the UIKit bar and use `InkNavBar` (hero 28, single line, scales down).
 
 | | Page | Bar text | Bar icon |
 | --- | --- | --- | --- |
@@ -235,33 +235,56 @@ Do not use system `.navigationTitle` + `.inline`. Hide the UIKit bar and pin `In
 | Width | Full | Hug | 32 square |
 | Height | 44 | 32 | 32 |
 
-Icon actions: `Button("Add", systemImage: "plus")` plus an **icon** style (`.iconOnly`, 15pt semibold). Do not put a `Label` / `systemImage` title on `.inkBarFillButton()` — that stacks or stretches the 32pt bar. A 2pt ink hairline sits under the bar by default (`showHairline: true`); pass `false` to hide it (e.g. transparent back headers).
+Icon actions: `Button("Add", systemImage: "plus")` plus an **icon** style (`.iconOnly`, 15pt semibold). Do not put a `Label` / `systemImage` title on `.inkBarFillButton()` — that stacks or stretches the 32pt bar. A 2pt ink hairline sits under the bar by default (`showHairline: true`); pass `false` to hide it. Frosted overlay always draws the hairline.
+
+### Frosted overlay (preferred for scroll screens)
+
+`safeAreaInset` reserves layout space, so blur cannot sample content under the bar. Prefer a `ZStack` overlay (or `InkPage`) with `frosted: true`: ultraThin material + paper at `Ink.frostedOpacity` (0.86). Pad scroll content with `.inkOverlayNavContentInset()` (or `InkOverlayInset.nav` / `InkPage.navExtent`). Sheets keep non-frosted nav.
+
+```swift
+InkPage(title: "Ask") {
+    Button("Close") { }.inkBarOutlineButton()
+    Button("Add", systemImage: "plus") { }.inkBarIconFillButton()
+} content: {
+    ScrollView {
+        /* body */
+            .inkOverlayNavContentInset()
+            .inkOverlayTabContentInset()
+    }
+}
+```
+
+Opaque inset is fine when content should not scroll under chrome:
 
 ```swift
 .toolbar(.hidden, for: .navigationBar)
 .safeAreaInset(edge: .top) {
     InkNavBar(title: "Ask") {
         Button("Close") { }.inkBarOutlineButton()
-        Button("Add", systemImage: "plus") { }.inkBarIconFillButton()
     }
 }
 ```
 
 ## Bottom Nav
 
-Pin `InkBottomNav` with a bottom safe area inset. It is chrome only — the host switches content from `selection`. Each `InkTabItem` takes an `id`, an SF Symbol `systemImage`, and a `label`. Uppercase the label at the call site.
+`InkBottomNav` is chrome only — the host switches content from `selection`. Each `InkTabItem` takes an `id`, an SF Symbol `systemImage`, and a `label`. Uppercase the label at the call site.
 
-Paper background extends under the Home Indicator. A 2pt ink hairline sits on top. Items share the width. Each item is at least 44pt tall. With labels (`showLabels: true`, default): 18pt semibold icon + capital label, spaced `xxs`. Icon-only (`showLabels: false`): 22pt semibold icon; `label` is still the accessibility name. Selected ink is full opacity. Unselected ink uses the capital opacity (0.45). Pressed opacity is 0.55. No fill, accent, or gray.
+Prefer frosted overlay in a bottom `ZStack` (`frosted: true`) so list rows can blur under the tabs. Set `.environment(\.inkOverlayTabInset, InkOverlayInset.tab)` and pad scroll content with `.inkOverlayTabContentInset()`. Do **not** use bottom `safeAreaInset` when you want under-tab blur.
+
+Paper / frosted fill extends under the Home Indicator. A 2pt ink hairline sits on top. Items share the width. Each item is at least 44pt tall. With labels (`showLabels: true`, default): 18pt semibold icon + capital label, spaced `xxs`. Icon-only (`showLabels: false`): 22pt semibold icon; `label` is still the accessibility name. Selected ink is full opacity. Unselected ink uses the capital opacity (0.45). Pressed opacity is 0.55. No fill, accent, or gray.
 
 ```swift
-.safeAreaInset(edge: .bottom, spacing: 0) {
+ZStack(alignment: .bottom) {
+    tabContent
+        .environment(\.inkOverlayTabInset, InkOverlayInset.tab)
     InkBottomNav(
         items: [
             InkTabItem(id: .home, label: "HOME", systemImage: "house"),
             InkTabItem(id: .ask, label: "ASK", systemImage: "mic"),
         ],
         selection: $tab,
-        showLabels: false
+        showLabels: false,
+        frosted: true
     )
 }
 ```
@@ -406,7 +429,7 @@ Backdrop: custom dialog defaults to `dismissOnBackdrop: true`. Alert uses `false
 8. Checkbox: `Toggle(...).toggleStyle(.inkCheckbox)`. 32 square; off 6% ink + waiting inverse hook + ink stroke; on accent fill + ink stroke. Tap pops the hook bigger then back.
 9. Sheets: `.inkSheet` + `InkSheet` + `InkSheetBody` / `InkSheetList` / `InkSheetFooter`. Lists: `InkListRow`. No system `.sheet`. No gray grouped lists.
 10. Dialogs: `InkDialog` / `InkAlert` via `.inkDialog` / `.inkAlert`. No system `.alert`.
-11. Bottom nav: `InkBottomNav` with `InkTabItem` (icon + capital label, or `showLabels: false` for icon-only). Pin with `.safeAreaInset(edge: .bottom)`. No system tab bar.
+11. Bottom nav: `InkBottomNav` with `InkTabItem` (icon + capital label, or `showLabels: false` for icon-only). Prefer frosted overlay (`frosted: true`) + `.inkOverlayTabContentInset()`. No system tab bar.
 
 ## Do not
 
@@ -444,11 +467,16 @@ NavigationStack {
     .padding(InkSpace.xl)
     .inkScreen()
     .toolbar(.hidden, for: .navigationBar)
-    .safeAreaInset(edge: .top) {
-        InkNavBar(title: "Screen") {
-            Button("Skip") { }.inkBarOutlineButton()
-            Button("Save") { }.inkBarFillButton()
-        }
+}
+
+// Prefer InkPage / frosted overlay for scroll screens:
+InkPage(title: "Screen") {
+    Button("Skip") { }.inkBarOutlineButton()
+    Button("Save") { }.inkBarFillButton()
+} content: {
+    ScrollView {
+        /* body */
+            .inkOverlayNavContentInset()
     }
 }
 ```

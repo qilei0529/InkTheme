@@ -26,33 +26,39 @@ struct DesignSystemPlaygroundView: View {
 
     var body: some View {
         NavigationStack {
-            Group {
-                switch bottomTab {
-                case .home:
-                    catalog
-                case .ask:
-                    askDemo
-                case .history:
-                    historyDemo
+            ZStack(alignment: .bottom) {
+                ZStack(alignment: .top) {
+                    Group {
+                        switch bottomTab {
+                        case .home:
+                            catalog
+                        case .ask:
+                            askDemo
+                        case .history:
+                            historyDemo
+                        }
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+                    InkNavBar(title: bottomTab.title, frosted: true) {
+                        Button("Settings") {}
+                            .inkBarOutlineButton()
+                        Button("Add", systemImage: "plus") {}
+                            .inkBarIconFillButton()
+                    }
                 }
-            }
-            .inkScreen()
-            .toolbar(.hidden, for: .navigationBar)
-            .safeAreaInset(edge: .top) {
-                InkNavBar(title: bottomTab.title) {
-                    Button("Settings") {}
-                        .inkBarOutlineButton()
-                    Button("Add", systemImage: "plus") {}
-                        .inkBarIconFillButton()
-                }
-            }
-            .safeAreaInset(edge: .bottom, spacing: 0) {
+
                 InkBottomNav(
                     items: PlaygroundTab.items,
                     selection: $bottomTab,
-                    showLabels: showTabLabels
+                    showLabels: showTabLabels,
+                    frosted: true
                 )
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .environment(\.inkOverlayTabInset, InkOverlayInset.tab)
+            .inkScreen()
+            .toolbar(.hidden, for: .navigationBar)
             .inkSheet(isPresented: $showListSheet) {
                 listSheet
             }
@@ -98,6 +104,8 @@ struct DesignSystemPlaygroundView: View {
             }
             .padding(InkSpace.xl)
             .frame(maxWidth: .infinity, alignment: .leading)
+            .inkOverlayNavContentInset()
+            .inkOverlayTabContentInset()
             .inkDismissKeyboardOnTap()
         }
     }
@@ -108,11 +116,13 @@ struct DesignSystemPlaygroundView: View {
                 .inkText(.capital)
             Text("Could you stay a bit later?")
                 .inkText(.hero)
-            Text("Ask is the selected tab. The bar stays pinned while this screen replaces the catalog.")
+            Text("Ask is the selected tab. Frosted nav and bottom tab float over the body so content can scroll underneath.")
                 .inkText(.body)
             Spacer(minLength: 0)
         }
         .padding(InkSpace.xl)
+        .inkOverlayNavContentInset()
+        .inkOverlayTabContentInset()
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 
@@ -142,6 +152,8 @@ struct DesignSystemPlaygroundView: View {
         }
         .padding(.horizontal, InkSpace.xl)
         .padding(.top, InkSpace.sm)
+        .inkOverlayNavContentInset()
+        .inkOverlayTabContentInset()
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 
@@ -260,7 +272,7 @@ struct DesignSystemPlaygroundView: View {
     private var navCatalog: some View {
         VStack(alignment: .leading, spacing: InkSpace.md) {
             sectionTitle("Nav")
-            Text("Hero title at 28. Text actions hug at 32; icon actions are a 32 square. Page actions stay 44 and full width. A 2pt ink hairline sits under the bar by default.")
+            Text("Hero title at 28. Text actions hug at 32; icon actions are a 32 square. Prefer `InkPage` / overlay with `frosted: true` (blur + paper at \(Ink.frostedOpacity) alpha) so content scrolls underneath. Pad scroll content with `inkOverlayNavContentInset()`. Opaque `safeAreaInset` is fine when frosted overlay is not needed. Sheets keep non-frosted nav.")
                 .inkText(.body)
             HStack(spacing: InkSpace.sm) {
                 Button("Close") {}
@@ -276,7 +288,7 @@ struct DesignSystemPlaygroundView: View {
     private var bottomNavCatalog: some View {
         VStack(alignment: .leading, spacing: InkSpace.md) {
             sectionTitle("Bottom Nav")
-            Text("This page pins the bar and switches HOME, ASK, and HISTORY. Selected is full ink; the rest stay at capital opacity. Turn off Labels for icon-only (22pt); the label stays the accessibility name.")
+            Text("This page overlays a frosted bar and switches HOME, ASK, and HISTORY. Use `frosted: true` in a bottom ZStack so rows blur under the tabs; pad scroll content with `inkOverlayTabContentInset()`. Selected is full ink; the rest stay at capital opacity. Turn off Labels for icon-only (22pt); the label stays the accessibility name.")
                 .inkText(.body)
             Toggle("Labels", isOn: $showTabLabels)
                 .inkText(.body)
