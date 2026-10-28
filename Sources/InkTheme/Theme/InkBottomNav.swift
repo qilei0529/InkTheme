@@ -1,21 +1,32 @@
 import SwiftUI
 
+public enum InkTabIcon: Hashable {
+    case system(String)
+    case asset(String)
+}
+
 public struct InkTabItem<ID: Hashable>: Identifiable {
     public let id: ID
     public let label: String
-    public let systemImage: String
+    public let icon: InkTabIcon
 
     public init(id: ID, label: String, systemImage: String) {
         self.id = id
         self.label = label
-        self.systemImage = systemImage
+        self.icon = .system(systemImage)
+    }
+
+    public init(id: ID, label: String, image: String) {
+        self.id = id
+        self.label = label
+        self.icon = .asset(image)
     }
 }
 
 public struct InkBottomNav<ID: Hashable>: View {
     let items: [InkTabItem<ID>]
     @Binding var selection: ID
-    /// When `false`, only the SF Symbol is shown. `label` remains the accessibility name.
+    /// When `false`, only the icon is shown. `label` remains the accessibility name.
     var showLabels: Bool
     /// Blur + translucent paper so content can show through when the bar overlays a scroll view.
     var frosted: Bool
@@ -54,7 +65,7 @@ public struct InkBottomNav<ID: Hashable>: View {
                 } label: {
                     InkBottomNavItem(
                         label: item.label,
-                        systemImage: item.systemImage,
+                        icon: item.icon,
                         isSelected: selection == item.id,
                         showLabel: showLabels
                     )
@@ -69,7 +80,7 @@ public struct InkBottomNav<ID: Hashable>: View {
         }
         .overlay(alignment: .top) {
             Rectangle()
-                .fill(palette.ink)
+                .fill(palette.border)
                 .frame(height: Ink.borderWidth)
         }
     }
@@ -77,26 +88,41 @@ public struct InkBottomNav<ID: Hashable>: View {
 
 private struct InkBottomNavItem: View {
     let label: String
-    let systemImage: String
+    let icon: InkTabIcon
     let isSelected: Bool
     let showLabel: Bool
     @Environment(\.inkPalette) private var palette
+
+    private var iconSize: CGFloat { showLabel ? 18 : 22 }
 
     var body: some View {
         Group {
             if showLabel {
                 VStack(spacing: InkSpace.xxs) {
-                    Image(systemName: systemImage)
-                        .font(.system(size: 18, weight: .semibold))
+                    iconView
                     Text(label)
                         .font(.system(size: 10, weight: .regular))
                 }
             } else {
-                Image(systemName: systemImage)
-                    .font(.system(size: 22, weight: .semibold))
+                iconView
             }
         }
         .foregroundStyle(palette.ink.opacity(isSelected ? 1 : InkTextStyle.capital.inkOpacity))
+    }
+
+    @ViewBuilder
+    private var iconView: some View {
+        switch icon {
+        case .system(let name):
+            Image(systemName: name)
+                .font(.system(size: iconSize, weight: .semibold))
+        case .asset(let name):
+            Image(name)
+                .renderingMode(.template)
+                .resizable()
+                .scaledToFit()
+                .frame(width: iconSize, height: iconSize)
+        }
     }
 }
 
