@@ -1,17 +1,46 @@
 import SwiftUI
 import UIKit
 
+/// Host-owned list of switchable themes. Pass into `InkAppearanceStore` so Settings
+/// and persistence resolve against the app catalog, not only `InkColorTheme.all`.
+public struct InkAppearanceConfiguration: Sendable {
+    public var themes: [InkColorTheme]
+    public var defaultThemeID: String?
+
+    public static let `default` = InkAppearanceConfiguration(themes: InkColorTheme.all)
+
+    public init(themes: [InkColorTheme], defaultThemeID: String? = nil) {
+        precondition(!themes.isEmpty, "InkAppearanceConfiguration.themes must not be empty")
+        self.themes = themes
+        self.defaultThemeID = defaultThemeID
+    }
+
+    public var defaultTheme: InkColorTheme {
+        if let defaultThemeID, let match = themes.first(where: { $0.id == defaultThemeID }) {
+            return match
+        }
+        return themes[0]
+    }
+
+    public func theme(id: String) -> InkColorTheme? {
+        themes.first { $0.id == id }
+    }
+}
+
 @Observable
 @MainActor
 public final class InkAppearanceStore {
     public var appearance: InkAppearance
     public var theme: InkColorTheme
     public var radius: InkRadius
+    /// Themes available for switching in this host (from configuration).
+    public private(set) var themes: [InkColorTheme]
 
-    public init() {
+    public init(configuration: InkAppearanceConfiguration = .default) {
+        themes = configuration.themes
         let appearanceRaw = UserDefaults.standard.string(forKey: InkAppearance.storageKey) ?? ""
         appearance = InkAppearance(rawValue: appearanceRaw) ?? .system
-        theme = Self.loadTheme()
+        theme = Self.loadTheme(from: configuration)
         let radiusRaw = UserDefaults.standard.string(forKey: InkRadius.storageKey) ?? ""
         radius = InkRadius(rawValue: radiusRaw) ?? .md
     }
@@ -38,6 +67,7 @@ public final class InkAppearanceStore {
 
     public func selectTheme(_ theme: InkColorTheme) {
         guard theme.id != self.theme.id else { return }
+        guard themes.contains(where: { $0.id == theme.id }) else { return }
         self.theme = theme
         UserDefaults.standard.set(theme.id, forKey: InkColorTheme.storageKey)
     }
@@ -54,18 +84,18 @@ public final class InkAppearanceStore {
         appearance.applyToOpenWindows()
     }
 
-    private static func loadTheme() -> InkColorTheme {
+    private static func loadTheme(from configuration: InkAppearanceConfiguration) -> InkColorTheme {
         if let raw = UserDefaults.standard.string(forKey: InkColorTheme.storageKey),
-           let theme = InkColorTheme.named(raw) {
+           let theme = configuration.theme(id: raw) {
             return theme
         }
         // Migrate legacy `ink.accent` (ink / red / blue / green).
         if let legacy = UserDefaults.standard.string(forKey: "ink.accent"),
-           let theme = InkColorTheme.named(legacy) {
+           let theme = configuration.theme(id: legacy) {
             UserDefaults.standard.set(theme.id, forKey: InkColorTheme.storageKey)
             return theme
         }
-        return .ink
+        return configuration.defaultTheme
     }
 }
 
@@ -280,15 +310,24 @@ public struct InkPalette: Equatable, Sendable {
     public var paper: Color
     public var accent: Color
     public var inverse: Color
+    /// Outlines, hairlines, and field strokes. Defaults to `ink` when omitted.
+    public var border: Color
 
     public static let light = InkPalette(ink: .black, paper: .white, accent: .black, inverse: .white)
     public static let dark = InkPalette(ink: .white, paper: .black, accent: .white, inverse: .black)
 
-    public init(ink: Color, paper: Color, accent: Color, inverse: Color) {
+    public init(
+        ink: Color,
+        paper: Color,
+        accent: Color,
+        inverse: Color,
+        border: Color? = nil
+    ) {
         self.ink = ink
         self.paper = paper
         self.accent = accent
         self.inverse = inverse
+        self.border = border ?? ink
     }
 
     public static func resolved(

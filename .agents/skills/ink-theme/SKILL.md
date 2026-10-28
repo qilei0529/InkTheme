@@ -42,10 +42,11 @@ Colors come from the selected `InkColorTheme`. Each theme owns a full light and 
 
 | Token | Role |
 | --- | --- |
-| `inkPalette.ink` | Type, outlines, hairlines, off-toggle knob |
+| `inkPalette.ink` | Type, scrims, off-toggle knob |
 | `inkPalette.paper` | Screens, nav, sheets, outline fills, off-toggle track |
 | `inkPalette.accent` | Fill buttons, listening mic, sound wave, on toggle / checkbox |
 | `inkPalette.inverse` | Fill labels, listening mic icon, on-toggle knob, checkbox hook |
+| `inkPalette.border` | Outlines, hairlines, field / card strokes (defaults to `ink`) |
 
 Read colors from `@Environment(\.inkPalette)` after the host root applies `.inkAppearance`. Do not use `Color.black` / `Color.white` for chrome.
 
@@ -83,7 +84,7 @@ Shipped themes (`InkColorTheme.all`):
 
 Ink stays black in light and white in dark. `inverse` stays white in light and black in dark for fill labels. Add a new theme by defining one `InkColorTheme` static and appending it to `InkColorTheme.all` — no new enums.
 
-Use `accent` for fill button backgrounds, listening `VoiceButton` fill, `SoundWaveView` bars, **on** Ink toggles, and **on** Ink checkboxes. Use `inverse` for fill button labels, the listening mic icon, the on-toggle knob, and the checkbox hook. Keep `ink` for type, outlines, hairlines, list covers, and the off-toggle knob. Use `paper` for screens, nav, sheets, outline fills, and the off-toggle track. No SF Rounded. No extra grays.
+Use `accent` for fill button backgrounds, listening `VoiceButton` fill, `SoundWaveView` bars, **on** Ink toggles, and **on** Ink checkboxes. Use `inverse` for fill button labels, the listening mic icon, the on-toggle knob, and the checkbox hook. Keep `ink` for type, scrims, list covers, and the off-toggle knob. Use `border` for outlines, hairlines, and field / card strokes (omit to follow `ink`). Use `paper` for screens, nav, sheets, outline fills, and the off-toggle track. No SF Rounded. No extra grays.
 
 ## Appearance
 
@@ -95,14 +96,19 @@ Three modes, persisted on `InkAppearanceStore` under `ink.appearance`. Default i
 | `light` | Use the theme’s `light` palette |
 | `dark` | Use the theme’s `dark` palette |
 
-Host apps must hold one `InkAppearanceStore`, put it in the environment, and apply `.inkAppearance` at the `WindowGroup` root so colors invert on tap. Pass `theme` and `radius` from the same store:
+Host apps must hold one `InkAppearanceStore`, put it in the environment, and apply `.inkAppearance` at the `WindowGroup` root so colors invert on tap. Pass `theme` and `radius` from the same store. Pass an `InkAppearanceConfiguration` when the host owns a custom switchable theme list (Settings should iterate `appearanceStore.themes`, not `InkColorTheme.all`):
 
 ```swift
 import InkTheme
 
 @main
 struct HostApp: App {
-    @State private var appearanceStore = InkAppearanceStore()
+    @State private var appearanceStore = InkAppearanceStore(
+        configuration: InkAppearanceConfiguration(
+            themes: [/* host themes, optional border: */],
+            defaultThemeID: "ink"
+        )
+    )
 
     var body: some Scene {
         WindowGroup {
@@ -118,7 +124,7 @@ struct HostApp: App {
 }
 ```
 
-`InkAppearanceStore` persists to `UserDefaults.standard` under `ink.appearance`, `ink.theme`, and `ink.radius`. One app process shares those keys. Legacy `ink.accent` migrates into `ink.theme` when present.
+`InkAppearanceStore` persists to `UserDefaults.standard` under `ink.appearance`, `ink.theme`, and `ink.radius`. Theme ids resolve against the configuration’s `themes`. One app process shares those keys. Legacy `ink.accent` migrates into `ink.theme` when present.
 
 `select` with a non-nil origin, and applying `.inkAppearance`, walks `UIApplication.shared.connectedScenes` and sets `overrideUserInterfaceStyle` on every open window. The reveal snapshots the key window. Use this from a normal iOS app scene. Widgets, app extensions, and scenes without a key window still update the store; they do not get the window override or the blob.
 
@@ -147,10 +153,23 @@ static let coral = InkColorTheme(
     id: "coral",
     title: "Coral",
     swatch: /* accent */,
-    light: InkPalette(ink: .black, paper: /* soft */, accent: /* hue */, inverse: .white),
-    dark: InkPalette(ink: .white, paper: /* deep */, accent: /* hue */, inverse: .black)
+    light: InkPalette(
+        ink: .black,
+        paper: /* soft */,
+        accent: /* hue */,
+        inverse: .white,
+        border: /* optional; defaults to ink */
+    ),
+    dark: InkPalette(
+        ink: .white,
+        paper: /* deep */,
+        accent: /* hue */,
+        inverse: .black,
+        border: /* optional; defaults to ink */
+    )
 )
-// then include `.coral` in `InkColorTheme.all`
+// Ship in InkTheme: append `.coral` to `InkColorTheme.all`.
+// Or keep host-only: pass it in `InkAppearanceConfiguration(themes:)`.
 ```
 
 ## Radius

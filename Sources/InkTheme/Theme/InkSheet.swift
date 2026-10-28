@@ -223,7 +223,7 @@ public struct InkSheet<Actions: View, Footer: View, Content: View>: View {
         .background(palette.paper)
         .clipShape(cardShape)
         .overlay {
-            cardShape.strokeBorder(palette.ink.opacity(strokeOpacity), lineWidth: Ink.borderWidth)
+            cardShape.strokeBorder(palette.border.opacity(strokeOpacity), lineWidth: Ink.borderWidth)
         }
     }
 
@@ -399,7 +399,7 @@ public struct InkSheetFooter<Content: View>: View {
         .overlay(alignment: .top) {
             if showsHairline {
                 Rectangle()
-                    .fill(palette.ink)
+                    .fill(palette.border)
                     .frame(height: Ink.borderWidth)
             }
         }

@@ -185,7 +185,7 @@ struct DesignSystemPlaygroundView: View {
             Text("One config per color. Red, Blue, and Green tint light paper and deep dark paper; fill uses accent in both.")
                 .inkText(.body)
             HStack(spacing: InkSpace.md) {
-                ForEach(InkColorTheme.all) { option in
+                ForEach(appearanceStore.themes) { option in
                     PaletteSwatchButton(
                         fill: option.swatch,
                         title: option.title,
@@ -299,7 +299,7 @@ struct DesignSystemPlaygroundView: View {
     private var listCatalog: some View {
         VStack(alignment: .leading, spacing: InkSpace.md) {
             sectionTitle("List")
-            Text("Cover, title, caption, and a 32pt bar action. Small is 48 square, medium 72 square, large 96×72 (4:3). Cover corners follow the radius picker. Rows use a 2pt ink hairline. Last row drops the border.")
+            Text("Cover, title, caption, and a 32pt bar action. Small is 48 square, medium 72 square, large 96×72 (4:3). Cover corners follow the radius picker. Rows use a 2pt border hairline. Last row drops the border.")
                 .inkText(.body)
 
             VStack(spacing: 0) {
@@ -361,7 +361,7 @@ struct DesignSystemPlaygroundView: View {
     private var sheetCatalog: some View {
         VStack(alignment: .leading, spacing: InkSpace.md) {
             sectionTitle("Sheet")
-            Text("Overlay card — 2pt ink stroke. Medium (10/20 inset) → Large (5/10 inset) → Full (edge-to-edge). Corner radius stays 24 until full. Confirm can drag through all three.")
+            Text("Overlay card — 2pt border stroke. Medium (10/20 inset) → Large (5/10 inset) → Full (edge-to-edge). Corner radius stays 24 until full. Confirm can drag through all three.")
                 .inkText(.body)
             Button("List sheet") { showListSheet = true }
                 .inkOutlineButton()
@@ -594,7 +594,7 @@ private struct PaletteSwatchButton: View {
                 .padding(ringInset)
                 .overlay {
                     RoundedRectangle(cornerRadius: ring, style: .continuous)
-                        .stroke(palette.ink, lineWidth: Ink.borderWidth)
+                        .stroke(palette.border, lineWidth: Ink.borderWidth)
                         .opacity(isSelected ? 1 : 0)
                 }
         }

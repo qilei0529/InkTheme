@@ -33,7 +33,7 @@ public struct InkDialog<Actions: View, Footer: View, Content: View>: View {
         .clipShape(RoundedRectangle(cornerRadius: inkRadius.dialog, style: .continuous))
         .overlay {
             RoundedRectangle(cornerRadius: inkRadius.dialog, style: .continuous)
-                .strokeBorder(palette.ink, lineWidth: Ink.borderWidth)
+                .strokeBorder(palette.border, lineWidth: Ink.borderWidth)
         }
     }
 

@@ -61,7 +61,7 @@ public struct InkNavBar<Actions: View>: View {
         .overlay(alignment: .bottom) {
             if showHairline {
                 Rectangle()
-                    .fill(palette.ink)
+                    .fill(palette.border)
                     .frame(height: Ink.borderWidth)
             }
         }

@@ -39,7 +39,7 @@ public struct InkToggleStyle: ToggleStyle {
         .frame(width: Ink.toggleWidth, height: Ink.toggleHeight)
         .overlay {
             track
-                .strokeBorder(palette.ink, lineWidth: Ink.borderWidth)
+                .strokeBorder(palette.border, lineWidth: Ink.borderWidth)
         }
         .animation(reduceMotion ? nil : .easeInOut(duration: 0.2), value: isOn)
         .accessibilityHidden(true)

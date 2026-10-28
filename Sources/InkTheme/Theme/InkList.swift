@@ -48,7 +48,7 @@ public struct InkListCover<Content: View>: View {
         .frame(width: size.width, height: size.height)
         .clipShape(shape)
         .overlay {
-            shape.strokeBorder(palette.ink, lineWidth: Ink.borderWidth)
+            shape.strokeBorder(palette.border, lineWidth: Ink.borderWidth)
         }
     }
 }
@@ -96,7 +96,7 @@ public struct InkListRow<Cover: View, Action: View>: View {
 
             if showsBottomBorder {
                 Rectangle()
-                    .fill(palette.ink)
+                    .fill(palette.border)
                     .frame(height: Ink.borderWidth)
             }
         }

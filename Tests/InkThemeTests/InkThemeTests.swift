@@ -66,6 +66,10 @@ struct InkThemeTests {
         #expect(darkInk == .dark)
         #expect(lightInk.accent == lightInk.ink)
         #expect(darkInk.accent == darkInk.ink)
+        #expect(lightInk.border == lightInk.ink)
+        #expect(darkInk.border == darkInk.ink)
+        #expect(InkColorTheme.red.light.border == InkColorTheme.red.light.ink)
+        #expect(InkColorTheme.red.dark.border == InkColorTheme.red.dark.ink)
 
         let lightRed = InkPalette.resolved(appearance: .light, theme: .red, system: .light)
         let darkRed = InkPalette.resolved(appearance: .dark, theme: .red, system: .dark)
@@ -103,6 +107,56 @@ struct InkThemeTests {
         #expect(systemLightGreen == InkColorTheme.green.light)
         #expect(systemLightGreen.paper == InkThemeColor.greenLightPaper)
         #expect(systemLightGreen.paper != .white)
+    }
+
+    @Test func paletteBorderDefaultsToInkAndAcceptsOverride() {
+        let soft = Color(red: 226 / 255, green: 232 / 255, blue: 240 / 255)
+        let custom = InkPalette(
+            ink: .black,
+            paper: .white,
+            accent: .black,
+            inverse: .white,
+            border: soft
+        )
+        #expect(custom.border == soft)
+        #expect(custom.border != custom.ink)
+        #expect(InkPalette.light.border == InkPalette.light.ink)
+    }
+
+    @Test @MainActor func appearanceConfigurationOwnsSwitchableThemes() {
+        let soft = Color(red: 226 / 255, green: 232 / 255, blue: 240 / 255)
+        let hostOnly = InkColorTheme(
+            id: "host",
+            title: "Host",
+            swatch: soft,
+            light: InkPalette(
+                ink: .black,
+                paper: .white,
+                accent: .black,
+                inverse: .white,
+                border: soft
+            ),
+            dark: InkPalette(
+                ink: .white,
+                paper: .black,
+                accent: .white,
+                inverse: .black,
+                border: soft
+            )
+        )
+        let configuration = InkAppearanceConfiguration(
+            themes: [hostOnly],
+            defaultThemeID: "host"
+        )
+        #expect(configuration.defaultTheme == hostOnly)
+        #expect(configuration.theme(id: "host") == hostOnly)
+        #expect(configuration.theme(id: "red") == nil)
+
+        let store = InkAppearanceStore(configuration: configuration)
+        #expect(store.themes.map(\.id) == ["host"])
+        #expect(store.theme.id == "host")
+        store.selectTheme(.red)
+        #expect(store.theme.id == "host")
     }
 
     @Test func radiusTokensMatchSpec() {
