@@ -2,7 +2,8 @@ import SwiftUI
 
 public enum InkTabIcon: Hashable {
     case system(String)
-    case asset(String)
+    /// Asset catalog name; optional `selected` swaps in when the tab is active.
+    case asset(String, selected: String?)
 }
 
 public struct InkTabItem<ID: Hashable>: Identifiable {
@@ -16,10 +17,10 @@ public struct InkTabItem<ID: Hashable>: Identifiable {
         self.icon = .system(systemImage)
     }
 
-    public init(id: ID, label: String, image: String) {
+    public init(id: ID, label: String, image: String, selectedImage: String? = nil) {
         self.id = id
         self.label = label
-        self.icon = .asset(image)
+        self.icon = .asset(image, selected: selectedImage)
     }
 }
 
@@ -116,8 +117,8 @@ private struct InkBottomNavItem: View {
         case .system(let name):
             Image(systemName: name)
                 .font(.system(size: iconSize, weight: .semibold))
-        case .asset(let name):
-            Image(name)
+        case .asset(let name, let selected):
+            Image(isSelected ? (selected ?? name) : name)
                 .renderingMode(.template)
                 .resizable()
                 .scaledToFit()
