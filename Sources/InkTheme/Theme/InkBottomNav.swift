@@ -33,6 +33,15 @@ public struct InkBottomNav<ID: Hashable>: View {
     var frosted: Bool
     var frostedOpacity: CGFloat
     @Environment(\.inkPalette) private var palette
+    @Environment(\.inkRadius) private var inkRadius
+
+    @State private var centers: [AnyHashable: CGFloat] = [:]
+    @State private var fromX: CGFloat = 0
+    @State private var toX: CGFloat = 0
+    @State private var morphProgress: CGFloat = 1
+    @State private var hasPlacedHighlight = false
+
+    private let tabBarSpace = "inkTabBar"
 
     public init(
         items: [InkTabItem<ID>],
@@ -59,21 +68,49 @@ public struct InkBottomNav<ID: Hashable>: View {
     }
 
     public var body: some View {
-        HStack(spacing: 0) {
-            ForEach(items) { item in
-                Button {
-                    selection = item.id
-                } label: {
-                    InkBottomNavItem(
-                        label: item.label,
-                        icon: item.icon,
-                        isSelected: selection == item.id,
-                        showLabel: showLabels
-                    )
-                }
-                .buttonStyle(InkBottomNavButtonStyle())
-                .accessibilityLabel(item.label)
+        ZStack {
+            if hasPlacedHighlight {
+                InkStretchTabHighlight(
+                    fromX: fromX,
+                    toX: toX,
+                    progress: morphProgress,
+                    cornerRadius: inkRadius.button,
+                    color: palette.ink.opacity(0.05)
+                )
+                .allowsHitTesting(false)
             }
+
+            HStack(spacing: 0) {
+                ForEach(items) { item in
+                    Button {
+                        selection = item.id
+                    } label: {
+                        InkBottomNavItem(
+                            label: item.label,
+                            icon: item.icon,
+                            isSelected: selection == item.id,
+                            showLabel: showLabels
+                        )
+                    }
+                    .buttonStyle(InkBottomNavButtonStyle())
+                    .accessibilityLabel(item.label)
+                    .background {
+                        GeometryReader { geo in
+                            Color.clear.preference(
+                                key: InkTabCenterPreferenceKey.self,
+                                value: [
+                                    AnyHashable(item.id): geo.frame(in: .named(tabBarSpace)).midX
+                                ]
+                            )
+                        }
+                    }
+                }
+            }
+        }
+        .coordinateSpace(name: tabBarSpace)
+        .onPreferenceChange(InkTabCenterPreferenceKey.self, perform: applyCenters)
+        .onChange(of: selection) { old, new in
+            morphHighlight(from: old, to: new)
         }
         .padding(.top, InkSpace.sm)
         .background {
@@ -84,6 +121,106 @@ public struct InkBottomNav<ID: Hashable>: View {
                 .fill(palette.border)
                 .frame(height: Ink.borderWidth)
         }
+    }
+
+    private func applyCenters(_ newCenters: [AnyHashable: CGFloat]) {
+        centers = newCenters
+        guard !hasPlacedHighlight,
+              let x = newCenters[AnyHashable(selection)]
+        else { return }
+        fromX = x
+        toX = x
+        morphProgress = 1
+        hasPlacedHighlight = true
+    }
+
+    private func morphHighlight(from old: ID, to new: ID) {
+        guard let from = centers[AnyHashable(old)],
+              let to = centers[AnyHashable(new)]
+        else { return }
+        var reset = Transaction()
+        reset.disablesAnimations = true
+        withTransaction(reset) {
+            fromX = from
+            toX = to
+            morphProgress = 0
+        }
+        withAnimation(.easeInOut(duration: 0.28)) {
+            morphProgress = 1
+        }
+    }
+}
+
+/// Stretch-then-shrink selection pill: widens toward the target mid-travel, then settles.
+private struct InkStretchTabHighlight: View {
+    var fromX: CGFloat
+    var toX: CGFloat
+    var progress: CGFloat
+    var cornerRadius: CGFloat
+    var color: Color
+
+    static let baseWidth: CGFloat = 54
+    static let height: CGFloat = 36
+
+    var body: some View {
+        InkStretchTabHighlightShape(
+            fromX: fromX,
+            toX: toX,
+            progress: progress,
+            cornerRadius: cornerRadius
+        )
+        .fill(color)
+        .frame(maxWidth: .infinity, minHeight: Ink.buttonHeight, maxHeight: Ink.buttonHeight)
+    }
+}
+
+/// Shape so `progress` animates via SwiftUI’s geometry interpolation.
+private struct InkStretchTabHighlightShape: Shape {
+    var fromX: CGFloat
+    var toX: CGFloat
+    var progress: CGFloat
+    var cornerRadius: CGFloat
+
+    var animatableData: CGFloat {
+        get { progress }
+        set { progress = newValue }
+    }
+
+    func path(in rect: CGRect) -> Path {
+        let half = InkStretchTabHighlight.baseWidth / 2
+        let fromLeft = fromX - half
+        let fromRight = fromX + half
+        let toLeft = toX - half
+        let toRight = toX + half
+        // Lead edge reaches the target first; lag edge holds, then catches up.
+        // Stretch only in the travel direction — never expands backward.
+        let leadT = min(1, progress * 2)
+        let lagT = max(0, progress * 2 - 1)
+        let left: CGFloat
+        let right: CGFloat
+        if toX >= fromX {
+            right = fromRight + (toRight - fromRight) * leadT
+            left = fromLeft + (toLeft - fromLeft) * lagT
+        } else {
+            left = fromLeft + (toLeft - fromLeft) * leadT
+            right = fromRight + (toRight - fromRight) * lagT
+        }
+        let height = InkStretchTabHighlight.height
+        let frame = CGRect(
+            x: left,
+            y: rect.midY - height / 2,
+            width: max(right - left, 0),
+            height: height
+        )
+        return Path(roundedRect: frame, cornerRadius: cornerRadius)
+    }
+}
+
+private struct InkTabCenterPreferenceKey: PreferenceKey {
+    static var defaultValue: [AnyHashable: CGFloat] { [:] }
+
+    static func reduce(value: inout [AnyHashable: CGFloat], nextValue: () -> [AnyHashable: CGFloat]) {
+        value.merge(nextValue(), uniquingKeysWith: { $1 })
     }
 }
 
