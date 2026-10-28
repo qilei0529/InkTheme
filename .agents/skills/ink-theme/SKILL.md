@@ -227,7 +227,7 @@ Label to body: `xs` (6) or `sm` (8). Sections: `section` (28). Screen inset: `xl
 
 ## Nav
 
-Do not use system `.navigationTitle` + `.inline`. Hide the UIKit bar and use `InkNavBar` (hero 28, single line, scales down).
+Do not use system `.navigationTitle` + `.inline`. Hide the UIKit bar and use `InkNavBar` (hero 28, single line, scales down). On each `NavigationStack` root, call `.inkInteractivePopGesture()` so left-edge swipe-back still works with the bar hidden.
 
 | | Page | Bar text | Bar icon |
 | --- | --- | --- | --- |
