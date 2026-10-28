@@ -181,20 +181,41 @@ struct InkThemeTests {
         #expect(InkTextStyle.numeral.pointSize == 56)
         #expect(InkTextStyle.numeral.tracking == 0)
 
-        #expect(InkTextStyle.hero.pointSize == 28)
+        #expect(InkTextStyle.hero.pointSize == InkType.x3l)
+        #expect(InkTextStyle.hero.size == 28)
         #expect(InkTextStyle.hero.tracking == 0)
         #expect(InkTextStyle.hero.inkOpacity == 1)
 
-        #expect(InkTextStyle.title.textStyle == .title2)
-        #expect(InkTextStyle.body.textStyle == .body)
-        #expect(InkTextStyle.bodyStrong.textStyle == .body)
-        #expect(InkTextStyle.caption.textStyle == .footnote)
+        #expect(InkTextStyle.title.size == InkType.x2l)
+        #expect(InkTextStyle.body.size == InkType.lg)
+        #expect(InkTextStyle.bodyStrong.size == InkType.lg)
+        #expect(InkTextStyle.caption.size == InkType.sm)
         #expect(InkTextStyle.caption.inkOpacity == 0.55)
         #expect(InkTextStyle.caption.tracking == 0)
 
-        #expect(InkTextStyle.capital.textStyle == .footnote)
+        #expect(InkTextStyle.capital.size == InkType.sm)
         #expect(InkTextStyle.capital.tracking == 1.2)
         #expect(InkTextStyle.capital.inkOpacity == 0.45)
+
+        #expect(InkTextStyle.title.textStyle == .title2)
+        #expect(InkTextStyle.body.textStyle == .body)
+        #expect(InkTextStyle.caption.textStyle == .footnote)
+    }
+
+    @Test func typeTokensMatchSpec() {
+        #expect(InkType.xxs == 10)
+        #expect(InkType.xs == 12)
+        #expect(InkType.sm == 13)
+        #expect(InkType.md == 15)
+        #expect(InkType.lg == 17)
+        #expect(InkType.xl == 20)
+        #expect(InkType.x2l == 22)
+        #expect(InkType.x3l == 28)
+        #expect(InkTypeToken.md.value == 15)
+        #expect(InkTypeToken.x3l.value == 28)
+        #expect(InkTypeToken.allCases.map(\.rawValue) == [
+            "xxs", "xs", "sm", "md", "lg", "xl", "x2l", "x3l",
+        ])
     }
 
     @Test func spaceTokensMatchSpec() {

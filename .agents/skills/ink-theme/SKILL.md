@@ -174,21 +174,40 @@ Switch is instant. At `sm` the knob is 2pt tighter than the track.
 
 Do not invent extra dark-mode grays or materials. Prefer black/white ink; tint paper and accent through the theme config.
 
-## Type — `.inkText(_:)`
+## Type — `.inkText(_:)` / `InkType`
 
 Do not use raw `.font(.system(size:))` or leftover `AskTheme.*Font`. Uppercase `capital` strings in the call site.
+
+Prefer **roles** (`InkTextStyle`) for weight / tracking / opacity. Use the **size ladder** (`InkType` / `InkTypeToken`) when a screen needs a step, e.g. dense chrome or a secondary body:
+
+```swift
+Text("GRAMMAR").inkText(.capital, size: .xxs)
+Text("Secondary").inkText(.body, size: .md)
+Text("Custom").inkText(.body, pointSize: 14)
+```
 
 | Style | Scene | Size | Weight | Tracking | Color |
 | --- | --- | --- | --- | --- | --- |
 | `display` | Short brand (INK / ASK) | 64 | bold | 4 | ink |
 | `displaySmall` | Onboarding brand line | 48 | bold | 3 | ink |
 | `numeral` | Score | 56 | bold | 0 | ink |
-| `hero` | Nav title, English prompt | 28 | bold | 0 | ink |
-| `title` | Empty/page title | title2 (~22) | semibold | 0 | ink |
-| `body` | Paragraph, md field, list subtitle | body (~17) | regular | 0 | ink |
-| `bodyStrong` | List title, button label, EN sample | body | semibold | 0 | ink |
-| `caption` | Status, translation, helper | footnote (~13) | regular | 0 | ink 0.55 |
-| `capital` | Section label | footnote | semibold | 1.2 | ink 0.45 |
+| `hero` | Nav title, English prompt | x3l 28 | bold | 0 | ink |
+| `title` | Empty/page title | x2l 22 | semibold | 0 | ink |
+| `body` | Paragraph, md field, list subtitle | lg 17 | regular | 0 | ink |
+| `bodyStrong` | List title, button label, EN sample | lg 17 | semibold | 0 | ink |
+| `caption` | Status, translation, helper | sm 13 | regular | 0 | ink 0.55 |
+| `capital` | Section label | sm 13 | semibold | 1.2 | ink 0.45 |
+
+| Token | pt | Use |
+| --- | --- | --- |
+| `xxs` | 10 | Micro labels, dense chrome |
+| `xs` | 12 | Compact secondary |
+| `sm` | 13 | Caption / capital |
+| `md` | 15 | Emphasized caption, secondary body |
+| `lg` | 17 | Body |
+| `xl` | 20 | Large body, subheads |
+| `x2l` | 22 | Title |
+| `x3l` | 28 | Hero |
 
 Buttons use `bodyStrong` inside the button styles. Disabled opacities stay in those styles.
 
@@ -216,7 +235,7 @@ Do not use system `.navigationTitle` + `.inline`. Hide the UIKit bar and pin `In
 | Width | Full | Hug | 32 square |
 | Height | 44 | 32 | 32 |
 
-Icon actions: `Button("Add", systemImage: "plus")` plus an **icon** style (`.iconOnly`, 15pt semibold). Do not put a `Label` / `systemImage` title on `.inkBarFillButton()` — that stacks or stretches the 32pt bar. Optional 2pt ink hairline under the bar in playground-style catalogs.
+Icon actions: `Button("Add", systemImage: "plus")` plus an **icon** style (`.iconOnly`, 15pt semibold). Do not put a `Label` / `systemImage` title on `.inkBarFillButton()` — that stacks or stretches the 32pt bar. A 2pt ink hairline sits under the bar by default (`showHairline: true`); pass `false` to hide it (e.g. transparent back headers).
 
 ```swift
 .toolbar(.hidden, for: .navigationBar)
@@ -232,7 +251,7 @@ Icon actions: `Button("Add", systemImage: "plus")` plus an **icon** style (`.ico
 
 Pin `InkBottomNav` with a bottom safe area inset. It is chrome only — the host switches content from `selection`. Each `InkTabItem` takes an `id`, an SF Symbol `systemImage`, and a `label`. Uppercase the label at the call site.
 
-Paper background extends under the Home Indicator. A 2pt ink hairline sits on top. Items share the width. Each item is at least 44pt tall: a 20pt semibold icon and a `capital` label, spaced `xxs`. Selected ink is full opacity. Unselected ink uses the capital opacity (0.45). Pressed opacity is 0.55. No fill, accent, or gray.
+Paper background extends under the Home Indicator. A 2pt ink hairline sits on top. Items share the width. Each item is at least 44pt tall. With labels (`showLabels: true`, default): 18pt semibold icon + capital label, spaced `xxs`. Icon-only (`showLabels: false`): 22pt semibold icon; `label` is still the accessibility name. Selected ink is full opacity. Unselected ink uses the capital opacity (0.45). Pressed opacity is 0.55. No fill, accent, or gray.
 
 ```swift
 .safeAreaInset(edge: .bottom, spacing: 0) {
@@ -241,7 +260,8 @@ Paper background extends under the Home Indicator. A 2pt ink hairline sits on to
             InkTabItem(id: .home, label: "HOME", systemImage: "house"),
             InkTabItem(id: .ask, label: "ASK", systemImage: "mic"),
         ],
-        selection: $tab
+        selection: $tab,
+        showLabels: false
     )
 }
 ```
@@ -386,7 +406,7 @@ Backdrop: custom dialog defaults to `dismissOnBackdrop: true`. Alert uses `false
 8. Checkbox: `Toggle(...).toggleStyle(.inkCheckbox)`. 32 square; off 6% ink + waiting inverse hook + ink stroke; on accent fill + ink stroke. Tap pops the hook bigger then back.
 9. Sheets: `.inkSheet` + `InkSheet` + `InkSheetBody` / `InkSheetList` / `InkSheetFooter`. Lists: `InkListRow`. No system `.sheet`. No gray grouped lists.
 10. Dialogs: `InkDialog` / `InkAlert` via `.inkDialog` / `.inkAlert`. No system `.alert`.
-11. Bottom nav: `InkBottomNav` with `InkTabItem` (icon + capital label). Pin with `.safeAreaInset(edge: .bottom)`. No system tab bar.
+11. Bottom nav: `InkBottomNav` with `InkTabItem` (icon + capital label, or `showLabels: false` for icon-only). Pin with `.safeAreaInset(edge: .bottom)`. No system tab bar.
 
 ## Do not
 

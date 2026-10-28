@@ -10,6 +10,53 @@ public enum InkSpace {
     public static let section: CGFloat = 28
 }
 
+/// Type size ladder (pt), parallel to ``InkSpace``.
+///
+/// Prefer ``InkTextStyle`` for role (weight / tracking / opacity). Use ``InkType`` /
+/// ``InkTypeToken`` when you only need a size step, e.g. `.inkText(.body, size: .md)`.
+public enum InkType {
+    public static let xxs: CGFloat = 10
+    public static let xs: CGFloat = 12
+    public static let sm: CGFloat = 13
+    public static let md: CGFloat = 15
+    public static let lg: CGFloat = 17
+    public static let xl: CGFloat = 20
+    public static let x2l: CGFloat = 22
+    public static let x3l: CGFloat = 28
+}
+
+public enum InkTypeToken: String, CaseIterable, Identifiable, Sendable {
+    case xxs, xs, sm, md, lg, xl, x2l, x3l
+
+    public var id: String { rawValue }
+
+    public var value: CGFloat {
+        switch self {
+        case .xxs: InkType.xxs
+        case .xs: InkType.xs
+        case .sm: InkType.sm
+        case .md: InkType.md
+        case .lg: InkType.lg
+        case .xl: InkType.xl
+        case .x2l: InkType.x2l
+        case .x3l: InkType.x3l
+        }
+    }
+
+    public var usage: String {
+        switch self {
+        case .xxs: "micro labels, dense chrome"
+        case .xs: "compact secondary"
+        case .sm: "caption / capital"
+        case .md: "emphasized caption, secondary body"
+        case .lg: "body"
+        case .xl: "large body, subheads"
+        case .x2l: "title"
+        case .x3l: "hero"
+        }
+    }
+}
+
 public enum InkTextStyle: String, CaseIterable, Identifiable {
     case display
     case displaySmall
@@ -23,27 +70,39 @@ public enum InkTextStyle: String, CaseIterable, Identifiable {
 
     public var id: String { rawValue }
 
-    public var font: Font {
+    /// Default point size for this role (aligned with ``InkType`` where applicable).
+    public var size: CGFloat {
         switch self {
-        case .display:
-            Font.system(size: 64, weight: .bold, design: .default)
-        case .displaySmall:
-            Font.system(size: 48, weight: .bold, design: .default)
-        case .numeral:
-            Font.system(size: 56, weight: .bold, design: .default)
-        case .hero:
-            Font.system(size: 28, weight: .bold, design: .default)
-        case .title:
-            Font.system(.title2, design: .default).weight(.semibold)
-        case .body:
-            Font.system(.body, design: .default)
-        case .bodyStrong:
-            Font.system(.body, design: .default).weight(.semibold)
-        case .caption:
-            Font.system(.footnote, design: .default)
-        case .capital:
-            Font.system(.footnote, design: .default).weight(.semibold)
+        case .display: 64
+        case .displaySmall: 48
+        case .numeral: 56
+        case .hero: InkType.x3l
+        case .title: InkType.x2l
+        case .body, .bodyStrong: InkType.lg
+        case .caption, .capital: InkType.sm
         }
+    }
+
+    public var weight: Font.Weight {
+        switch self {
+        case .display, .displaySmall, .numeral, .hero:
+            .bold
+        case .title, .bodyStrong, .capital:
+            .semibold
+        case .body, .caption:
+            .regular
+        }
+    }
+
+    public var font: Font {
+        font(size: nil)
+    }
+
+    /// Role font. Pass ``InkTypeToken`` or a raw `pointSize` to override the ladder size
+    /// while keeping weight / tracking / opacity from the style.
+    public func font(size: InkTypeToken? = nil, pointSize: CGFloat? = nil) -> Font {
+        let resolved = pointSize ?? size?.value ?? self.size
+        return Font.system(size: resolved, weight: weight, design: .default)
     }
 
     public var tracking: CGFloat {
@@ -64,13 +123,7 @@ public enum InkTextStyle: String, CaseIterable, Identifiable {
     }
 
     public var pointSize: CGFloat? {
-        switch self {
-        case .display: 64
-        case .displaySmall: 48
-        case .numeral: 56
-        case .hero: 28
-        default: nil
-        }
+        size
     }
 
     public var textStyle: Font.TextStyle? {
@@ -87,12 +140,12 @@ public enum InkTextStyle: String, CaseIterable, Identifiable {
         case .display: "display · 64 bold · track 4"
         case .displaySmall: "displaySmall · 48 bold · track 3"
         case .numeral: "numeral · 56 bold"
-        case .hero: "hero · 28 bold"
-        case .title: "title · title2 semibold"
-        case .body: "body · body regular"
-        case .bodyStrong: "bodyStrong · body semibold"
-        case .caption: "caption · footnote · ink 0.55"
-        case .capital: "capital · footnote semibold · track 1.2 · ink 0.45"
+        case .hero: "hero · x3l \(Int(InkType.x3l)) bold"
+        case .title: "title · x2l \(Int(InkType.x2l)) semibold"
+        case .body: "body · lg \(Int(InkType.lg)) regular"
+        case .bodyStrong: "bodyStrong · lg \(Int(InkType.lg)) semibold"
+        case .caption: "caption · sm \(Int(InkType.sm)) · ink 0.55"
+        case .capital: "capital · sm \(Int(InkType.sm)) semibold · track 1.2 · ink 0.45"
         }
     }
 
@@ -143,17 +196,29 @@ public enum InkSpaceToken: String, CaseIterable, Identifiable {
 
 extension View {
     public func inkText(_ style: InkTextStyle) -> some View {
-        modifier(InkTextModifier(style: style))
+        modifier(InkTextModifier(style: style, size: nil, pointSize: nil))
+    }
+
+    /// Role style with an ``InkTypeToken`` size override (weight / tracking / opacity stay).
+    public func inkText(_ style: InkTextStyle, size: InkTypeToken) -> some View {
+        modifier(InkTextModifier(style: style, size: size, pointSize: nil))
+    }
+
+    /// Role style with a raw point-size override.
+    public func inkText(_ style: InkTextStyle, pointSize: CGFloat) -> some View {
+        modifier(InkTextModifier(style: style, size: nil, pointSize: pointSize))
     }
 }
 
 private struct InkTextModifier: ViewModifier {
     var style: InkTextStyle
+    var size: InkTypeToken?
+    var pointSize: CGFloat?
     @Environment(\.inkPalette) private var palette
 
     func body(content: Content) -> some View {
         content
-            .font(style.font)
+            .font(style.font(size: size, pointSize: pointSize))
             .tracking(style.tracking)
             .foregroundStyle(palette.ink.opacity(style.inkOpacity))
     }

@@ -15,11 +15,18 @@ public struct InkTabItem<ID: Hashable>: Identifiable {
 public struct InkBottomNav<ID: Hashable>: View {
     let items: [InkTabItem<ID>]
     @Binding var selection: ID
+    /// When `false`, only the SF Symbol is shown. `label` remains the accessibility name.
+    var showLabels: Bool
     @Environment(\.inkPalette) private var palette
 
-    public init(items: [InkTabItem<ID>], selection: Binding<ID>) {
+    public init(
+        items: [InkTabItem<ID>],
+        selection: Binding<ID>,
+        showLabels: Bool = true
+    ) {
         self.items = items
         _selection = selection
+        self.showLabels = showLabels
     }
 
     public var body: some View {
@@ -31,10 +38,12 @@ public struct InkBottomNav<ID: Hashable>: View {
                     InkBottomNavItem(
                         label: item.label,
                         systemImage: item.systemImage,
-                        isSelected: selection == item.id
+                        isSelected: selection == item.id,
+                        showLabel: showLabels
                     )
                 }
                 .buttonStyle(InkBottomNavButtonStyle())
+                .accessibilityLabel(item.label)
             }
         }
         .padding(.top, InkSpace.sm)
@@ -54,14 +63,22 @@ private struct InkBottomNavItem: View {
     let label: String
     let systemImage: String
     let isSelected: Bool
+    let showLabel: Bool
     @Environment(\.inkPalette) private var palette
 
     var body: some View {
-        VStack(spacing: InkSpace.xxs) {
-            Image(systemName: systemImage)
-                .font(.system(size: 18, weight: .semibold))
-            Text(label)
-                .font(.system(size: 10, weight: .regular))
+        Group {
+            if showLabel {
+                VStack(spacing: InkSpace.xxs) {
+                    Image(systemName: systemImage)
+                        .font(.system(size: 18, weight: .semibold))
+                    Text(label)
+                        .font(.system(size: 10, weight: .regular))
+                }
+            } else {
+                Image(systemName: systemImage)
+                    .font(.system(size: 22, weight: .semibold))
+            }
         }
         .foregroundStyle(palette.ink.opacity(isSelected ? 1 : InkTextStyle.capital.inkOpacity))
     }

@@ -244,6 +244,7 @@ public struct InkSheet<Actions: View, Footer: View, Content: View>: View {
             InkNavBar(
                 title: title,
                 topPadding: showsDragIndicator ? InkSpace.sm : InkSpace.xl,
+                showHairline: false,
                 actions: actions
             )
         }

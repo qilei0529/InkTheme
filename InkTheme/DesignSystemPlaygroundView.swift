@@ -20,6 +20,7 @@ struct DesignSystemPlaygroundView: View {
     @State private var fieldSearch = "Search"
     @State private var fieldDisabled = "Disabled field"
     @State private var bottomTab = PlaygroundTab.home
+    @State private var showTabLabels = true
     @Environment(InkAppearanceStore.self) private var appearanceStore
     @Environment(\.inkPalette) private var palette
 
@@ -44,14 +45,13 @@ struct DesignSystemPlaygroundView: View {
                     Button("Add", systemImage: "plus") {}
                         .inkBarIconFillButton()
                 }
-                .overlay(alignment: .bottom) {
-                    Rectangle()
-                        .fill(palette.ink)
-                        .frame(height: Ink.borderWidth)
-                }
             }
             .safeAreaInset(edge: .bottom, spacing: 0) {
-                InkBottomNav(items: PlaygroundTab.items, selection: $bottomTab)
+                InkBottomNav(
+                    items: PlaygroundTab.items,
+                    selection: $bottomTab,
+                    showLabels: showTabLabels
+                )
             }
             .inkSheet(isPresented: $showListSheet) {
                 listSheet
@@ -205,6 +205,8 @@ struct DesignSystemPlaygroundView: View {
     private var typeCatalog: some View {
         VStack(alignment: .leading, spacing: InkSpace.md) {
             sectionTitle("Type")
+            Text("Roles keep weight / tracking / opacity. Override size with InkTypeToken (xxs…x3l), e.g. .inkText(.body, size: .md).")
+                .inkText(.body)
             ForEach(InkTextStyle.allCases) { style in
                 VStack(alignment: .leading, spacing: InkSpace.xs) {
                     Text(style.sample)
@@ -214,6 +216,23 @@ struct DesignSystemPlaygroundView: View {
                         .inkText(.caption)
                 }
             }
+
+            sectionTitle("Type size")
+            Text("Parallel to InkSpace. Prefer roles; use tokens when a screen needs a step on the ladder.")
+                .inkText(.body)
+            ForEach(InkTypeToken.allCases) { token in
+                VStack(alignment: .leading, spacing: InkSpace.xxs) {
+                    Text("The quick brown fox — \(token.rawValue) \(Int(token.value))")
+                        .inkText(.body, size: token)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Text(token.usage)
+                        .inkText(.caption)
+                }
+            }
+            Text("body + md override")
+                .inkText(.capital, size: .xxs)
+            Text("Secondary body on a dense card.")
+                .inkText(.body, size: .md)
         }
     }
 
@@ -241,7 +260,7 @@ struct DesignSystemPlaygroundView: View {
     private var navCatalog: some View {
         VStack(alignment: .leading, spacing: InkSpace.md) {
             sectionTitle("Nav")
-            Text("Hero title at 28. Text actions hug at 32; icon actions are a 32 square. Page actions stay 44 and full width.")
+            Text("Hero title at 28. Text actions hug at 32; icon actions are a 32 square. Page actions stay 44 and full width. A 2pt ink hairline sits under the bar by default.")
                 .inkText(.body)
             HStack(spacing: InkSpace.sm) {
                 Button("Close") {}
@@ -257,8 +276,11 @@ struct DesignSystemPlaygroundView: View {
     private var bottomNavCatalog: some View {
         VStack(alignment: .leading, spacing: InkSpace.md) {
             sectionTitle("Bottom Nav")
-            Text("This page pins the bar and switches HOME, ASK, and HISTORY. Selected is full ink; the rest stay at capital opacity.")
+            Text("This page pins the bar and switches HOME, ASK, and HISTORY. Selected is full ink; the rest stay at capital opacity. Turn off Labels for icon-only (22pt); the label stays the accessibility name.")
                 .inkText(.body)
+            Toggle("Labels", isOn: $showTabLabels)
+                .inkText(.body)
+                .toggleStyle(.ink)
         }
     }
 
