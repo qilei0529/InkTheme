@@ -38,7 +38,7 @@ public enum Ink {
     public static let frostedOpacity: CGFloat = 0.86
 }
 
-/// Shared opaque / frosted paper fill for overlay chrome (nav + bottom tab).
+/// Shared opaque / frosted chrome fill for overlay bars (nav + bottom tab).
 public struct InkChromeBackground: View {
     var frosted: Bool
     var frostedOpacity: CGFloat
@@ -60,10 +60,10 @@ public struct InkChromeBackground: View {
             if frosted {
                 ZStack {
                     Rectangle().fill(.ultraThinMaterial)
-                    palette.paper.opacity(frostedOpacity)
+                    palette.chrome.opacity(frostedOpacity)
                 }
             } else {
-                palette.paper
+                palette.chrome
             }
         }
         .ignoresSafeArea(edges: safeEdges)
@@ -105,7 +105,7 @@ struct InkOutlineButtonStyle: ButtonStyle {
             .foregroundStyle(palette.ink.opacity(isEnabled ? 1 : 0.35))
             .frame(maxWidth: .infinity, minHeight: Ink.buttonHeight)
             .padding(.horizontal, InkSpace.lg)
-            .background(palette.paper)
+            .background(palette.panel)
             .clipShape(RoundedRectangle(cornerRadius: inkRadius.button, style: .continuous))
             .overlay {
                 RoundedRectangle(cornerRadius: inkRadius.button, style: .continuous)
@@ -144,7 +144,7 @@ struct InkBarOutlineButtonStyle: ButtonStyle {
             .foregroundStyle(palette.ink.opacity(isEnabled ? 1 : 0.35))
             .frame(minHeight: Ink.barButtonHeight)
             .padding(.horizontal, InkSpace.md)
-            .background(palette.paper)
+            .background(palette.panel)
             .clipShape(RoundedRectangle(cornerRadius: inkRadius.button, style: .continuous))
             .overlay {
                 RoundedRectangle(cornerRadius: inkRadius.button, style: .continuous)
@@ -183,7 +183,7 @@ struct InkIconOutlineButtonStyle: ButtonStyle {
             .font(.system(size: 20, weight: .semibold))
             .foregroundStyle(palette.ink.opacity(isEnabled ? 1 : 0.35))
             .frame(width: Ink.buttonHeight, height: Ink.buttonHeight)
-            .background(palette.paper)
+            .background(palette.panel)
             .clipShape(RoundedRectangle(cornerRadius: inkRadius.button, style: .continuous))
             .overlay {
                 RoundedRectangle(cornerRadius: inkRadius.button, style: .continuous)
@@ -221,7 +221,7 @@ struct InkBarIconOutlineButtonStyle: ButtonStyle {
             .font(.system(size: 15, weight: .semibold))
             .foregroundStyle(palette.ink.opacity(isEnabled ? 1 : 0.35))
             .frame(width: Ink.barButtonHeight, height: Ink.barButtonHeight)
-            .background(palette.paper)
+            .background(palette.panel)
             .clipShape(RoundedRectangle(cornerRadius: inkRadius.button, style: .continuous))
             .overlay {
                 RoundedRectangle(cornerRadius: inkRadius.button, style: .continuous)
@@ -353,7 +353,7 @@ private struct InkStrokeModifier: ViewModifier {
     func body(content: Content) -> some View {
         let shape = RoundedRectangle(cornerRadius: inkRadius.button, style: .continuous)
         content
-            .background(palette.paper)
+            .background(palette.panel)
             .clipShape(shape)
             .overlay {
                 shape.strokeBorder(palette.border.opacity(enabled ? 1 : 0.2), lineWidth: Ink.borderWidth)

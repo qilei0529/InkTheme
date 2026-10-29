@@ -29,7 +29,7 @@ public struct InkDialog<Actions: View, Footer: View, Content: View>: View {
         .padding(InkSpace.xl)
         .frame(maxWidth: Ink.dialogMaxWidth, alignment: .leading)
         .inkDismissKeyboardOnTap()
-        .background(palette.paper)
+        .background(palette.panel)
         .clipShape(RoundedRectangle(cornerRadius: inkRadius.dialog, style: .continuous))
         .overlay {
             RoundedRectangle(cornerRadius: inkRadius.dialog, style: .continuous)

@@ -44,7 +44,7 @@ public struct InkListCover<Content: View>: View {
         ZStack {
             content()
         }
-        .background(palette.paper)
+        .background(palette.panel)
         .frame(width: size.width, height: size.height)
         .clipShape(shape)
         .overlay {

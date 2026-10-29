@@ -30,7 +30,7 @@ public struct InkToggleStyle: ToggleStyle {
         let track = RoundedRectangle(cornerRadius: radius, style: .continuous)
         return ZStack(alignment: isOn ? .trailing : .leading) {
             track
-                .fill(isOn ? palette.accent : palette.paper)
+                .fill(isOn ? palette.accent : palette.panel)
             RoundedRectangle(cornerRadius: inkRadius.toggleKnob, style: .continuous)
                 .fill(isOn ? palette.inverse : palette.ink)
                 .frame(width: knob, height: knob)

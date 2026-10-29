@@ -161,7 +161,7 @@ struct DesignSystemPlaygroundView: View {
         VStack(alignment: .leading, spacing: InkSpace.sm) {
             Text("INK / PAPER")
                 .inkText(.caption)
-            Text("Named type styles and spacing. Each color theme owns a full light and dark palette — background, foreground, muted, border, primary, gray, ring (plus legacy ink/paper/accent/inverse aliases). Appearance flips between those two sides.")
+            Text("Named type styles and spacing. Each color theme owns a full light and dark palette — background, chrome, panel, foreground, muted, border, primary, gray, ring (plus legacy ink/paper/accent/inverse aliases). Appearance flips between those two sides.")
                 .inkText(.body)
         }
     }
@@ -272,7 +272,7 @@ struct DesignSystemPlaygroundView: View {
     private var navCatalog: some View {
         VStack(alignment: .leading, spacing: InkSpace.md) {
             sectionTitle("Nav")
-            Text("Hero title at 28. Text actions hug at 32; icon actions are a 32 square. Prefer `InkPage` / overlay with `frosted: true` (blur + paper at \(Ink.frostedOpacity) alpha) so content scrolls underneath. Pad scroll content with `inkOverlayNavContentInset()`. Opaque `safeAreaInset` is fine when frosted overlay is not needed. Sheets keep non-frosted nav.")
+            Text("Hero title at 28. Text actions hug at 32; icon actions are a 32 square. Prefer `InkPage` / overlay with `frosted: true` (blur + chrome at \(Ink.frostedOpacity) alpha) so content scrolls underneath. Pad scroll content with `inkOverlayNavContentInset()`. Opaque `safeAreaInset` is fine when frosted overlay is not needed. Sheets keep non-frosted nav.")
                 .inkText(.body)
             HStack(spacing: InkSpace.sm) {
                 Button("Close") {}

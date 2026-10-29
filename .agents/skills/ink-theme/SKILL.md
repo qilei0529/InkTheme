@@ -42,7 +42,9 @@ Colors come from the selected `InkColorTheme`. Each theme owns a full light and 
 
 | Token | Role |
 | --- | --- |
-| `inkPalette.background` | Screens, nav, sheets, outline fills (`paper` alias) |
+| `inkPalette.background` | Screens (`paper` alias) |
+| `inkPalette.chrome` | Header nav and bottom bar fill |
+| `inkPalette.panel` | Elevated surfaces: cards, sheets, dialogs, fields, outline fills |
 | `inkPalette.foreground` | Type, scrims, off-toggle knob (`ink` alias) |
 | `inkPalette.muted` | Subtle surfaces |
 | `inkPalette.mutedForeground` | Secondary / caption type |
@@ -80,16 +82,16 @@ Read colors from `@Environment(\.inkPalette)` after the host root applies `.inkA
 
 Shipped themes (`InkColorTheme.all`):
 
-| Theme | Light paper | Dark paper | Accent (both) |
+| Theme | Light background | Dark background | Accent (both) |
 | --- | --- | --- | --- |
-| ink | `#FFFFFF` | `#000000` | follows ink (black / white) |
+| ink | `#FAFAFA` (zinc-50) | `#000000` | follows ink (black / white) |
 | red | `#FFF5F6` | `#1E080B` | `#F6465D` |
 | blue | `#F5F9FF` | `#000E1F` | `#0077FF` |
 | green | `#F3FBF6` | `#04180B` | `#22C55E` |
 
-Ink stays black in light and white in dark. `inverse` stays white in light and black in dark for fill labels. Add a new theme by defining one `InkColorTheme` static and appending it to `InkColorTheme.all` — no new enums.
+Light ink chrome/panel are white; dark chrome matches background and panel is zinc-900. Colored themes keep white chrome/panel in light. Ink stays black in light and white in dark. `inverse` stays white in light and black in dark for fill labels. Add a new theme by defining one `InkColorTheme` static and appending it to `InkColorTheme.all` — no new enums.
 
-Use `accent` for fill button backgrounds, listening `VoiceButton` fill, `SoundWaveView` bars, **on** Ink toggles, and **on** Ink checkboxes. Use `inverse` for fill button labels, the listening mic icon, the on-toggle knob, and the checkbox hook. Keep `ink` for type, scrims, list covers, and the off-toggle knob. Use `border` for outlines, hairlines, and field / card strokes (omit to follow `ink`). Use `paper` for screens, nav, sheets, outline fills, and the off-toggle track. No SF Rounded. No extra grays.
+Use `accent` for fill button backgrounds, listening `VoiceButton` fill, `SoundWaveView` bars, **on** Ink toggles, and **on** Ink checkboxes. Use `inverse` for fill button labels, the listening mic icon, the on-toggle knob, and the checkbox hook. Keep `ink` for type, scrims, list covers, and the off-toggle knob. Use `border` for outlines, hairlines, and field / card strokes (omit to follow `ink`). Use `paper` / `background` for screens. Use `chrome` for header nav and bottom bar. Use `panel` for cards, sheets, dialogs, fields, outline fills, and the off-toggle track. No SF Rounded. No extra grays.
 
 ## Appearance
 
@@ -263,7 +265,7 @@ Icon actions: `Button("Add", systemImage: "plus")` plus an **icon** style (`.ico
 
 ### Frosted overlay (preferred for scroll screens)
 
-`safeAreaInset` reserves layout space, so blur cannot sample content under the bar. Prefer a `ZStack` overlay (or `InkPage`) with `frosted: true`: ultraThin material + paper at `Ink.frostedOpacity` (0.86). Pad scroll content with `.inkOverlayNavContentInset()` (or `InkOverlayInset.nav` / `InkPage.navExtent`). Sheets keep non-frosted nav.
+`safeAreaInset` reserves layout space, so blur cannot sample content under the bar. Prefer a `ZStack` overlay (or `InkPage`) with `frosted: true`: ultraThin material + chrome at `Ink.frostedOpacity` (0.86). Pad scroll content with `.inkOverlayNavContentInset()` (or `InkOverlayInset.nav` / `InkPage.navExtent`). Sheets keep non-frosted nav.
 
 ```swift
 InkPage(title: "Ask") {
@@ -377,7 +379,7 @@ Chrome: overlay card on an ink scrim (`palette.ink.opacity(0.45)`). Three chrome
 | Large | safe area + `5` side / `10` vertical | `24` (same as medium) | none |
 | Full | `0` (full-bleed paper) | `0` | pad content by safe area; top also adds `sheetFullTopExtra` (`36`) |
 
-Card is opaque `paper` with a 2pt ink `strokeBorder`. Bottom-aligned; the overlay geometry ignores safe area so full paper can fill the screen while content keeps safe insets. Appear and dismiss both travel the sheet height (`Y + h`); appear ease-out, dismiss ease-in, no fade. Skip motion when Reduce Motion is on. Visible ink grabber (2pt capsule) + `InkNavBar`. Drag **only** the grabber and nav to move detents or dismiss — do not attach drag to `InkSheetBody` / `InkSheetList`. Optional `InkSheetFooter`.
+Card is opaque `panel` with a 2pt ink `strokeBorder`. Bottom-aligned; the overlay geometry ignores safe area so full panel can fill the screen while content keeps safe insets. Appear and dismiss both travel the sheet height (`Y + h`); appear ease-out, dismiss ease-in, no fade. Skip motion when Reduce Motion is on. Visible ink grabber (2pt capsule) + `InkNavBar`. Drag **only** the grabber and nav to move detents or dismiss — do not attach drag to `InkSheetBody` / `InkSheetList`. Optional `InkSheetFooter`.
 
 Content:
 
@@ -412,7 +414,7 @@ Present with `.inkDialog` / `.inkAlert` on the host screen (attach high enough t
 | `InkAlert` via `.inkAlert` | Confirm / delete — title + optional message + 1–2 actions |
 | `InkDialog` via `.inkDialog` | Custom body (field, copy, etc.) + optional close + footer |
 
-Chrome: scrim `palette.ink.opacity(0.45)` (no material / gray). Card is opaque `paper`, corner radius `inkRadius.dialog` (button + 4; zero stays square), 2pt ink `strokeBorder`, max width `Ink.dialogMaxWidth` (320), horizontal inset `Ink.sheetScreenInset` (20). Title uses `.inkText(.title)` (not hero). Close reuses `InkSheetCloseButton`. Footer is `InkDialogFooter` — stacked 44pt fill / outline, spacing `md`, no hairline. Appear with a 40pt Y move-in (`Ink.dialogMoveInOffset`); dismiss is instant; no fade. Skip the move when Reduce Motion is on. Buttons and fields inside still follow `inkRadius.button`.
+Chrome: scrim `palette.ink.opacity(0.45)` (no material / gray). Card is opaque `panel`, corner radius `inkRadius.dialog` (button + 4; zero stays square), 2pt ink `strokeBorder`, max width `Ink.dialogMaxWidth` (320), horizontal inset `Ink.sheetScreenInset` (20). Title uses `.inkText(.title)` (not hero). Close reuses `InkSheetCloseButton`. Footer is `InkDialogFooter` — stacked 44pt fill / outline, spacing `md`, no hairline. Appear with a 40pt Y move-in (`Ink.dialogMoveInOffset`); dismiss is instant; no fade. Skip the move when Reduce Motion is on. Buttons and fields inside still follow `inkRadius.button`.
 
 Backdrop: custom dialog defaults to `dismissOnBackdrop: true`. Alert uses `false` — user must tap an action. Caller still owns dismiss (`isPresented = false`).
 
@@ -447,9 +449,9 @@ Backdrop: custom dialog defaults to `dismissOnBackdrop: true`. Alert uses `false
 2. Text: `.inkText(.body)` (and siblings). Never `.primary` / `.tint` for chrome.
 3. Page buttons: `.inkFillButton()` or `.inkOutlineButton()`. Min height 44.
 4. Nav text: `.inkBarFillButton()` / `.inkBarOutlineButton()`. Nav icons: `.inkBarIconFillButton()` / `.inkBarIconOutlineButton()` (32 square).
-5. Fields: `.inkField()` (md 44, body) or `.inkField(size: .sm)` (32, footnote, full ink). Cards: paper fill + `.inkStroke()`. Corners follow the radius token.
+5. Fields: `.inkField()` (md 44, body) or `.inkField(size: .sm)` (32, footnote, full ink). Cards: panel fill + `.inkStroke()`. Corners follow the radius token.
 6. Voice: `VoiceButton` + `SoundWaveView(isActive:)`.
-7. Toggle: `Toggle(...).toggleStyle(.ink)`. Off paper + ink stroke; on accent fill + ink stroke.
+7. Toggle: `Toggle(...).toggleStyle(.ink)`. Off panel + ink stroke; on accent fill + ink stroke.
 8. Checkbox: `Toggle(...).toggleStyle(.inkCheckbox)`. 32 square; off 6% ink + waiting inverse hook + ink stroke; on accent fill + ink stroke. Tap pops the hook bigger then back.
 9. Sheets: `.inkSheet` + `InkSheet` + `InkSheetBody` / `InkSheetList` / `InkSheetFooter`. Lists: `InkListRow`. No system `.sheet`. No gray grouped lists.
 10. Dialogs: `InkDialog` / `InkAlert` via `.inkDialog` / `.inkAlert`. No system `.alert`.
@@ -505,7 +507,7 @@ InkPage(title: "Screen") {
 }
 ```
 
-Lists: `InkListRow` + `listRowBackground(Ink.paper)`. Hide system separators when the row draws its own 2pt hairline.
+Lists: `InkListRow` + `listRowBackground` with `palette.panel`. Hide system separators when the row draws its own 2pt hairline.
 
 ## Verify
 

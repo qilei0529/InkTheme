@@ -325,6 +325,10 @@ public struct InkPalette: Equatable, Sendable {
     public var gray: Color
     public var grayForeground: Color
     public var ring: Color
+    /// Header nav and bottom bar fill.
+    public var chrome: Color
+    /// Elevated surfaces (cards, sheets, dialogs, fields) contrasted with `background`.
+    public var panel: Color
 
     /// Type, scrims, off-toggle knob. Alias of `foreground`.
     public var ink: Color {
@@ -332,7 +336,7 @@ public struct InkPalette: Equatable, Sendable {
         set { foreground = newValue }
     }
 
-    /// Screens, nav, sheets, outline fills. Alias of `background`.
+    /// Screens. Alias of `background`.
     public var paper: Color {
         get { background }
         set { background = newValue }
@@ -351,7 +355,7 @@ public struct InkPalette: Equatable, Sendable {
     }
 
     public static let light = InkPalette(
-        background: .white,
+        background: InkThemeColor.zinc50,
         foreground: .black,
         muted: InkThemeColor.zinc100,
         mutedForeground: InkThemeColor.zinc500,
@@ -360,7 +364,9 @@ public struct InkPalette: Equatable, Sendable {
         primaryForeground: .white,
         gray: InkThemeColor.zinc100,
         grayForeground: InkThemeColor.zinc900,
-        ring: .black
+        ring: .black,
+        chrome: .white,
+        panel: .white
     )
 
     public static let dark = InkPalette(
@@ -373,7 +379,9 @@ public struct InkPalette: Equatable, Sendable {
         primaryForeground: .black,
         gray: InkThemeColor.zinc800,
         grayForeground: InkThemeColor.zinc50,
-        ring: InkThemeColor.zinc300
+        ring: InkThemeColor.zinc300,
+        chrome: .black,
+        panel: InkThemeColor.zinc900
     )
 
     public init(
@@ -386,7 +394,9 @@ public struct InkPalette: Equatable, Sendable {
         primaryForeground: Color,
         gray: Color,
         grayForeground: Color,
-        ring: Color
+        ring: Color,
+        chrome: Color? = nil,
+        panel: Color? = nil
     ) {
         self.background = background
         self.foreground = foreground
@@ -398,6 +408,8 @@ public struct InkPalette: Equatable, Sendable {
         self.gray = gray
         self.grayForeground = grayForeground
         self.ring = ring
+        self.chrome = chrome ?? background
+        self.panel = panel ?? background
     }
 
     /// Legacy initializer. Fills muted / gray / ring from zinc neutrals when omitted.
@@ -411,7 +423,9 @@ public struct InkPalette: Equatable, Sendable {
         mutedForeground: Color? = nil,
         gray: Color? = nil,
         grayForeground: Color? = nil,
-        ring: Color? = nil
+        ring: Color? = nil,
+        chrome: Color? = nil,
+        panel: Color? = nil
     ) {
         let resolvedBorder = border ?? ink
         self.background = paper
@@ -424,6 +438,8 @@ public struct InkPalette: Equatable, Sendable {
         self.gray = gray ?? paper
         self.grayForeground = grayForeground ?? ink
         self.ring = ring ?? resolvedBorder
+        self.chrome = chrome ?? paper
+        self.panel = panel ?? paper
     }
 
     /// Tinted paper theme (red / blue / green) with shared zinc neutrals.
@@ -439,7 +455,9 @@ public struct InkPalette: Equatable, Sendable {
                 primaryForeground: .black,
                 gray: InkThemeColor.zinc800,
                 grayForeground: InkThemeColor.zinc50,
-                ring: InkThemeColor.zinc300
+                ring: InkThemeColor.zinc300,
+                chrome: background,
+                panel: InkThemeColor.zinc900
             )
         } else {
             InkPalette(
@@ -452,7 +470,9 @@ public struct InkPalette: Equatable, Sendable {
                 primaryForeground: .white,
                 gray: InkThemeColor.zinc100,
                 grayForeground: InkThemeColor.zinc900,
-                ring: .black
+                ring: .black,
+                chrome: .white,
+                panel: .white
             )
         }
     }

@@ -220,7 +220,7 @@ public struct InkSheet<Actions: View, Footer: View, Content: View>: View {
         .padding(contentSafeInsets)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .inkDismissKeyboardOnTap()
-        .background(palette.paper)
+        .background(palette.panel)
         .clipShape(cardShape)
         .overlay {
             cardShape.strokeBorder(palette.border.opacity(strokeOpacity), lineWidth: Ink.borderWidth)
@@ -375,7 +375,7 @@ private struct InkSheetListRowModifier: ViewModifier {
         content
             .listRowInsets(EdgeInsets())
             .listRowSeparator(.hidden)
-            .listRowBackground(Rectangle().fill(palette.paper))
+            .listRowBackground(Rectangle().fill(palette.panel))
     }
 }
 
@@ -395,7 +395,7 @@ public struct InkSheetFooter<Content: View>: View {
         }
         .padding(InkSpace.xl)
         .frame(maxWidth: .infinity)
-        .background(palette.paper)
+        .background(palette.panel)
         .overlay(alignment: .top) {
             if showsHairline {
                 Rectangle()

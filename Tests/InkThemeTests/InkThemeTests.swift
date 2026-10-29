@@ -72,6 +72,11 @@ struct InkThemeTests {
         #expect(darkInk.border == InkThemeColor.zinc800)
         #expect(lightInk.muted == InkThemeColor.zinc100)
         #expect(darkInk.mutedForeground == InkThemeColor.zinc400)
+        #expect(lightInk.background == InkThemeColor.zinc50)
+        #expect(lightInk.chrome == .white)
+        #expect(lightInk.panel == .white)
+        #expect(darkInk.chrome == .black)
+        #expect(darkInk.panel == InkThemeColor.zinc900)
         #expect(InkColorTheme.red.light.border == InkColorTheme.red.light.foreground)
         #expect(InkColorTheme.red.dark.border == InkColorTheme.red.dark.foreground)
 
@@ -82,8 +87,12 @@ struct InkThemeTests {
         #expect(lightRed.foreground == .black)
         #expect(lightRed.background != .white)
         #expect(lightRed.background == InkThemeColor.redLightPaper)
+        #expect(lightRed.chrome == .white)
+        #expect(lightRed.panel == .white)
         #expect(darkRed.foreground == .white)
         #expect(darkRed.background == InkThemeColor.redDarkPaper)
+        #expect(darkRed.chrome == InkThemeColor.redDarkPaper)
+        #expect(darkRed.panel == InkThemeColor.zinc900)
         #expect(lightRed.primary == darkRed.primary)
         #expect(lightRed.primary == InkThemeColor.redAccent)
         #expect(lightRed.primaryForeground == .white)
@@ -94,6 +103,8 @@ struct InkThemeTests {
         #expect(lightBlue.background == InkThemeColor.blueLightPaper)
         #expect(darkBlue.background == InkThemeColor.blueDarkPaper)
         #expect(lightBlue.primary == darkBlue.primary)
+        #expect(lightBlue.chrome == .white)
+        #expect(lightBlue.panel == .white)
 
         let systemDarkGreen = InkPalette.resolved(
             appearance: .system,
@@ -102,6 +113,8 @@ struct InkThemeTests {
         )
         #expect(systemDarkGreen == InkColorTheme.green.dark)
         #expect(systemDarkGreen.background == InkThemeColor.greenDarkPaper)
+        #expect(systemDarkGreen.chrome == InkThemeColor.greenDarkPaper)
+        #expect(systemDarkGreen.panel == InkThemeColor.zinc900)
 
         let systemLightGreen = InkPalette.resolved(
             appearance: .system,
@@ -111,6 +124,25 @@ struct InkThemeTests {
         #expect(systemLightGreen == InkColorTheme.green.light)
         #expect(systemLightGreen.background == InkThemeColor.greenLightPaper)
         #expect(systemLightGreen.background != .white)
+        #expect(systemLightGreen.chrome == .white)
+        #expect(systemLightGreen.panel == .white)
+    }
+
+    @Test func paletteChromeAndPanelDefaultToBackgroundWhenOmitted() {
+        let custom = InkPalette(
+            background: .white,
+            foreground: .black,
+            muted: InkThemeColor.zinc100,
+            mutedForeground: InkThemeColor.zinc500,
+            border: InkThemeColor.zinc200,
+            primary: .black,
+            primaryForeground: .white,
+            gray: InkThemeColor.zinc100,
+            grayForeground: InkThemeColor.zinc900,
+            ring: .black
+        )
+        #expect(custom.chrome == .white)
+        #expect(custom.panel == .white)
     }
 
     @Test func paletteBorderDefaultsToInkAndAcceptsOverride() {
