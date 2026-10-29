@@ -288,7 +288,7 @@ struct DesignSystemPlaygroundView: View {
     private var bottomNavCatalog: some View {
         VStack(alignment: .leading, spacing: InkSpace.md) {
             sectionTitle("Bottom Nav")
-            Text("This page overlays a frosted bar and switches HOME, ASK, and HISTORY. Use `frosted: true` in a bottom ZStack so rows blur under the tabs; pad scroll content with `inkOverlayTabContentInset()`. Selected is full ink; the rest stay at capital opacity. Turn off Labels for icon-only (22pt); the label stays the accessibility name.")
+            Text("This page overlays a frosted bar and switches HOME, ASK, and HISTORY. Use `frosted: true` in a bottom ZStack so rows blur under the tabs; pad scroll content with `inkOverlayTabContentInset()`. Selected is full ink; unselected icons use ink at 0.78. Turn off Labels for icon-only (22pt); the label stays the accessibility name.")
                 .inkText(.body)
             Toggle("Labels", isOn: $showTabLabels)
                 .inkText(.body)
