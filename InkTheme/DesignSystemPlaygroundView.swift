@@ -14,6 +14,10 @@ struct DesignSystemPlaygroundView: View {
     @State private var showConfirmSheet = false
     @State private var showAlertDialog = false
     @State private var showCustomDialog = false
+    @State private var showLangMenu = false
+    @State private var showTypeMenu = false
+    @State private var menuLang = PlaygroundMenuLang.french
+    @State private var menuType = PlaygroundMenuType.teacher
     @State private var dialogName = "Alex"
     @State private var formName = "Alex"
     @State private var fieldText = "Could you stay a bit later?"
@@ -97,6 +101,7 @@ struct DesignSystemPlaygroundView: View {
                 fieldCatalog
                 sheetCatalog
                 dialogCatalog
+                menuCatalog
                 buttons
                 toggles
                 checkboxes
@@ -384,6 +389,64 @@ struct DesignSystemPlaygroundView: View {
         }
     }
 
+    private var menuCatalog: some View {
+        VStack(alignment: .leading, spacing: InkSpace.md) {
+            sectionTitle("Menu")
+            Text("Anchored dropdown on a light ink scrim. Panel uses panel fill + 2pt border. Prefer InkMenu / InkMenuPicker over system Menu.")
+                .inkText(.body)
+            HStack(spacing: InkSpace.sm) {
+                InkMenuPicker(
+                    selection: $menuLang,
+                    isPresented: menuPresented(.lang),
+                    options: PlaygroundMenuLang.allCases,
+                    title: \.label
+                )
+                InkMenuPicker(
+                    selection: $menuType,
+                    isPresented: menuPresented(.type),
+                    options: PlaygroundMenuType.allCases,
+                    title: \.label,
+                    systemImage: \.systemImage
+                ) { type in
+                    HStack(spacing: 4) {
+                        Image(systemName: type.systemImage)
+                            .font(.system(size: 11, weight: .semibold))
+                        Text(type.label)
+                            .inkText(.caption, size: .xxs)
+                            .lineLimit(1)
+                    }
+                }
+                Spacer(minLength: 0)
+            }
+        }
+    }
+
+    private enum PlaygroundOpenMenu {
+        case lang
+        case type
+    }
+
+    private func menuPresented(_ menu: PlaygroundOpenMenu) -> Binding<Bool> {
+        Binding(
+            get: {
+                switch menu {
+                case .lang: showLangMenu
+                case .type: showTypeMenu
+                }
+            },
+            set: { isOpen in
+                switch menu {
+                case .lang:
+                    showLangMenu = isOpen
+                    if isOpen { showTypeMenu = false }
+                case .type:
+                    showTypeMenu = isOpen
+                    if isOpen { showLangMenu = false }
+                }
+            }
+        )
+    }
+
     private var customDialog: some View {
         InkDialog(title: "Rename") {
             InkSheetCloseButton { showCustomDialog = false }
@@ -640,6 +703,42 @@ private struct AppearanceOptionStyle: ViewModifier {
             content.inkFillButton()
         } else {
             content.inkOutlineButton()
+        }
+    }
+}
+
+private enum PlaygroundMenuLang: String, CaseIterable, Hashable {
+    case french
+    case english
+    case chinese
+
+    var label: String {
+        switch self {
+        case .french: "French"
+        case .english: "English"
+        case .chinese: "Chinese"
+        }
+    }
+}
+
+private enum PlaygroundMenuType: String, CaseIterable, Hashable {
+    case teacher
+    case sentence
+    case translate
+
+    var label: String {
+        switch self {
+        case .teacher: "Teacher"
+        case .sentence: "Sentence"
+        case .translate: "Translate"
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .teacher: "bubble.left.and.bubble.right"
+        case .sentence: "text.alignleft"
+        case .translate: "character.book.closed"
         }
     }
 }
