@@ -245,8 +245,8 @@ private struct InkBottomNavItem: View {
                 iconView
             }
         }
-        // Unselected stays near-ink (not capital gray); selected asset fill still marks the active tab.
-        .foregroundStyle(palette.ink.opacity(isSelected ? 1 : 0.78))
+        // Unselected stays near-ink; selected uses primary (brand accent when themed).
+        .foregroundStyle(isSelected ? palette.primary : palette.ink.opacity(0.78))
     }
 
     @ViewBuilder
