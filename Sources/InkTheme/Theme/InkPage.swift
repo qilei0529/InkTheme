@@ -1,15 +1,19 @@
 import SwiftUI
 
 /// Overlay page chrome matching Flutter `InkPage`: frosted nav floats over body;
-/// body scrolls underneath. Pad scroll content with ``navExtent`` so the first
-/// rows clear the bar (both chrome and body sit in the layout safe area; the
-/// frosted fill extends under the status bar via ``InkChromeBackground``).
-public struct InkPage<Actions: View, Body: View>: View {
+/// body scrolls underneath. Pad scroll content with ``navExtent`` / 
+/// ``inkOverlayNavContentInset()`` so the first rows clear the bar.
+///
+/// Pass ``header`` to **replace** the default title text inside the nav
+/// (custom leading chrome). Omit ``header`` to keep the string ``title``.
+public struct InkPage<TitleAccessory: View, Actions: View, Header: View, Body: View>: View {
     let title: String
     var frosted: Bool
     var frostedOpacity: CGFloat
     var titlePointSize: CGFloat?
+    @ViewBuilder var titleAccessory: () -> TitleAccessory
     @ViewBuilder var actions: () -> Actions
+    @ViewBuilder var header: () -> Header
     @ViewBuilder var content: () -> Body
 
     public init(
@@ -17,15 +21,23 @@ public struct InkPage<Actions: View, Body: View>: View {
         frosted: Bool = true,
         frostedOpacity: CGFloat = Ink.frostedOpacity,
         titlePointSize: CGFloat? = 22,
+        @ViewBuilder titleAccessory: @escaping () -> TitleAccessory,
         @ViewBuilder actions: @escaping () -> Actions,
+        @ViewBuilder header: @escaping () -> Header,
         @ViewBuilder content: @escaping () -> Body
     ) {
         self.title = title
         self.frosted = frosted
         self.frostedOpacity = frostedOpacity
         self.titlePointSize = titlePointSize
+        self.titleAccessory = titleAccessory
         self.actions = actions
+        self.header = header
         self.content = content
+    }
+
+    private var usesCustomHeader: Bool {
+        Header.self != EmptyView.self
     }
 
     public var body: some View {
@@ -34,13 +46,21 @@ public struct InkPage<Actions: View, Body: View>: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
 
             InkNavBar(
-                title: title,
                 showHairline: true,
                 frosted: frosted,
-                frostedOpacity: frostedOpacity,
-                titlePointSize: titlePointSize,
-                actions: actions
-            )
+                frostedOpacity: frostedOpacity
+            ) {
+                if usesCustomHeader {
+                    header()
+                } else {
+                    HStack(alignment: .center, spacing: InkSpace.sm) {
+                        InkNavBarTitle(title, pointSize: titlePointSize)
+                        titleAccessory()
+                    }
+                }
+            } actions: {
+                actions()
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .inkScreen()
@@ -56,7 +76,52 @@ public struct InkPage<Actions: View, Body: View>: View {
     }
 }
 
-extension InkPage where Actions == EmptyView {
+extension InkPage where TitleAccessory == EmptyView {
+    public init(
+        title: String,
+        frosted: Bool = true,
+        frostedOpacity: CGFloat = Ink.frostedOpacity,
+        titlePointSize: CGFloat? = 22,
+        @ViewBuilder actions: @escaping () -> Actions,
+        @ViewBuilder header: @escaping () -> Header,
+        @ViewBuilder content: @escaping () -> Body
+    ) {
+        self.init(
+            title: title,
+            frosted: frosted,
+            frostedOpacity: frostedOpacity,
+            titlePointSize: titlePointSize,
+            titleAccessory: { EmptyView() },
+            actions: actions,
+            header: header,
+            content: content
+        )
+    }
+}
+
+extension InkPage where TitleAccessory == EmptyView, Header == EmptyView {
+    public init(
+        title: String,
+        frosted: Bool = true,
+        frostedOpacity: CGFloat = Ink.frostedOpacity,
+        titlePointSize: CGFloat? = 22,
+        @ViewBuilder actions: @escaping () -> Actions,
+        @ViewBuilder content: @escaping () -> Body
+    ) {
+        self.init(
+            title: title,
+            frosted: frosted,
+            frostedOpacity: frostedOpacity,
+            titlePointSize: titlePointSize,
+            titleAccessory: { EmptyView() },
+            actions: actions,
+            header: { EmptyView() },
+            content: content
+        )
+    }
+}
+
+extension InkPage where TitleAccessory == EmptyView, Actions == EmptyView, Header == EmptyView {
     public init(
         title: String,
         frosted: Bool = true,
@@ -69,7 +134,32 @@ extension InkPage where Actions == EmptyView {
             frosted: frosted,
             frostedOpacity: frostedOpacity,
             titlePointSize: titlePointSize,
+            titleAccessory: { EmptyView() },
             actions: { EmptyView() },
+            header: { EmptyView() },
+            content: content
+        )
+    }
+}
+
+extension InkPage where Header == EmptyView {
+    public init(
+        title: String,
+        frosted: Bool = true,
+        frostedOpacity: CGFloat = Ink.frostedOpacity,
+        titlePointSize: CGFloat? = 22,
+        @ViewBuilder titleAccessory: @escaping () -> TitleAccessory,
+        @ViewBuilder actions: @escaping () -> Actions,
+        @ViewBuilder content: @escaping () -> Body
+    ) {
+        self.init(
+            title: title,
+            frosted: frosted,
+            frostedOpacity: frostedOpacity,
+            titlePointSize: titlePointSize,
+            titleAccessory: titleAccessory,
+            actions: actions,
+            header: { EmptyView() },
             content: content
         )
     }
@@ -84,11 +174,21 @@ public enum InkOverlayInset {
     public static var tab: CGFloat { InkSpace.sm + Ink.buttonHeight }
 }
 
+private struct InkOverlayNavInsetKey: EnvironmentKey {
+    nonisolated static let defaultValue: CGFloat = 0
+}
+
 private struct InkOverlayTabInsetKey: EnvironmentKey {
-    static let defaultValue: CGFloat = 0
+    nonisolated static let defaultValue: CGFloat = 0
 }
 
 extension EnvironmentValues {
+    /// Optional override for top overlay inset. `0` falls back to ``InkOverlayInset/nav``.
+    public var inkOverlayNavInset: CGFloat {
+        get { self[InkOverlayNavInsetKey.self] }
+        set { self[InkOverlayNavInsetKey.self] = newValue }
+    }
+
     /// Extra bottom inset when a frosted `InkBottomNav` overlays the tab root.
     /// Set by the app shell; scroll content and secondary bottom bars should clear it.
     public var inkOverlayTabInset: CGFloat {
@@ -98,15 +198,24 @@ extension EnvironmentValues {
 }
 
 extension View {
-    /// Pads the top of scroll content so it clears an overlay `InkNavBar`.
+    /// Pads the top of scroll content so it clears an overlay `InkNavBar` / `InkPage` chrome.
+    /// Uses `inkOverlayNavInset` from the environment when set, else ``InkOverlayInset/nav``.
     public func inkOverlayNavContentInset() -> some View {
-        padding(.top, InkOverlayInset.nav)
+        modifier(InkOverlayNavContentInsetModifier())
     }
 
     /// Pads the bottom of scroll content so it clears an overlay `InkBottomNav`.
     /// Uses `inkOverlayTabInset` from the environment when set, else ``InkOverlayInset/tab``.
     public func inkOverlayTabContentInset() -> some View {
         modifier(InkOverlayTabContentInsetModifier())
+    }
+}
+
+private struct InkOverlayNavContentInsetModifier: ViewModifier {
+    @Environment(\.inkOverlayNavInset) private var navInset
+
+    func body(content: Content) -> some View {
+        content.padding(.top, navInset > 0 ? navInset : InkOverlayInset.nav)
     }
 }
 

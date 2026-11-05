@@ -278,6 +278,20 @@ InkPage(title: "Ask") {
             .inkOverlayTabContentInset()
     }
 }
+
+// `header:` replaces the default title text inside the nav (custom leading chrome).
+// Omit `header` to keep the string title.
+InkPage(title: "Board") {
+    Button("Settings") { }.inkBarIconOutlineButton()
+} header: {
+    SessionTabs()
+} content: {
+    ScrollView {
+        /* body */
+            .inkOverlayNavContentInset()
+            .inkOverlayTabContentInset()
+    }
+}
 ```
 
 Opaque inset is fine when content should not scroll under chrome:

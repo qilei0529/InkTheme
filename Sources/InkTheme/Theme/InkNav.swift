@@ -1,51 +1,63 @@
 import SwiftUI
 
-public struct InkNavBar<Actions: View>: View {
+public struct InkNavBarTitle: View {
     let title: String
+    var pointSize: CGFloat?
+
+    public init(_ title: String, pointSize: CGFloat? = nil) {
+        self.title = title
+        self.pointSize = pointSize
+    }
+
+    public var body: some View {
+        Group {
+            if let pointSize {
+                Text(title)
+                    .inkText(.hero, pointSize: pointSize)
+            } else {
+                Text(title)
+                    .inkText(.hero)
+            }
+        }
+        .lineLimit(1)
+        .minimumScaleFactor(0.7)
+    }
+}
+
+/// Leading chrome for ``InkNavBar`` / ``InkPage``. Pass a custom ``title`` view to
+/// replace the default title text (session tabs, filters, etc.).
+public struct InkNavBar<Title: View, Actions: View>: View {
     var topPadding: CGFloat
     /// 2pt ink hairline under the bar (matches Flutter `showHairline` / bottom nav).
     var showHairline: Bool
     /// Blur + translucent paper so content can show through when the bar overlays a scroll view.
     var frosted: Bool
     var frostedOpacity: CGFloat
-    /// Title point size override (Flutter `titleFontSize`). `nil` uses hero.
-    var titlePointSize: CGFloat?
     @Environment(\.inkPalette) private var palette
+    @ViewBuilder var title: () -> Title
     @ViewBuilder var actions: () -> Actions
 
     public init(
-        title: String,
         topPadding: CGFloat = InkSpace.sm,
         showHairline: Bool = true,
         frosted: Bool = false,
         frostedOpacity: CGFloat = Ink.frostedOpacity,
-        titlePointSize: CGFloat? = nil,
+        @ViewBuilder title: @escaping () -> Title,
         @ViewBuilder actions: @escaping () -> Actions
     ) {
-        self.title = title
         self.topPadding = topPadding
         // Frosted overlay always draws the hairline (Flutter: showHairline || frosted).
         self.showHairline = showHairline || frosted
         self.frosted = frosted
         self.frostedOpacity = frostedOpacity
-        self.titlePointSize = titlePointSize
+        self.title = title
         self.actions = actions
     }
 
     public var body: some View {
         HStack(alignment: .center, spacing: InkSpace.sm) {
-            Group {
-                if let titlePointSize {
-                    Text(title)
-                        .inkText(.hero, pointSize: titlePointSize)
-                } else {
-                    Text(title)
-                        .inkText(.hero)
-                }
-            }
-            .lineLimit(1)
-            .minimumScaleFactor(0.7)
-            .frame(maxWidth: .infinity, alignment: .leading)
+            title()
+                .frame(maxWidth: .infinity, alignment: .leading)
 
             HStack(spacing: InkSpace.sm) {
                 actions()
@@ -73,7 +85,28 @@ public struct InkNavBar<Actions: View>: View {
     }
 }
 
-extension InkNavBar where Actions == EmptyView {
+extension InkNavBar where Title == InkNavBarTitle {
+    public init(
+        title: String,
+        topPadding: CGFloat = InkSpace.sm,
+        showHairline: Bool = true,
+        frosted: Bool = false,
+        frostedOpacity: CGFloat = Ink.frostedOpacity,
+        titlePointSize: CGFloat? = nil,
+        @ViewBuilder actions: @escaping () -> Actions
+    ) {
+        self.init(
+            topPadding: topPadding,
+            showHairline: showHairline,
+            frosted: frosted,
+            frostedOpacity: frostedOpacity,
+            title: { InkNavBarTitle(title, pointSize: titlePointSize) },
+            actions: actions
+        )
+    }
+}
+
+extension InkNavBar where Title == InkNavBarTitle, Actions == EmptyView {
     public init(
         title: String,
         topPadding: CGFloat = InkSpace.sm,
@@ -88,9 +121,8 @@ extension InkNavBar where Actions == EmptyView {
             showHairline: showHairline,
             frosted: frosted,
             frostedOpacity: frostedOpacity,
-            titlePointSize: titlePointSize
-        ) {
-            EmptyView()
-        }
+            titlePointSize: titlePointSize,
+            actions: { EmptyView() }
+        )
     }
 }
