@@ -94,15 +94,27 @@ public enum InkTextStyle: String, CaseIterable, Identifiable {
         }
     }
 
+    /// System-font fallback when no ``EnvironmentValues/inkFontFamily`` is available.
+    /// Prefer ``View/inkText`` / ``View/inkFont(size:weight:)`` so custom families apply.
     public var font: Font {
         font(size: nil)
     }
 
-    /// Role font. Pass ``InkTypeToken`` or a raw `pointSize` to override the ladder size
-    /// while keeping weight / tracking / opacity from the style.
+    /// Role font using the system typeface. Pass ``InkTypeToken`` or a raw `pointSize`
+    /// to override the ladder size while keeping weight / tracking / opacity.
+    /// Prefer environment-aware modifiers when the host sets ``InkFontFamily``.
     public func font(size: InkTypeToken? = nil, pointSize: CGFloat? = nil) -> Font {
+        font(family: .system, size: size, pointSize: pointSize)
+    }
+
+    /// Role font resolved against a host ``InkFontFamily``.
+    public func font(
+        family: InkFontFamily,
+        size: InkTypeToken? = nil,
+        pointSize: CGFloat? = nil
+    ) -> Font {
         let resolved = pointSize ?? size?.value ?? self.size
-        return Font.system(size: resolved, weight: weight, design: .default)
+        return family.font(size: resolved, weight: weight)
     }
 
     public var tracking: CGFloat {
@@ -215,10 +227,11 @@ private struct InkTextModifier: ViewModifier {
     var size: InkTypeToken?
     var pointSize: CGFloat?
     @Environment(\.inkPalette) private var palette
+    @Environment(\.inkFontFamily) private var fontFamily
 
     func body(content: Content) -> some View {
         content
-            .font(style.font(size: size, pointSize: pointSize))
+            .font(style.font(family: fontFamily, size: size, pointSize: pointSize))
             .tracking(style.tracking)
             .foregroundStyle(palette.ink.opacity(style.inkOpacity))
     }

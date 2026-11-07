@@ -239,7 +239,7 @@ private struct InkBottomNavItem: View {
                 VStack(spacing: InkSpace.xxs) {
                     iconView
                     Text(label)
-                        .font(.system(size: 10, weight: .regular))
+                        .inkFont(size: 10, weight: .regular)
                 }
             } else {
                 iconView

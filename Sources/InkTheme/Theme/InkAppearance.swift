@@ -518,13 +518,15 @@ extension View {
     public func inkAppearance(
         _ preference: InkAppearance,
         theme: InkColorTheme = .ink,
-        radius: InkRadius = .md
+        radius: InkRadius = .md,
+        fontFamily: InkFontFamily = .system
     ) -> some View {
         modifier(
             InkAppearanceModifier(
                 preference: preference,
                 theme: theme,
-                radius: radius
+                radius: radius,
+                fontFamily: fontFamily
             )
         )
     }
@@ -534,6 +536,7 @@ private struct InkAppearanceModifier: ViewModifier {
     var preference: InkAppearance
     var theme: InkColorTheme
     var radius: InkRadius
+    var fontFamily: InkFontFamily
     @Environment(\.colorScheme) private var systemColorScheme
 
     func body(content: Content) -> some View {
@@ -547,12 +550,14 @@ private struct InkAppearanceModifier: ViewModifier {
                 content
                     .environment(\.inkPalette, palette)
                     .environment(\.inkRadius, radius)
+                    .environment(\.inkFontFamily, fontFamily)
                     .environment(\.colorScheme, scheme)
                     .preferredColorScheme(scheme)
             } else {
                 content
                     .environment(\.inkPalette, palette)
                     .environment(\.inkRadius, radius)
+                    .environment(\.inkFontFamily, fontFamily)
                     .preferredColorScheme(nil)
             }
         }

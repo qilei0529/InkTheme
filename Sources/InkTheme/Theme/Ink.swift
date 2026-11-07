@@ -86,11 +86,16 @@ public enum InkFieldSize: CaseIterable, Identifiable {
     public var padding: CGFloat { InkSpace.md }
 
     /// `sm` uses footnote at full ink — not caption’s 0.55 opacity.
-    public var font: Font {
+    public var textStyle: InkTextStyle {
         switch self {
-        case .sm: InkTextStyle.caption.font
-        case .md: InkTextStyle.body.font
+        case .sm: .caption
+        case .md: .body
         }
+    }
+
+    /// System-font fallback. Prefer resolving via ``InkFontFamily`` in modifiers.
+    public var font: Font {
+        textStyle.font
     }
 }
 
@@ -98,10 +103,11 @@ struct InkOutlineButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
     @Environment(\.inkPalette) private var palette
     @Environment(\.inkRadius) private var inkRadius
+    @Environment(\.inkFontFamily) private var fontFamily
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(InkTextStyle.bodyStrong.font)
+            .font(InkTextStyle.bodyStrong.font(family: fontFamily))
             .foregroundStyle(palette.ink.opacity(isEnabled ? 1 : 0.35))
             .frame(maxWidth: .infinity, minHeight: Ink.buttonHeight)
             .padding(.horizontal, InkSpace.lg)
@@ -119,10 +125,11 @@ struct InkFillButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
     @Environment(\.inkPalette) private var palette
     @Environment(\.inkRadius) private var inkRadius
+    @Environment(\.inkFontFamily) private var fontFamily
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(InkTextStyle.bodyStrong.font)
+            .font(InkTextStyle.bodyStrong.font(family: fontFamily))
             .foregroundStyle(palette.inverse.opacity(isEnabled ? 1 : 0.7))
             .frame(maxWidth: .infinity, minHeight: Ink.buttonHeight)
             .padding(.horizontal, InkSpace.lg)
@@ -136,11 +143,12 @@ struct InkBarOutlineButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
     @Environment(\.inkPalette) private var palette
     @Environment(\.inkRadius) private var inkRadius
+    @Environment(\.inkFontFamily) private var fontFamily
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .labelStyle(.titleAndIcon)
-            .font(InkTextStyle.bodyStrong.font)
+            .font(InkTextStyle.bodyStrong.font(family: fontFamily))
             .foregroundStyle(palette.ink.opacity(isEnabled ? 1 : 0.35))
             .frame(minHeight: Ink.barButtonHeight)
             .padding(.horizontal, InkSpace.md)
@@ -158,11 +166,12 @@ struct InkBarFillButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
     @Environment(\.inkPalette) private var palette
     @Environment(\.inkRadius) private var inkRadius
+    @Environment(\.inkFontFamily) private var fontFamily
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .labelStyle(.titleAndIcon)
-            .font(InkTextStyle.bodyStrong.font)
+            .font(InkTextStyle.bodyStrong.font(family: fontFamily))
             .foregroundStyle(palette.inverse.opacity(isEnabled ? 1 : 0.7))
             .frame(minHeight: Ink.barButtonHeight)
             .padding(.horizontal, InkSpace.md)
@@ -326,10 +335,11 @@ private struct InkFieldModifier: ViewModifier {
     var size: InkFieldSize
     var enabled: Bool
     @Environment(\.inkPalette) private var palette
+    @Environment(\.inkFontFamily) private var fontFamily
 
     func body(content: Content) -> some View {
         content
-            .font(size.font)
+            .font(size.textStyle.font(family: fontFamily))
             .foregroundStyle(palette.ink)
             .padding(.horizontal, size.padding)
             .frame(minHeight: size.height)
