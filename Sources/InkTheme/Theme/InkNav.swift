@@ -63,8 +63,7 @@ public struct InkNavBar<Title: View, Actions: View>: View {
                 actions()
             }
         }
-        .padding(.top, topPadding)
-        .padding(.bottom, InkSpace.sm)
+        .padding(.bottom, InkSpace.xs)
         .padding(.horizontal, InkSpace.xl)
         .frame(minHeight: Ink.navBarHeight, alignment: .center)
         .background {

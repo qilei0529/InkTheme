@@ -95,7 +95,7 @@ public struct InkMenu<Label: View, Content: View>: View {
                         RoundedRectangle(cornerRadius: inkRadius.button, style: .continuous)
                             .stroke(
                                 palette.border.opacity(isPresented ? 1 : 0.45),
-                                lineWidth: isPresented ? Ink.borderWidth : 1
+                                lineWidth:  Ink.borderWidth
                             )
                     }
             }

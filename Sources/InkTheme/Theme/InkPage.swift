@@ -22,7 +22,7 @@ public struct InkPage<TitleAccessory: View, Actions: View, Header: View, Overlay
         title: String,
         frosted: Bool = true,
         frostedOpacity: CGFloat = Ink.frostedOpacity,
-        titlePointSize: CGFloat? = 22,
+        titlePointSize: CGFloat? = 20,
         @ViewBuilder titleAccessory: @escaping () -> TitleAccessory,
         @ViewBuilder actions: @escaping () -> Actions,
         @ViewBuilder header: @escaping () -> Header,
@@ -87,7 +87,7 @@ extension InkPage where TitleAccessory == EmptyView, Overlay == EmptyView {
         title: String,
         frosted: Bool = true,
         frostedOpacity: CGFloat = Ink.frostedOpacity,
-        titlePointSize: CGFloat? = 22,
+        titlePointSize: CGFloat? = 20,
         @ViewBuilder actions: @escaping () -> Actions,
         @ViewBuilder header: @escaping () -> Header,
         @ViewBuilder content: @escaping () -> Body
@@ -111,7 +111,7 @@ extension InkPage where TitleAccessory == EmptyView {
         title: String,
         frosted: Bool = true,
         frostedOpacity: CGFloat = Ink.frostedOpacity,
-        titlePointSize: CGFloat? = 22,
+        titlePointSize: CGFloat? = 20,
         @ViewBuilder actions: @escaping () -> Actions,
         @ViewBuilder header: @escaping () -> Header,
         @ViewBuilder overlay: @escaping () -> Overlay,
@@ -136,7 +136,7 @@ extension InkPage where TitleAccessory == EmptyView, Header == EmptyView, Overla
         title: String,
         frosted: Bool = true,
         frostedOpacity: CGFloat = Ink.frostedOpacity,
-        titlePointSize: CGFloat? = 22,
+        titlePointSize: CGFloat? = 20,
         @ViewBuilder actions: @escaping () -> Actions,
         @ViewBuilder content: @escaping () -> Body
     ) {
@@ -159,7 +159,7 @@ extension InkPage where TitleAccessory == EmptyView, Actions == EmptyView, Heade
         title: String,
         frosted: Bool = true,
         frostedOpacity: CGFloat = Ink.frostedOpacity,
-        titlePointSize: CGFloat? = 22,
+        titlePointSize: CGFloat? = 20,
         @ViewBuilder content: @escaping () -> Body
     ) {
         self.init(
@@ -181,7 +181,7 @@ extension InkPage where Header == EmptyView, Overlay == EmptyView {
         title: String,
         frosted: Bool = true,
         frostedOpacity: CGFloat = Ink.frostedOpacity,
-        titlePointSize: CGFloat? = 22,
+        titlePointSize: CGFloat? = 20,
         @ViewBuilder titleAccessory: @escaping () -> TitleAccessory,
         @ViewBuilder actions: @escaping () -> Actions,
         @ViewBuilder content: @escaping () -> Body
