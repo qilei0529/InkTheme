@@ -6,7 +6,7 @@ import SwiftUI
 ///
 /// Pass ``header`` to **replace** the default title text inside the nav
 /// (custom leading chrome). Omit ``header`` to keep the string ``title``.
-public struct InkPage<TitleAccessory: View, Actions: View, Header: View, Body: View>: View {
+public struct InkPage<TitleAccessory: View, Actions: View, Header: View, Overlay: View, Body: View>: View {
     let title: String
     var frosted: Bool
     var frostedOpacity: CGFloat
@@ -14,6 +14,8 @@ public struct InkPage<TitleAccessory: View, Actions: View, Header: View, Body: V
     @ViewBuilder var titleAccessory: () -> TitleAccessory
     @ViewBuilder var actions: () -> Actions
     @ViewBuilder var header: () -> Header
+    /// Page chrome between the scrolling body and the nav. Drawn under the header.
+    @ViewBuilder var overlay: () -> Overlay
     @ViewBuilder var content: () -> Body
 
     public init(
@@ -24,6 +26,7 @@ public struct InkPage<TitleAccessory: View, Actions: View, Header: View, Body: V
         @ViewBuilder titleAccessory: @escaping () -> TitleAccessory,
         @ViewBuilder actions: @escaping () -> Actions,
         @ViewBuilder header: @escaping () -> Header,
+        @ViewBuilder overlay: @escaping () -> Overlay,
         @ViewBuilder content: @escaping () -> Body
     ) {
         self.title = title
@@ -33,6 +36,7 @@ public struct InkPage<TitleAccessory: View, Actions: View, Header: View, Body: V
         self.titleAccessory = titleAccessory
         self.actions = actions
         self.header = header
+        self.overlay = overlay
         self.content = content
     }
 
@@ -45,21 +49,23 @@ public struct InkPage<TitleAccessory: View, Actions: View, Header: View, Body: V
             content()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-            InkNavBar(
-                showHairline: true,
-                frosted: frosted,
-                frostedOpacity: frostedOpacity
-            ) {
-                if usesCustomHeader {
-                    header()
-                } else {
+            overlay()
+
+            if usesCustomHeader {
+                header()
+            } else {
+                InkNavBar(
+                    showHairline: true,
+                    frosted: frosted,
+                    frostedOpacity: frostedOpacity
+                ) {
                     HStack(alignment: .center, spacing: InkSpace.sm) {
                         InkNavBarTitle(title, pointSize: titlePointSize)
                         titleAccessory()
                     }
+                } actions: {
+                    actions()
                 }
-            } actions: {
-                actions()
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -76,7 +82,7 @@ public struct InkPage<TitleAccessory: View, Actions: View, Header: View, Body: V
     }
 }
 
-extension InkPage where TitleAccessory == EmptyView {
+extension InkPage where TitleAccessory == EmptyView, Overlay == EmptyView {
     public init(
         title: String,
         frosted: Bool = true,
@@ -94,12 +100,38 @@ extension InkPage where TitleAccessory == EmptyView {
             titleAccessory: { EmptyView() },
             actions: actions,
             header: header,
+            overlay: { EmptyView() },
             content: content
         )
     }
 }
 
-extension InkPage where TitleAccessory == EmptyView, Header == EmptyView {
+extension InkPage where TitleAccessory == EmptyView {
+    public init(
+        title: String,
+        frosted: Bool = true,
+        frostedOpacity: CGFloat = Ink.frostedOpacity,
+        titlePointSize: CGFloat? = 22,
+        @ViewBuilder actions: @escaping () -> Actions,
+        @ViewBuilder header: @escaping () -> Header,
+        @ViewBuilder overlay: @escaping () -> Overlay,
+        @ViewBuilder content: @escaping () -> Body
+    ) {
+        self.init(
+            title: title,
+            frosted: frosted,
+            frostedOpacity: frostedOpacity,
+            titlePointSize: titlePointSize,
+            titleAccessory: { EmptyView() },
+            actions: actions,
+            header: header,
+            overlay: overlay,
+            content: content
+        )
+    }
+}
+
+extension InkPage where TitleAccessory == EmptyView, Header == EmptyView, Overlay == EmptyView {
     public init(
         title: String,
         frosted: Bool = true,
@@ -116,12 +148,13 @@ extension InkPage where TitleAccessory == EmptyView, Header == EmptyView {
             titleAccessory: { EmptyView() },
             actions: actions,
             header: { EmptyView() },
+            overlay: { EmptyView() },
             content: content
         )
     }
 }
 
-extension InkPage where TitleAccessory == EmptyView, Actions == EmptyView, Header == EmptyView {
+extension InkPage where TitleAccessory == EmptyView, Actions == EmptyView, Header == EmptyView, Overlay == EmptyView {
     public init(
         title: String,
         frosted: Bool = true,
@@ -137,12 +170,13 @@ extension InkPage where TitleAccessory == EmptyView, Actions == EmptyView, Heade
             titleAccessory: { EmptyView() },
             actions: { EmptyView() },
             header: { EmptyView() },
+            overlay: { EmptyView() },
             content: content
         )
     }
 }
 
-extension InkPage where Header == EmptyView {
+extension InkPage where Header == EmptyView, Overlay == EmptyView {
     public init(
         title: String,
         frosted: Bool = true,
@@ -160,6 +194,7 @@ extension InkPage where Header == EmptyView {
             titleAccessory: titleAccessory,
             actions: actions,
             header: { EmptyView() },
+            overlay: { EmptyView() },
             content: content
         )
     }
