@@ -29,6 +29,8 @@ public struct InkBottomNav<ID: Hashable>: View {
     @Binding var selection: ID
     /// When `false`, only the icon is shown. `label` remains the accessibility name.
     var showLabels: Bool
+    /// Tab icon point size (SF Symbol font / asset frame). Default `20`.
+    var iconSize: CGFloat
     /// Blur + translucent paper so content can show through when the bar overlays a scroll view.
     var frosted: Bool
     var frostedOpacity: CGFloat
@@ -47,12 +49,14 @@ public struct InkBottomNav<ID: Hashable>: View {
         items: [InkTabItem<ID>],
         selection: Binding<ID>,
         showLabels: Bool = true,
+        iconSize: CGFloat = 20,
         frosted: Bool = false,
         frostedOpacity: CGFloat = Ink.frostedOpacity
     ) {
         self.items = items
         _selection = selection
         self.showLabels = showLabels
+        self.iconSize = iconSize
         self.frosted = frosted
         self.frostedOpacity = frostedOpacity
     }
@@ -78,7 +82,8 @@ public struct InkBottomNav<ID: Hashable>: View {
                         label: item.label,
                         icon: item.icon,
                         isSelected: selection == item.id,
-                        showLabel: showLabels
+                        showLabel: showLabels,
+                        iconSize: iconSize
                     )
                 }
                 .buttonStyle(InkBottomNavButtonStyle())
@@ -250,9 +255,9 @@ private struct InkBottomNavItem: View {
     let icon: InkTabIcon
     let isSelected: Bool
     let showLabel: Bool
+    let iconSize: CGFloat
     @Environment(\.inkPalette) private var palette
 
-    private var iconSize: CGFloat { 18 }
     /// Push label below the centered icon without growing the bar layout height.
     private var labelOffsetY: CGFloat {
         iconSize / 2 + InkSpace.xxs + 6 + 4
