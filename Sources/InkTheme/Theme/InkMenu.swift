@@ -83,7 +83,7 @@ public struct InkMenu<Label: View, Content: View>: View {
             HStack(spacing: 4) {
                 label()
                 Image(systemName: "chevron.down")
-                    .font(.system(size: 10, weight: .semibold))
+                    .font(.system(size: 12, weight: .semibold))
             }
             .foregroundStyle(palette.foreground)
             .padding(.horizontal, 10)
@@ -201,7 +201,7 @@ public struct InkMenuPickerTitle: View {
 
     public var body: some View {
         Text(title)
-            .inkText(.caption, size: .xxs)
+            .inkText(.caption, size: .md)
             .lineLimit(1)
     }
 }

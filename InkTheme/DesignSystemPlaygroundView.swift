@@ -410,9 +410,9 @@ struct DesignSystemPlaygroundView: View {
                 ) { type in
                     HStack(spacing: 4) {
                         Image(systemName: type.systemImage)
-                            .font(.system(size: 11, weight: .semibold))
+                            .font(.system(size: 15, weight: .semibold))
                         Text(type.label)
-                            .inkText(.caption, size: .xxs)
+                            .inkText(.caption, size: .md)
                             .lineLimit(1)
                     }
                 }
