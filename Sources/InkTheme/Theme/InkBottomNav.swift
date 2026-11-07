@@ -68,7 +68,34 @@ public struct InkBottomNav<ID: Hashable>: View {
     }
 
     public var body: some View {
-        ZStack {
+        HStack(spacing: 0) {
+            ForEach(items) { item in
+                Button {
+                    selection = item.id
+                } label: {
+                    InkBottomNavItem(
+                        label: item.label,
+                        icon: item.icon,
+                        isSelected: selection == item.id,
+                        showLabel: showLabels
+                    )
+                }
+                .buttonStyle(InkBottomNavButtonStyle())
+                .accessibilityLabel(item.label)
+                .background {
+                    GeometryReader { geo in
+                        Color.clear.preference(
+                            key: InkTabCenterPreferenceKey.self,
+                            value: [
+                                AnyHashable(item.id): geo.frame(in: .named(tabBarSpace)).midX
+                            ]
+                        )
+                    }
+                }
+            }
+        }
+        // Draw behind the tabs in the same bounds as `tabBarSpace` so midX matches the pill.
+        .background {
             if hasPlacedHighlight {
                 InkStretchTabHighlight(
                     fromX: fromX,
@@ -78,33 +105,6 @@ public struct InkBottomNav<ID: Hashable>: View {
                     color: palette.ink.opacity(0.05)
                 )
                 .allowsHitTesting(false)
-            }
-
-            HStack(spacing: 0) {
-                ForEach(items) { item in
-                    Button {
-                        selection = item.id
-                    } label: {
-                        InkBottomNavItem(
-                            label: item.label,
-                            icon: item.icon,
-                            isSelected: selection == item.id,
-                            showLabel: showLabels
-                        )
-                    }
-                    .buttonStyle(InkBottomNavButtonStyle())
-                    .accessibilityLabel(item.label)
-                    .background {
-                        GeometryReader { geo in
-                            Color.clear.preference(
-                                key: InkTabCenterPreferenceKey.self,
-                                value: [
-                                    AnyHashable(item.id): geo.frame(in: .named(tabBarSpace)).midX
-                                ]
-                            )
-                        }
-                    }
-                }
             }
         }
         .coordinateSpace(name: tabBarSpace)
@@ -125,13 +125,33 @@ public struct InkBottomNav<ID: Hashable>: View {
 
     private func applyCenters(_ newCenters: [AnyHashable: CGFloat]) {
         centers = newCenters
-        guard !hasPlacedHighlight,
-              let x = newCenters[AnyHashable(selection)]
+        // First layout often reports 0 / partial centers; wait until every tab has a real midX.
+        guard items.allSatisfy({ item in
+            (newCenters[AnyHashable(item.id)] ?? 0) > 0
+        }),
+        let x = newCenters[AnyHashable(selection)], x > 0
         else { return }
-        fromX = x
-        toX = x
-        morphProgress = 1
-        hasPlacedHighlight = true
+
+        if !hasPlacedHighlight {
+            pinHighlight(to: x)
+            return
+        }
+
+        // Re-pin while idle so a bad first frame (or rotation / width change) is corrected.
+        guard morphProgress >= 1 else { return }
+        guard abs(fromX - x) > 0.5 || abs(toX - x) > 0.5 else { return }
+        pinHighlight(to: x)
+    }
+
+    private func pinHighlight(to x: CGFloat) {
+        var reset = Transaction()
+        reset.disablesAnimations = true
+        withTransaction(reset) {
+            fromX = x
+            toX = x
+            morphProgress = 1
+            hasPlacedHighlight = true
+        }
     }
 
     private func morphHighlight(from old: ID, to new: ID) {
@@ -231,7 +251,7 @@ private struct InkBottomNavItem: View {
     let showLabel: Bool
     @Environment(\.inkPalette) private var palette
 
-    private var iconSize: CGFloat { showLabel ? 18 : 22 }
+    private var iconSize: CGFloat { showLabel ? 18 : 18 }
 
     var body: some View {
         Group {
