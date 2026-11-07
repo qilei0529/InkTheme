@@ -28,11 +28,11 @@ public struct InkMenuRow: View {
             HStack(spacing: InkSpace.sm) {
                 if let systemImage {
                     Image(systemName: systemImage)
-                        .font(.system(size: 13, weight: .semibold))
-                        .frame(width: 16, alignment: .center)
+                        .font(.system(size: 16, weight: .semibold))
+                        .frame(width: 20, alignment: .center)
                 }
                 Text(title)
-                    .inkText(.bodyStrong, size: .xs)
+                    .inkText(.bodyStrong, size: .md)
                     .lineLimit(1)
                     .fixedSize(horizontal: true, vertical: false)
                 Image(systemName: "checkmark")
@@ -82,10 +82,10 @@ public struct InkMenu<Label: View, Content: View>: View {
         } label: {
             HStack(spacing: 4) {
                 label()
-                Image(systemName: "chevron.up.chevron.down")
-                    .font(.system(size: 9, weight: .semibold))
+                Image(systemName: "chevron.down")
+                    .font(.system(size: 10, weight: .semibold))
             }
-            .foregroundStyle(palette.foreground.opacity(isEnabled ? 0.75 : 0.35))
+            .foregroundStyle(palette.foreground)
             .padding(.horizontal, 10)
             .frame(minHeight: Ink.barButtonHeight)
             .background {
@@ -94,8 +94,8 @@ public struct InkMenu<Label: View, Content: View>: View {
                     .overlay {
                         RoundedRectangle(cornerRadius: inkRadius.button, style: .continuous)
                             .stroke(
-                                palette.border.opacity(isPresented ? 1 : 0.45),
-                                lineWidth:  Ink.borderWidth
+                                isPresented ? palette.primary : palette.border,
+                                lineWidth: Ink.borderWidth
                             )
                     }
             }
