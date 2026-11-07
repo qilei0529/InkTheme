@@ -57,7 +57,8 @@ public struct InkBottomNav<ID: Hashable>: View {
         self.frostedOpacity = frostedOpacity
     }
 
-    /// Content row height (excludes home-indicator safe area).
+    /// Content row height (excludes home-indicator safe area). Fixed whether labels are shown —
+    /// labels are drawn with an offset and do not grow the bar.
     public static var contentHeight: CGFloat {
         InkSpace.sm + Ink.buttonHeight
     }
@@ -251,18 +252,21 @@ private struct InkBottomNavItem: View {
     let showLabel: Bool
     @Environment(\.inkPalette) private var palette
 
-    private var iconSize: CGFloat { showLabel ? 18 : 18 }
+    private var iconSize: CGFloat { 18 }
+    /// Push label below the centered icon without growing the bar layout height.
+    private var labelOffsetY: CGFloat {
+        iconSize / 2 + InkSpace.xxs + 6 + 4
+    }
 
     var body: some View {
-        Group {
+        ZStack {
+            iconView
             if showLabel {
-                VStack(spacing: InkSpace.xxs) {
-                    iconView
-                    Text(label)
-                        .inkFont(size: 10, weight: .regular)
-                }
-            } else {
-                iconView
+                Text(label)
+                    .inkFont(size: 10, weight: .regular)
+                    .lineLimit(1)
+                    .offset(y: labelOffsetY)
+                    .padding(.top, 4)
             }
         }
         // Unselected stays near-ink; selected uses primary (brand accent when themed).
